@@ -1,0 +1,4 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "NEXT_DISABLE_TURBOPACK=1 npx next build"
+}
