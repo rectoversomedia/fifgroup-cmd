@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 const FIFGO_LOGO = 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/FIFGO_APP_LOGO-1780892650611.png';
-const FIFADA_LOGO = 'https://www.fifgroup.co.id/assets/images/png/fifada-logo.png';
+const FIFADA_LOGO = 'https://scontent-cgk2-1.cdninstagram.com/v/t51.2885-19/49858272_338347660347827_7285482938928463872_n.jpg?stp=dst-jpg_s100x100_tt6&_nc_cat=106&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MTIuQzMifQ%3D%3D&_nc_ohc=bIdS5-hmhaMQ7kNvwHRAgTa&_nc_oc=AdrifddXOrGA5_zK-ZfF12fUMNEhqGQI05S0gpwA9bpPeuPdP-rlpUYcI2F6DK7Edp-aW8lcFzdjGJbA-PRKu02X&_nc_zt=24&_nc_ht=scontent-cgk2-1.cdninstagram.com&_nc_ss=7f60f&oh=00_AQDhtqX_BnGYvs3T00h1Av3rLy_9_Zmaja8YrqVFlcTbDw&oe=6A68ABD2';
 const LOB_LOGOS: Record<string, string> = {
   FIFASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FIFASTRA-1780538519035.png',
   SPEKTRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20SPEKTRA-1780538544863.png',
