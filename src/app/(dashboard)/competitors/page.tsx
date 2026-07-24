@@ -5,59 +5,59 @@ import { Globe, TrendUp, TrendDown, Star } from '@phosphor-icons/react';
 
 const COMPETITORS = [
   {
-    name: 'Akulaku',
-    type: 'Digital Lending',
+    name: 'Adira Finance',
+    type: 'Multi Asset Financing',
     rating: '4.1',
-    mau: '4.2M',
-    downloads: '18M',
-    color: '#7c3aed',
-    strength: ['Fast disbursement (15 min)', 'Strong tech stack', 'Good UX'],
-    weakness: ['Higher interest rates', 'Limited LoB coverage'],
+    mau: '1.8M',
+    downloads: '6.2M',
+    color: '#dc2626',
+    strength: ['Strong motorcycle financing brand', 'Nationwide branch network', 'Adira e-wallet integration'],
+    weakness: ['Mostly offline', 'Slower digital adoption', 'Higher interest rates'],
     share: 28,
   },
   {
-    name: 'Kredivo',
-    type: 'BNPL + Lending',
-    rating: '4.3',
-    mau: '3.8M',
-    downloads: '14M',
+    name: 'BFI Finance',
+    type: 'Motorcycle & Auto',
+    rating: '4.0',
+    mau: '2.1M',
+    downloads: '4.8M',
+    color: '#0284c7',
+    strength: ['Largest motorcycle financing', 'Widest branch coverage', 'Strong repeat customers'],
+    weakness: ['Legacy tech stack', 'Complex onboarding', 'App UX lags competitors'],
+    share: 32,
+  },
+  {
+    name: 'BAF (Bussan Auto)',
+    type: 'Yamaha Motorcycle',
+    rating: '3.9',
+    mau: '1.4M',
+    downloads: '3.1M',
+    color: '#7c3aed',
+    strength: ['Yamaha partnership exclusive', 'Fast Yamaha claims process', 'Loyal Yamaha dealer network'],
+    weakness: ['Single brand dependency', 'Limited digital features', 'No multi-product offering'],
+    share: 22,
+  },
+  {
+    name: 'WOM Finance',
+    type: 'Motorcycle Financing',
+    rating: '3.8',
+    mau: '680K',
+    downloads: '1.2M',
+    color: '#d97706',
+    strength: ['Aggressive pricing', 'Fast approval cycle'],
+    weakness: ['Small app ecosystem', 'Limited app features'],
+    share: 8,
+  },
+  {
+    name: 'SMS Finance',
+    type: 'Motorcycle & Micro',
+    rating: '3.7',
+    mau: '420K',
+    downloads: '890K',
     color: '#059669',
-    strength: ['BNPL leader', 'Strong brand', 'Multi-merchant'],
-    weakness: ['Longer approval time', 'Complex T&Cs'],
-    share: 24,
-  },
-  {
-    name: 'Dana',
-    type: 'E-Wallet',
-    rating: '4.4',
-    mau: '25M',
-    downloads: '45M',
-    color: '#4f8ef7',
-    strength: ['Largest e-wallet user base', 'Ecosystem plays', 'PayLater growing'],
-    weakness: ['Lending is secondary', 'Lower loan limits'],
-    share: 18,
-  },
-  {
-    name: 'OVO',
-    type: 'E-Wallet + Lending',
-    rating: '4.2',
-    mau: '18M',
-    downloads: '32M',
-    color: '#dc2626',
-    strength: ['FIFGROUP partnership', 'Strong offline presence', 'PayLater integration'],
-    weakness: ['Smaller MAU than Dana', 'Slower tech adoption'],
-    share: 12,
-  },
-  {
-    name: 'Gojek / GoPay',
-    type: 'Super App',
-    rating: '4.3',
-    mau: '22M',
-    downloads: '55M',
-    color: '#10b981',
-    strength: ['Largest super app', 'GoPayLater', 'Strong brand'],
-    weakness: ['Crowded app', 'Complex UX for loans'],
-    share: 10,
+    strength: ['Competitive rates', 'Micro lending focus'],
+    weakness: ['Small brand recognition', 'Limited digital presence'],
+    share: 6,
   },
 ];
 
@@ -66,13 +66,13 @@ export default function CompetitorsPage() {
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <div>
         <h1 className="text-2xl font-extrabold" style={{ color: '#111827' }}>Competitor Landscape</h1>
-        <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>Digital lending & fintech market — July 2026</p>
+        <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>Indonesian multi-finance & fintech market — July 2026</p>
       </div>
 
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-4 gap-5">
         {[
-          { label: 'Market Competitors', value: '5+', sub: 'Key players tracked', color: '#4f8ef7' },
+          { label: 'Market Competitors', value: '5', sub: 'Key players tracked', color: '#4f8ef7' },
           { label: 'FIFGROUP Strength', value: '5 LoBs', sub: 'Full-stack coverage', color: '#10b981' },
           { label: 'FIFGO Downloads', value: '850K', sub: 'Fastest growing', color: '#8b5cf6' },
           { label: 'CDP Advantage', value: 'Unique', sub: 'Full journey tracking', color: '#f59e0b' },
@@ -106,68 +106,57 @@ export default function CompetitorsPage() {
         ))}
       </div>
 
-      {/* SWOT-style Comparison */}
+      {/* Comparison Table */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <h3 className="text-sm font-bold mb-5" style={{ color: '#111827' }}>Competitor Feature Comparison</h3>
+        <h3 className="text-sm font-bold mb-5" style={{ color: '#111827' }}>Feature Comparison — Traditional Multi-Finance vs FIFGROUP Digital</h3>
         <table className="w-full">
           <thead>
             <tr className="text-[11px] font-semibold uppercase" style={{ color: '#9ca3af', borderBottom: '1px solid #f3f4f6' }}>
               <th className="text-left pb-2 pr-4">Competitor</th>
               <th className="text-center pb-2 pr-4">Rating</th>
-              <th className="text-center pb-2 pr-4">Disburse Speed</th>
+              <th className="text-center pb-2 pr-4">MAU</th>
+              <th className="text-center pb-2 pr-4">App Speed</th>
               <th className="text-center pb-2 pr-4">LoB Coverage</th>
               <th className="text-center pb-2 pr-4">CDP / Journey</th>
-              <th className="text-center pb-2">MAU</th>
+              <th className="text-center pb-2">Branch Network</th>
             </tr>
           </thead>
           <tbody>
             {COMPETITORS.map(c => (
               <tr key={c.name} style={{ borderBottom: '1px solid #f9fafb' }}>
-                <td className="py-3.5 pr-4">
-                  <span className="text-sm font-bold" style={{ color: c.color }}>{c.name}</span>
-                </td>
-                <td className="py-3.5 pr-4 text-center">
-                  <span className="text-sm font-bold" style={{ color: '#f59e0b' }}>{c.rating}★</span>
-                </td>
-                <td className="py-3.5 pr-4 text-center">
-                  <span className="text-sm font-medium" style={{ color: '#374151' }}>{(Math.random() * 20 + 5).toFixed(0)} min</span>
-                </td>
-                <td className="py-3.5 pr-4 text-center">
-                  <span className="text-sm font-medium" style={{ color: '#374151' }}>{Math.floor(Math.random() * 2 + 1)} LoB</span>
-                </td>
-                <td className="py-3.5 pr-4 text-center">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: '#fee2e2', color: '#dc2626' }}>No</span>
-                </td>
-                <td className="py-3.5 text-center">
-                  <span className="text-sm font-bold" style={{ color: '#111827' }}>{c.mau}</span>
-                </td>
+                <td className="py-3.5 pr-4"><span className="text-sm font-bold" style={{ color: c.color }}>{c.name}</span></td>
+                <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#f59e0b' }}>{c.rating}★</span></td>
+                <td className="py-3.5 pr-4 text-center"><span className="text-sm font-medium" style={{ color: '#374151' }}>{c.mau}</span></td>
+                <td className="py-3.5 pr-4 text-center"><span className="text-sm font-medium" style={{ color: '#374151' }}>{(Math.random() * 5 + 2).toFixed(1)} days</span></td>
+                <td className="py-3.5 pr-4 text-center"><span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: '#fef3c7', color: '#92400e' }}>1 LoB</span></td>
+                <td className="py-3.5 pr-4 text-center"><span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: '#fee2e2', color: '#dc2626' }}>No</span></td>
+                <td className="py-3.5 text-center"><span className="text-sm font-medium" style={{ color: '#059669' }}>Extensive</span></td>
               </tr>
             ))}
             <tr style={{ background: '#f0fdf4' }}>
               <td className="py-3.5 pr-4"><span className="text-sm font-bold" style={{ color: '#1e3a5f' }}>FIFGO + FIFADA</span></td>
               <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#f59e0b' }}>4.2★</span></td>
+              <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#111827' }}>296K</span></td>
               <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#059669' }}>3.2 days</span></td>
-              <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#059669' }}>5 LoBs</span></td>
-              <td className="py-3.5 pr-4 text-center">
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: '#dcfce7', color: '#059669' }}>Yes</span>
-              </td>
-              <td className="py-3.5 text-center"><span className="text-sm font-bold" style={{ color: '#111827' }}>296K</span></td>
+              <td className="py-3.5 pr-4 text-center"><span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: '#dcfce7', color: '#059669' }}>5 LoBs</span></td>
+              <td className="py-3.5 pr-4 text-center"><span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: '#dcfce7', color: '#059669' }}>Yes</span></td>
+              <td className="py-3.5 text-center"><span className="text-sm font-medium" style={{ color: '#6b7280' }}>Nationwide</span></td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      {/* FIFGROUP Advantages */}
+      {/* Advantages + Areas to Improve */}
       <div className="grid grid-cols-2 gap-5">
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>FIFGROUP Key Advantages</h3>
           <div className="space-y-3">
             {[
-              { text: 'Only player with 5 full LoBs under one ecosystem', color: '#10b981' },
+              { text: 'Only player with 5 full LoBs under one digital ecosystem', color: '#10b981' },
               { text: 'Insider CDP — full user journey tracking & automation', color: '#4f8ef7' },
-              { text: 'Branch network coverage + digital app (offline-to-online)', color: '#8b5cf6' },
-              { text: 'Deep FIFGROUP brand trust across Indonesia', color: '#f59e0b' },
-              { text: 'Bill Reminder journey: 94% collection rate', color: '#06b6d4' },
+              { text: 'FIFGO Super App + FIFADA — digital-first with branch backup', color: '#8b5cf6' },
+              { text: 'Bill Reminder journey: 94% collection rate via CDP', color: '#06b6d4' },
+              { text: 'Branch network coverage + full digital app (offline-to-online)', color: '#f59e0b' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: `${item.color}08` }}>
                 <TrendUp size={14} style={{ color: item.color }} weight="fill" />
@@ -181,11 +170,11 @@ export default function CompetitorsPage() {
           <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Areas to Improve</h3>
           <div className="space-y-3">
             {[
-              { text: 'FIFADA app health: crash rate 1.4% (threshold 0.5%)', color: '#dc2626' },
+              { text: 'FIFADA app health: crash rate 1.4% — threshold 0.5%', color: '#dc2626' },
               { text: 'SPEKTRA document drop-off: 62% at upload stage', color: '#dc2626' },
-              { text: 'Disbursement speed: 3.2 days vs Akulaku 15 min', color: '#f59e0b' },
-              { text: 'App rating: 4.2 vs Kredivo 4.3 — improve UX', color: '#f59e0b' },
-              { text: 'Post-disbursement journey: still in draft', color: '#f59e0b' },
+              { text: 'Disbursement speed: 3.2 days vs competitors 2-5 days avg', color: '#f59e0b' },
+              { text: 'MAU gap: 296K vs BFI 2.1M — need aggressive user growth', color: '#f59e0b' },
+              { text: 'Post-disbursement journey: still in draft, not live yet', color: '#f59e0b' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: `${item.color}08` }}>
                 <TrendDown size={14} style={{ color: item.color }} weight="fill" />
