@@ -1,4 +1,8 @@
 node_modules/
 .next/
 *.local
+.env.local
+.env*.local
+*.log
+.vercel/
 .vercel
