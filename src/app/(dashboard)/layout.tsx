@@ -5,27 +5,58 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Bell, List, User,
-  ChartBar, DeviceMobile, CurrencyCircleDollar, Stack,
-  Users, Lightning, Megaphone, Rocket,
-  Pulse, Database, Globe, Brain,
+  ChartBar, Star, Stack,
+  CurrencyCircleDollar, Globe,
+  Megaphone, Database, Pulse, Brain,
 } from '@phosphor-icons/react';
 
 const FIFGROUP_LOGO = 'https://www.fifgroup.co.id/assets/images/png/fifgroup-logo-v2-20260423.png';
 
-const NAV = [
-  { href: '/',                     label: 'Portfolio Overview',      icon: ChartBar,              color: '#1e3a5f' },
-  { href: '/app-health',            label: 'App Health',            icon: DeviceMobile,          color: '#4f8ef7' },
-  { href: '/sales',                label: 'Sales & Disbursement',   icon: CurrencyCircleDollar,   color: '#10b981' },
-  { href: '/lob',                  label: 'LoB Performance',        icon: Stack,                color: '#8b5cf6' },
-  { href: '/customer-intelligence',label: 'Customer Intelligence',  icon: Users,                color: '#06b6d4' },
-  { href: '/automation',           label: 'Automation',             icon: Lightning,             color: '#f59e0b' },
-  { href: '/marketing',             label: 'Marketing',              icon: Megaphone,             color: '#f97316' },
-  { href: '/campaigns',            label: 'Campaigns',              icon: Rocket,               color: '#ec4899' },
-  { href: '/events',               label: 'Events',                 icon: Pulse,                color: '#14b8a6' },
-  { href: '/insider',             label: 'Insider CDP',            icon: Database,             color: '#6366f1' },
-  { href: '/competitors',          label: 'Competitors',            icon: Globe,                color: '#64748b' },
-  { href: '/recommendations',      label: 'AI Insights',            icon: Brain,                color: '#a855f7' },
-  { href: '/alerts',              label: 'Alert Center',           icon: Bell,                 color: '#dc2626' },
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ElementType;
+  color: string;
+  badge?: number;
+};
+
+type NavGroup = {
+  label: string;
+  items: NavItem[];
+};
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Executive',
+    items: [
+      { href: '/',                     label: 'Portfolio Overview',     icon: ChartBar,           color: '#1e3a5f' },
+      { href: '/alerts',             label: 'Alert Center',          icon: Bell,               color: '#dc2626' },
+    ],
+  },
+  {
+    label: 'Digital Products',
+    items: [
+      { href: '/fifgo',    label: 'FIFGO App',          icon: Star,               color: '#06b6d4' },
+      { href: '/fifada',  label: 'FIFADA App',         icon: Star,              color: '#f59e0b' },
+      { href: '/lob',     label: 'LoB Performance',    icon: Stack,             color: '#8b5cf6' },
+    ],
+  },
+  {
+    label: 'Commercial',
+    items: [
+      { href: '/sales',        label: 'Sales & Disbursement', icon: CurrencyCircleDollar, color: '#10b981' },
+      { href: '/competitors',  label: 'Competitors',          icon: Globe,               color: '#64748b' },
+    ],
+  },
+  {
+    label: 'Growth & CDP',
+    items: [
+      { href: '/marketing',       label: 'Marketing & Campaigns', icon: Megaphone,  color: '#f97316' },
+      { href: '/cdp',          label: 'CDP & Journeys',       icon: Database,  color: '#6366f1' },
+      { href: '/events',       label: 'Events Monitor',        icon: Pulse,     color: '#14b8a6' },
+      { href: '/recommendations', label: 'AI Insights',        icon: Brain,     color: '#a855f7' },
+    ],
+  },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -39,7 +70,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => clearInterval(timer);
   }, []);
 
-  const activeAlertCount = 2;
+  const activeAlertCount = 3;
 
   const timeStr = lastUpdated.toLocaleTimeString('id-ID', {
     hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta',
@@ -47,6 +78,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const sidebarContent = (
     <>
+      {/* Logo */}
       <div className="h-16 flex items-center justify-center shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
         <img
           src={FIFGROUP_LOGO}
@@ -56,6 +88,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
       </div>
 
+      {/* Live Indicator */}
       {!collapsed && (
         <div className="px-4 py-2 flex items-center gap-2 shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
           <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot shrink-0" />
@@ -64,41 +97,55 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       )}
 
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-        {NAV.map(item => {
-          const isActive = item.href === '/'
-            ? pathname === '/'
-            : pathname.startsWith(item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all md:text-[13px] text-sm"
-              style={{
-                background: isActive ? `${item.color}12` : 'transparent',
-                color: isActive ? item.color : '#64748b',
-                fontWeight: isActive ? 700 : 500,
-              }}
-            >
-              <Icon
-                size={20}
-                weight={isActive ? 'fill' : 'regular'}
-                style={{ color: isActive ? item.color : '#94a3b8', flexShrink: 0 }}
-              />
-              {!collapsed && <span>{item.label}</span>}
-              {item.href === '/alerts' && activeAlertCount > 0 && !collapsed && (
-                <span className="ml-auto w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shrink-0"
-                  style={{ background: '#dc2626' }}>
-                  {activeAlertCount}
-                </span>
-              )}
-            </Link>
-          );
-        })}
+      {/* Nav groups */}
+      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
+        {NAV_GROUPS.map(group => (
+          <div key={group.label}>
+            {!collapsed && (
+              <p className="text-[9px] font-extrabold uppercase tracking-widest px-3 mb-1.5" style={{ color: '#d1d5db' }}>
+                {group.label}
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {group.items.map(item => {
+                const isActive = item.href === '/'
+                  ? pathname === '/'
+                  : pathname.startsWith(item.href);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all md:text-[13px] text-sm"
+                    style={{
+                      background: isActive ? `${item.color}12` : 'transparent',
+                      color: isActive ? item.color : '#64748b',
+                      fontWeight: isActive ? 700 : 500,
+                    }}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <Icon
+                      size={20}
+                      weight={isActive ? 'fill' : 'regular'}
+                      style={{ color: isActive ? item.color : '#94a3b8', flexShrink: 0 }}
+                    />
+                    {!collapsed && <span>{item.label}</span>}
+                    {item.href === '/alerts' && activeAlertCount > 0 && !collapsed && (
+                      <span className="ml-auto w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shrink-0"
+                        style={{ background: '#dc2626' }}>
+                        {activeAlertCount}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
+      {/* Collapse button */}
       <div className="p-3 shrink-0 hidden md:block" style={{ borderTop: '1px solid #f3f4f6' }}>
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -113,6 +160,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#f8fafc' }}>
+      {/* Desktop Sidebar */}
       <aside
         className="hidden md:flex flex-col bg-white transition-all duration-200 overflow-hidden shrink-0"
         style={{ width: collapsed ? 72 : 240, borderRight: '1px solid #f1f5f9', zIndex: 10 }}
@@ -120,6 +168,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {sidebarContent}
       </aside>
 
+      {/* Mobile Sidebar Overlay */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-40 md:hidden"
@@ -134,7 +183,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {sidebarContent}
       </aside>
 
+      {/* Main */}
       <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Bar */}
         <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3 md:hidden">
             <button
@@ -185,6 +236,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
 
+        {/* Page Content */}
         <div className="flex-1 overflow-y-auto">
           {children}
         </div>
