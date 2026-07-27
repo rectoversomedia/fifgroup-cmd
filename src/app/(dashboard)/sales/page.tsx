@@ -209,8 +209,13 @@ export default function SalesPage() {
   const { data: disbursements, isLoading: loadingDisb } = useRealtime(getDisbursementsByLoB, 30_000);
   const [drillStage, setDrillStage] = React.useState<string | null>(null);
 
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
+  const [timeStr, setTimeStr] = React.useState('--:--');
+
+  React.useEffect(() => {
+    setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }));
+    const t = setInterval(() => setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })), 30_000);
+    return () => clearInterval(t);
+  }, []);
 
   const funnelData = funnel ?? [
     { stage: 'Banner Viewed',  count: 124_800, color: '#4f8ef7' },

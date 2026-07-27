@@ -74,6 +74,7 @@ export default function PortfolioPage() {
   const { data: kpis, isLoading } = useRealtime(getDashboardKPIs, 30_000);
   const [tick, setTick] = React.useState(0);
   const [, forceUpdate] = React.useState(0);
+  const [timeStr, setTimeStr] = React.useState('--:--');
 
   // Simulate live ticks
   React.useEffect(() => {
@@ -81,8 +82,11 @@ export default function PortfolioPage() {
     return () => clearInterval(t);
   }, []);
 
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
+  React.useEffect(() => {
+    setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }));
+    const timer = setInterval(() => setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })), 30_000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="p-4 sm:p-6 space-y-6 bg-gray-50 min-h-screen">

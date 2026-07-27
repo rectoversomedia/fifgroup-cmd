@@ -115,6 +115,14 @@ const TABS: { id: Tab; label: string }[] = [
 export default function MarketingPage() {
   const [tab, setTab] = React.useState<Tab>('channels');
   const [selectedCampaign, setSelectedCampaign] = React.useState('ramadan-promo');
+  const [timeStr, setTimeStr] = React.useState('--:--');
+
+  React.useEffect(() => {
+    setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }));
+    const t = setInterval(() => setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })), 30_000);
+    return () => clearInterval(t);
+  }, []);
+
   const campaign = CAMPAIGNS.find(c => c.id === selectedCampaign)!;
   const totalSent = CHANNELS.reduce((s, c) => s + c.sent, 0);
   const totalConverted = CHANNELS.reduce((s, c) => s + c.converted, 0);
@@ -125,8 +133,6 @@ export default function MarketingPage() {
   const avgRoas = totalSpend > 0 ? Math.round(totalRevenue / totalSpend) : 0;
   const bestConv = Math.max(...CHANNELS.map(c => c.converted / c.sent * 100));
 
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
 
   return (
     <div className="p-4 sm:p-6 space-y-5 bg-gray-50 min-h-screen">

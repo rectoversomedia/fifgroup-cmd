@@ -153,13 +153,18 @@ function Skeleton({ className = '' }: { className?: string }) {
 export default function LoBPage() {
   const [selectedLoB, setSelectedLoB] = React.useState('fifastra');
   const [drilledLoB, setDrilledLoB] = React.useState<string | null>(null);
+  const [timeStr, setTimeStr] = React.useState('--:--');
+
+  React.useEffect(() => {
+    setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }));
+    const t = setInterval(() => setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })), 30_000);
+    return () => clearInterval(t);
+  }, []);
   const { data: disbData, isLoading } = useRealtime(getDisbursementsByLoB, 30_000);
 
   const current = LOBS.find(l => l.id === selectedLoB)!;
   const drilled = LOBS.find(l => l.id === drilledLoB);
 
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
 
   // Radar chart — cross-LoB comparison across 4 dimensions
   const radarData = [

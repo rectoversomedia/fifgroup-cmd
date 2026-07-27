@@ -11,6 +11,13 @@ const FIFADA_LOGO = '/images/fifada-logo.jpg';
 
 export default function FIFADAPage() {
   const [tab, setTab] = React.useState<'overview' | 'reviews' | 'health'>('overview');
+  const [timeStr, setTimeStr] = React.useState('--:--');
+
+  React.useEffect(() => {
+    setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }));
+    const t = setInterval(() => setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })), 30_000);
+    return () => clearInterval(t);
+  }, []);
 
   const negativeReviews = [
     { author: 'Joko P.', rating: 1, date: '1 Jul 2026', text: 'Sudah 7 hari belum cair, pihak cabang bilang tunggu. Sangat mengecewakan!' },
@@ -40,8 +47,6 @@ export default function FIFADAPage() {
     { severity: 'medium', text: 'Push delivery 89% — below 95% target. Check FCM configuration.', date: '20 Jul 2026' },
   ];
 
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
 
   return (
     <div className="p-4 sm:p-6 space-y-5 bg-gray-50 min-h-screen">

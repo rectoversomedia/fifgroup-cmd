@@ -62,19 +62,20 @@ const NAV_GROUPS: NavGroup[] = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [lastUpdated, setLastUpdated] = React.useState<Date>(new Date());
+  const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
   const pathname = usePathname();
 
   React.useEffect(() => {
+    setLastUpdated(new Date());
     const timer = setInterval(() => setLastUpdated(new Date()), 30_000);
     return () => clearInterval(timer);
   }, []);
 
   const activeAlertCount = 3;
 
-  const timeStr = lastUpdated.toLocaleTimeString('id-ID', {
-    hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta',
-  });
+  const timeStr = lastUpdated
+    ? lastUpdated.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })
+    : '--:--';
 
   const sidebarContent = (
     <>

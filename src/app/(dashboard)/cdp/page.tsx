@@ -149,11 +149,16 @@ const TABS: { id: Tab; label: string }[] = [
 export default function CDPPage() {
   const [tab, setTab] = React.useState<Tab>('overview');
   const [selectedJourney, setSelectedJourney] = React.useState('new-user');
+  const [timeStr, setTimeStr] = React.useState('--:--');
   const journey = JOURNEYS.find(j => j.id === selectedJourney)!;
   const totalUsers = SEGMENTS.reduce((s, seg) => s + seg.count, 0);
   const totalActive = JOURNEYS.filter(j => j.status === 'active').length;
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
+
+  React.useEffect(() => {
+    setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }));
+    const t = setInterval(() => setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })), 30_000);
+    return () => clearInterval(t);
+  }, []);
 
   return (
     <div className="p-4 sm:p-6 space-y-5 bg-gray-50 min-h-screen">
