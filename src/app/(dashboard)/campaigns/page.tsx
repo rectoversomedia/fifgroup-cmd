@@ -147,6 +147,12 @@ export default function CampaignsPage() {
   const campaign = CAMPAIGNS.find(c => c.id === selected)!;
   const totalLive = CAMPAIGNS.filter(c => c.status === 'live').length;
 
+  // Derive avg ROAS from actual revenue / spend of live campaigns
+  const liveCampaigns = CAMPAIGNS.filter(c => c.status === 'live' && c.revenue !== 'TBD');
+  const totalRevenue = liveCampaigns.reduce((s, c) => s + parseFloat(c.revenue.replace(/[Rp.\sB]/g, '')), 0);
+  const totalSpend = liveCampaigns.reduce((s, c) => s + parseFloat(c.spent.replace(/[Rp.\sBM]/g, '')), 0);
+  const avgRoas = totalSpend > 0 ? Math.round(totalRevenue / totalSpend) : 0;
+
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between">
@@ -167,7 +173,7 @@ export default function CampaignsPage() {
           { icon: Rocket, label: 'Live Campaigns', value: `${totalLive}/6`, color: '#4f8ef7' },
           { icon: ChartBar, label: 'Total Spend', value: 'Rp 1.15B', sub: 'of Rp 2.82B budget', color: '#f97316' },
           { icon: CurrencyCircleDollar, label: 'Attributed Revenue', value: 'Rp 108B', sub: 'All live campaigns', color: '#10b981' },
-          { icon: TrendUp, label: 'Avg ROAS', value: '480x', sub: 'Blended across campaigns', color: '#8b5cf6' },
+          { icon: TrendUp, label: 'Avg ROAS', value: `${avgRoas}x`, sub: 'Revenue / spend · live campaigns', color: '#8b5cf6' },
         ].map(m => (
           <div key={m.label} className="bg-white rounded-2xl p-5 border border-gray-200 flex flex-col items-center text-center">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: `${m.color}15` }}>

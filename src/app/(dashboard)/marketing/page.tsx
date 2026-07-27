@@ -8,7 +8,7 @@ const CHANNELS = [
   { channel: 'In-App Message', icon: Bell, sent: 234000, delivered: 234000, opened: 117000, clicked: 21060, converted: 7020, color: '#8b5cf6', cost: 'Rp 0', revenue: 'Rp 12.6B' },
   { channel: 'SMS', icon: Lightning, sent: 45600, delivered: 43600, opened: 0, clicked: 3928, converted: 1309, color: '#06b6d4', cost: 'Rp 45.6M', revenue: 'Rp 2.4B' },
   { channel: 'Email', icon: Envelope, sent: 89000, delivered: 80100, opened: 20025, clicked: 4005, converted: 801, color: '#f59e0b', cost: 'Rp 8.9M', revenue: 'Rp 1.4B' },
-  { channel: 'Branch /柜台', icon: Users, sent: 2800, delivered: 2800, opened: 2800, clicked: 1400, converted: 840, color: '#10b981', cost: 'Rp 280M', revenue: 'Rp 1.5B' },
+  { channel: 'Branch / Walk-in', icon: Users, sent: 2800, delivered: 2800, opened: 2800, clicked: 1400, converted: 840, color: '#10b981', cost: 'Rp 280M', revenue: 'Rp 1.5B' },
 ];
 
 const TEMPLATES = [
@@ -26,15 +26,26 @@ export default function MarketingPage() {
   const totalRevenue = CHANNELS.reduce((s, c) => s + parseFloat(c.revenue.replace(/[Rp.\sB]/g, '')), 0);
   const bestConv = Math.max(...CHANNELS.map(c => c.converted / c.sent * 100));
 
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
+
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      <div>
-        <h1 className="text-2xl font-extrabold" style={{ color: '#111827' }}>Marketing Channel Performance</h1>
-        <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>Omnichannel campaign tracking — July 2026</p>
+    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 min-h-screen">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-extrabold" style={{ color: '#111827' }}>Marketing Channel Performance</h1>
+          <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>Omnichannel campaign tracking — July 2026</p>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" />
+          <span className="text-[11px] font-medium" style={{ color: '#059669' }}>LIVE</span>
+          <span className="text-[11px]" style={{ color: '#9ca3af' }}>·</span>
+          <span className="text-[11px]" style={{ color: '#9ca3af' }}>{timeStr} WIB</span>
+        </div>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         {[
           { icon: TrendUp, label: 'Total Reach', value: `${Math.round(totalSent / 1000)}K`, sub: 'All channels', color: '#4f8ef7' },
           { icon: CheckCircle, label: 'Total Conversions', value: totalConverted.toLocaleString(), sub: 'All channels', color: '#10b981' },

@@ -8,7 +8,7 @@ const EVENTS = [
   { id: 2, name: 'kyc_completed', category: 'KYC', icon: CheckCircle, color: '#10b981', count: 62400, trend: '+8%', description: 'User completes identity verification' },
   { id: 3, name: 'application_started', category: 'Sales', icon: Lightning, color: '#8b5cf6', count: 52800, trend: '+15%', description: 'User begins loan application flow' },
   { id: 4, name: 'document_uploaded', category: 'Sales', icon: Lightning, color: '#f59e0b', count: 39400, trend: '+3%', description: 'User uploads required documents' },
-  { id: 5, name: 'loan_approved', category: 'Sales', icon: CheckCircle, color: '#10b981', count: 28000, trend: '+11%', description: 'Application approved by system' },
+  { id: 5, name: 'loan_approved', category: 'Sales', icon: CheckCircle, color: '#10b981', count: 9734, trend: '+11%', description: 'Application approved by system' },
   { id: 6, name: 'disbursement_completed', category: 'Sales', icon: CheckCircle, color: '#059669', count: 19200, trend: '+12%', description: 'Funds transferred to user account' },
   { id: 7, name: 'repayment_made', category: 'Collections', icon: CheckCircle, color: '#06b6d4', count: 15800, trend: '+9%', description: 'User makes scheduled repayment' },
   { id: 8, name: 'push_sent', category: 'Marketing', icon: Lightning, color: '#4f8ef7', count: 189000, trend: '+18%', description: 'Push notification dispatched' },

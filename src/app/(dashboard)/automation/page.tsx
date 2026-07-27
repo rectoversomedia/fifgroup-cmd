@@ -25,7 +25,7 @@ const performance = {
   'bill-reminder': [
     { label: 'Day -3 — First Reminder', sent: 45600, opened: 41040, converted: 41040, openRate: 90 },
     { label: 'Day -1 — Deadline Alert', sent: 45600, opened: 36480, converted: 34560, openRate: 80 },
-    { label: 'Day 0 — Final Notice', sent: 45600, opened: 41040, converted: 42000, openRate: 90 },
+    { label: 'Day 0 — Final Notice', sent: 45600, opened: 41040, converted: 41000, openRate: 90 },
   ],
   dormant: [
     { label: 'Day 0 — Nostalgic Message', sent: 8920, opened: 6244, converted: 0, openRate: 70 },
@@ -44,14 +44,23 @@ export default function AutomationPage() {
 
   const icons: Record<string, any> = { UserCirclePlus: Users, Crosshair: TrendUp, CheckCircle, Lightning, Rocket: Lightning };
 
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
+
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 min-h-screen">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-extrabold" style={{ color: '#111827' }}>Automation Pipeline</h1>
           <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>CDP journey management — July 2026</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" />
+            <span className="text-[11px] font-medium" style={{ color: '#059669' }}>LIVE</span>
+            <span className="text-[11px]" style={{ color: '#9ca3af' }}>·</span>
+            <span className="text-[11px]" style={{ color: '#9ca3af' }}>{timeStr} WIB</span>
+          </div>
           <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-emerald-50" style={{ color: '#059669' }}>{totalActive} Active</span>
           <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-amber-50" style={{ color: '#d97706' }}>1 Paused</span>
           <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-blue-50" style={{ color: '#1d4ed8' }}>1 Draft</span>
@@ -59,7 +68,7 @@ export default function AutomationPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         {[
           { icon: Users, label: 'Total Users in Journeys', value: totalUsers.toLocaleString(), color: '#4f8ef7' },
           { icon: CheckCircle, label: 'Active Journeys', value: `${totalActive}/5`, color: '#10b981' },
@@ -75,7 +84,7 @@ export default function AutomationPage() {
       </div>
 
       {/* Journey Pipeline */}
-      <div className="grid grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {JOURNEYS.map(j => {
           const isSelected = selected === j.id;
           const Icon = icons[j.icon] || Users;

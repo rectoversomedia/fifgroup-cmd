@@ -14,6 +14,7 @@ const COMPETITORS = [
     strength: ['Strong motorcycle financing brand', 'Nationwide branch network', 'Adira e-wallet integration'],
     weakness: ['Mostly offline', 'Slower digital adoption', 'Higher interest rates'],
     share: 28,
+    speedDays: 6.0,
   },
   {
     name: 'BFI Finance',
@@ -25,6 +26,7 @@ const COMPETITORS = [
     strength: ['Largest motorcycle financing', 'Widest branch coverage', 'Strong repeat customers'],
     weakness: ['Legacy tech stack', 'Complex onboarding', 'App UX lags competitors'],
     share: 32,
+    speedDays: 4.2,
   },
   {
     name: 'BAF (Bussan Auto)',
@@ -36,6 +38,7 @@ const COMPETITORS = [
     strength: ['Yamaha partnership exclusive', 'Fast Yamaha claims process', 'Loyal Yamaha dealer network'],
     weakness: ['Single brand dependency', 'Limited digital features', 'No multi-product offering'],
     share: 22,
+    speedDays: 6.5,
   },
   {
     name: 'WOM Finance',
@@ -47,6 +50,7 @@ const COMPETITORS = [
     strength: ['Aggressive pricing', 'Fast approval cycle'],
     weakness: ['Small app ecosystem', 'Limited app features'],
     share: 8,
+    speedDays: 5.0,
   },
   {
     name: 'SMS Finance',
@@ -58,6 +62,7 @@ const COMPETITORS = [
     strength: ['Competitive rates', 'Micro lending focus'],
     weakness: ['Small brand recognition', 'Limited digital presence'],
     share: 6,
+    speedDays: 4.7,
   },
 ];
 
@@ -127,14 +132,14 @@ export default function CompetitorsPage() {
                 <td className="py-3.5 pr-4"><span className="text-sm font-bold" style={{ color: c.color }}>{c.name}</span></td>
                 <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#f59e0b' }}>{c.rating}★</span></td>
                 <td className="py-3.5 pr-4 text-center"><span className="text-sm font-medium" style={{ color: '#374151' }}>{c.mau}</span></td>
-                <td className="py-3.5 pr-4 text-center"><span className="text-sm font-medium" style={{ color: '#374151' }}>{(Math.random() * 5 + 2).toFixed(1)} days</span></td>
+                <td className="py-3.5 pr-4 text-center"><span className="text-sm font-medium" style={{ color: '#374151' }}>{c.speedDays} days</span></td>
                 <td className="py-3.5 pr-4 text-center"><span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: '#fef3c7', color: '#92400e' }}>1 LoB</span></td>
                 <td className="py-3.5 pr-4 text-center"><span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: '#fee2e2', color: '#dc2626' }}>No</span></td>
                 <td className="py-3.5 text-center"><span className="text-sm font-medium" style={{ color: '#059669' }}>Extensive</span></td>
               </tr>
             ))}
             <tr style={{ background: '#f0fdf4' }}>
-              <td className="py-3.5 pr-4"><span className="text-sm font-bold" style={{ color: '#1e3a5f' }}>FIFGO + FIFADA</span></td>
+              <td className="py-3.5 pr-4"><span className="text-sm font-bold" style={{ color: '#1e3a5f' }}>FIFGO</span></td>
               <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#f59e0b' }}>4.2★</span></td>
               <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#111827' }}>296K</span></td>
               <td className="py-3.5 pr-4 text-center"><span className="text-sm font-bold" style={{ color: '#059669' }}>3.2 days</span></td>
@@ -154,7 +159,7 @@ export default function CompetitorsPage() {
             {[
               { text: 'Only player with 5 full LoBs under one digital ecosystem', color: '#10b981' },
               { text: 'Insider CDP — full user journey tracking & automation', color: '#4f8ef7' },
-              { text: 'FIFGO Super App + FIFADA — digital-first with branch backup', color: '#8b5cf6' },
+              { text: 'FIFGO Super App — digital-first with nationwide branch backup', color: '#8b5cf6' },
               { text: 'Bill Reminder journey: 94% collection rate via CDP', color: '#06b6d4' },
               { text: 'Branch network coverage + full digital app (offline-to-online)', color: '#f59e0b' },
             ].map((item, i) => (

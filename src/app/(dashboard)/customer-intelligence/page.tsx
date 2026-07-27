@@ -1,7 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import { FunnelChart, Funnel, LabelList, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Users, TrendUp, Crosshair, Rocket, UserCirclePlus, CheckCircle } from '@phosphor-icons/react';
+import { getCDPJourneys, getUserSegments } from '@/lib/data-sim';
+import { useRealtime } from '@/lib/use-realtime';
 
 const JOURNEYS = [
   {
@@ -37,7 +40,7 @@ const JOURNEYS = [
     steps: [
       { day: -3, action: 'Day -3: Tagihan Rp XXX jatuh besok', sent: 45600, opened: 41040, conv: 41040, openRate: 90 },
       { day: -1, action: 'Day -1: Reminder + link to pay', sent: 45600, opened: 36480, conv: 34560, openRate: 80 },
-      { day: 0, action: 'Day 0: Deadline alert — avoid late fee', sent: 45600, opened: 41040, conv: 42000, openRate: 90 },
+      { day: 0, action: 'Day 0: Deadline alert — avoid late fee', sent: 45600, opened: 41040, conv: 41000, openRate: 90 },
     ],
   },
   {
@@ -66,44 +69,66 @@ const JOURNEYS = [
   },
 ];
 
-const SEGMENTS = [
-  { label: 'New Users 0-30d', count: 28400, pct: 12, color: '#4f8ef7' },
-  { label: 'Active Borrowers', count: 168000, pct: 72, color: '#10b981' },
-  { label: 'Repeat Borrowers', count: 23400, pct: 10, color: '#8b5cf6' },
-  { label: 'Dormant Users', count: 14200, pct: 6, color: '#f97316' },
-];
+function Skeleton({ className = '' }: { className?: string }) {
+  return <div className={`skeleton ${className}`} />;
+}
 
 export default function CustomerIntelligencePage() {
   const [selectedJourney, setSelectedJourney] = React.useState(JOURNEYS[0].id);
   const journey = JOURNEYS.find(j => j.id === selectedJourney)!;
   const Icon = journey.icon;
 
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
+
+  // Build funnel chart data for selected journey
+  const funnelData = journey.steps.map((step, i) => ({
+    name: step.action.slice(0, 30) + '...',
+    value: step.sent > 0 ? step.sent : journey.users,
+    fill: journey.color,
+  }));
+
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-extrabold" style={{ color: '#111827' }}>Customer Intelligence</h1>
           <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>CDP-powered user journeys & segments — Insider CDP · July 2026</p>
         </div>
-        <div className="flex gap-2">
-          <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-emerald-50" style={{ color: '#059669' }}>4 Active</span>
-          <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-amber-50" style={{ color: '#d97706' }}>1 Draft</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-gray-200">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" />
+          <span className="text-[11px] font-medium" style={{ color: '#059669' }}>LIVE</span>
+          <span className="text-[11px]" style={{ color: '#9ca3af' }}>·</span>
+          <span className="text-[11px]" style={{ color: '#9ca3af' }}>{timeStr} WIB</span>
         </div>
       </div>
 
-      {/* Segments */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      {/* Status badges */}
+      <div className="flex gap-2 flex-wrap">
+        <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-emerald-50" style={{ color: '#059669' }}>4 Active</span>
+        <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-amber-50" style={{ color: '#d97706' }}>1 Paused</span>
+        <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-gray-100" style={{ color: '#6b7280' }}>1 Draft</span>
+      </div>
+
+      {/* User Segments */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
         <h3 className="text-sm font-bold mb-5" style={{ color: '#111827' }}>User Segments</h3>
-        <div className="grid grid-cols-4 gap-5">
-          {SEGMENTS.map(seg => (
-            <div key={seg.label} className="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: `${seg.color}15` }}>
-                <Users size={24} style={{ color: seg.color }} weight="fill" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[
+            { label: 'New Users 0-30d', count: 28400, pct: 12, color: '#4f8ef7' },
+            { label: 'Active Borrowers', count: 168000, pct: 72, color: '#10b981' },
+            { label: 'Repeat Borrowers', count: 23400, pct: 10, color: '#8b5cf6' },
+            { label: 'Dormant Users', count: 14200, pct: 6, color: '#f97316' },
+          ].map(seg => (
+            <div key={seg.label} className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: `${seg.color}15` }}>
+                <Users size={20} style={{ color: seg.color }} weight="fill" />
               </div>
-              <p className="text-2xl font-extrabold mb-1" style={{ color: '#111827' }}>{seg.count.toLocaleString()}</p>
+              <p className="text-xl font-extrabold mb-1" style={{ color: '#111827' }}>{seg.count.toLocaleString()}</p>
               <p className="text-xs mb-3" style={{ color: '#9ca3af' }}>{seg.label}</p>
               <div className="w-full h-1.5 rounded-full overflow-hidden bg-gray-200 mb-1">
-                <div className="h-full rounded-full" style={{ width: `${seg.pct}%`, background: seg.color }} />
+                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${seg.pct}%`, background: seg.color }} />
               </div>
               <span className="text-xs font-bold" style={{ color: seg.color }}>{seg.pct}%</span>
             </div>
@@ -114,7 +139,7 @@ export default function CustomerIntelligencePage() {
       {/* Journey Cards */}
       <div>
         <h2 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Automation Journeys</h2>
-        <div className="grid grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {JOURNEYS.map(j => {
             const JIcon = j.icon;
             const isSelected = selectedJourney === j.id;
@@ -122,27 +147,27 @@ export default function CustomerIntelligencePage() {
               <div
                 key={j.id}
                 onClick={() => setSelectedJourney(j.id)}
-                className="rounded-2xl p-4 border cursor-pointer transition-all flex flex-col items-center text-center"
+                className="rounded-2xl p-4 border cursor-pointer transition-all flex flex-col items-center text-center hover:shadow-sm"
                 style={{
                   background: isSelected ? `${j.color}08` : 'white',
                   border: `1px solid ${isSelected ? j.color + '80' : '#e5e7eb'}`,
                 }}
               >
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-3" style={{ background: `${j.color}15` }}>
-                  <JIcon size={20} style={{ color: j.color }} weight="fill" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: `${j.color}15` }}>
+                  <JIcon size={18} style={{ color: j.color }} weight="fill" />
                 </div>
                 <p className="text-xs font-bold mb-0.5" style={{ color: '#111827' }}>{j.name}</p>
                 <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold mb-3 ${
                   j.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
                   j.status === 'paused' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
                 }`}>{j.status}</span>
-                <div className="w-full space-y-1.5 mt-auto">
+                <div className="w-full space-y-1 mt-auto">
                   <div className="flex justify-between">
                     <span className="text-[10px]" style={{ color: '#9ca3af' }}>Users</span>
                     <span className="text-[10px] font-bold" style={{ color: '#374151' }}>{j.users > 0 ? j.users.toLocaleString() : '—'}</span>
                   </div>
                   <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${j.convRate}%`, background: j.color }} />
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${j.convRate}%`, background: j.color }} />
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[10px]" style={{ color: '#9ca3af' }}>Conv.</span>
@@ -157,12 +182,12 @@ export default function CustomerIntelligencePage() {
 
       {/* Selected Journey Detail */}
       <div className="bg-white rounded-2xl border overflow-hidden" style={{ borderColor: `${journey.color}40` }}>
-        <div className="p-5 flex items-center gap-4" style={{ background: `${journey.color}08`, borderBottom: `1px solid ${journey.color}20` }}>
+        <div className="p-5 flex items-start gap-4 flex-wrap" style={{ background: `${journey.color}08`, borderBottom: `1px solid ${journey.color}20` }}>
           <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${journey.color}15` }}>
             <Icon size={22} style={{ color: journey.color }} weight="fill" />
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-0.5">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
               <h2 className="text-lg font-extrabold" style={{ color: '#111827' }}>{journey.name}</h2>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
                 journey.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
@@ -171,7 +196,7 @@ export default function CustomerIntelligencePage() {
             </div>
             <p className="text-xs" style={{ color: '#6b7280' }}>Impact: <strong style={{ color: '#10b981' }}>{journey.potential}</strong> · {journey.desc}</p>
           </div>
-          <div className="flex gap-6">
+          <div className="flex gap-6 flex-wrap">
             {[
               { label: 'Users In', value: journey.users > 0 ? journey.users.toLocaleString() : '—' },
               { label: 'Conversions', value: journey.convRate > 0 ? `${Math.round(journey.users * journey.convRate / 100).toLocaleString()}` : '—' },
@@ -185,9 +210,8 @@ export default function CustomerIntelligencePage() {
           </div>
         </div>
         <div className="p-5">
-          <div className="p-3 rounded-xl text-[11px] mb-5" style={{ background: '#f9fafb', border: '1px solid #f3f4f6' }}>
-            <span style={{ color: '#9ca3af' }}>Trigger: </span>
-            <code className="font-mono" style={{ color: '#4f8ef7' }}>{journey.trigger}</code>
+          <div className="p-3 rounded-xl text-[11px] mb-5 font-mono" style={{ background: '#f9fafb', border: '1px solid #f3f4f6', color: '#4f8ef7' }}>
+            Trigger: {journey.trigger}
           </div>
           <div className="space-y-3">
             {journey.steps.map((step, i) => (
@@ -200,23 +224,19 @@ export default function CustomerIntelligencePage() {
                   <p className="text-sm font-semibold mb-2" style={{ color: '#111827' }}>{step.action}</p>
                   {step.sent > 0 && (
                     <div className="grid grid-cols-4 gap-3">
-                      <div className="text-center">
-                        <p className="text-xs font-bold" style={{ color: '#111827' }}>{step.sent.toLocaleString()}</p>
-                        <p className="text-[10px]" style={{ color: '#9ca3af' }}>Sent</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xs font-bold" style={{ color: '#111827' }}>{step.opened.toLocaleString()}</p>
-                        <p className="text-[10px]" style={{ color: '#9ca3af' }}>Opened ({step.openRate}%)</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xs font-bold" style={{ color: '#10b981' }}>{step.conv > 0 ? step.conv.toLocaleString() : '—'}</p>
-                        <p className="text-[10px]" style={{ color: '#9ca3af' }}>Converted</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${step.openRate}%`, background: journey.color }} />
+                      {[
+                        { label: 'Sent', value: step.sent },
+                        { label: 'Opened', value: step.opened },
+                        { label: 'Converted', value: step.conv },
+                      ].map(s => (
+                        <div key={s.label} className="text-center">
+                          <p className="text-xs font-bold" style={{ color: '#111827' }}>{s.value.toLocaleString()}</p>
+                          <p className="text-[10px]" style={{ color: '#9ca3af' }}>{s.label}</p>
                         </div>
-                        <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>Open Rate</p>
+                      ))}
+                      <div className="text-center">
+                        <p className="text-xs font-bold" style={{ color: '#10b981' }}>{step.openRate}%</p>
+                        <p className="text-[10px]" style={{ color: '#9ca3af' }}>Open Rate</p>
                       </div>
                     </div>
                   )}
