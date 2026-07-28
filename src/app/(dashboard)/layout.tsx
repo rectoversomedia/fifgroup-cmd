@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Bell, List, User,
+  List, User,
   ChartBar, Star, Stack,
   CurrencyCircleDollar, Globe,
   Megaphone, Database, Pulse, Brain,
@@ -30,7 +30,6 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Executive',
     items: [
       { href: '/',                     label: 'Portfolio Overview',     icon: ChartBar,           color: '#1e3a5f' },
-      { href: '/alerts',             label: 'Alert Center',          icon: Bell,               color: '#dc2626' },
     ],
   },
   {
@@ -70,8 +69,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const timer = setInterval(() => setLastUpdated(new Date()), 30_000);
     return () => clearInterval(timer);
   }, []);
-
-  const activeAlertCount = 3;
 
   const timeStr = lastUpdated
     ? lastUpdated.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })
@@ -132,12 +129,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       style={{ color: isActive ? item.color : '#94a3b8', flexShrink: 0 }}
                     />
                     {!collapsed && <span>{item.label}</span>}
-                    {item.href === '/alerts' && activeAlertCount > 0 && !collapsed && (
-                      <span className="ml-auto w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shrink-0"
-                        style={{ background: '#dc2626' }}>
-                        {activeAlertCount}
-                      </span>
-                    )}
                   </Link>
                 );
               })}
@@ -212,20 +203,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span className="text-[11px] font-medium" style={{ color: '#059669' }}>LIVE</span>
               <span className="text-[11px]" style={{ color: '#9ca3af' }}>{timeStr} WIB</span>
             </div>
-
-            <Link
-              href="/alerts"
-              className="w-9 h-9 rounded-xl flex items-center justify-center relative transition-all"
-              style={{ background: activeAlertCount > 0 ? '#fef2f2' : '#f8fafc' }}
-            >
-              <Bell size={18} weight="fill" style={{ color: activeAlertCount > 0 ? '#dc2626' : '#64748b' }} />
-              {activeAlertCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white"
-                  style={{ background: '#dc2626' }}>
-                  {activeAlertCount}
-                </span>
-              )}
-            </Link>
 
             <button
               className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shrink-0"
