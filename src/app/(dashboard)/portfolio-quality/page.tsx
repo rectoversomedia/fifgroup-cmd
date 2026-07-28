@@ -211,7 +211,6 @@ export default function PortfolioQualityPage() {
                           src={LOB_LOGOS[lob.lob]}
                           alt={lob.lob}
                           className="w-8 h-8 object-contain"
-                          style={{ filter: 'brightness(0) saturate(100%)' }}
                         />
                         <span className="text-sm font-bold" style={{ color: '#111827' }}>{lob.lob}</span>
                       </div>

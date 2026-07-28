@@ -104,12 +104,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <>
       {/* Logo */}
       <div className="h-16 flex items-center justify-center shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
-        <img
-          src={FIFGROUP_LOGO}
-          alt="FIFGROUP"
-          className="object-contain"
-          style={{ height: 36, width: 'auto', filter: 'brightness(0) saturate(100%)' }}
-        />
+        {collapsed ? (
+          // Collapsed: show favicon (Astra circle with star)
+          <img
+            src="https://www.fifgroup.co.id/favicon.ico"
+            alt="FIFGROUP"
+            className="object-contain"
+            style={{ height: 32, width: 32 }}
+          />
+        ) : (
+          // Expanded: show full logo in color
+          <img
+            src="https://www.fifgroup.co.id/assets/images/png/fifgroup-logo-v2-20260423.png"
+            alt="FIFGROUP"
+            className="object-contain"
+            style={{ height: 36, width: 'auto' }}
+          />
+        )}
       </div>
 
       {/* Live Indicator */}
@@ -217,7 +228,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               src={FIFGROUP_LOGO}
               alt="FIFGROUP"
               className="object-contain"
-              style={{ height: 26, width: 'auto', filter: 'brightness(0) saturate(100%)' }}
+              style={{ height: 26, width: 'auto' }}
             />
           </div>
 
