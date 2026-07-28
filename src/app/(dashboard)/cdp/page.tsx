@@ -780,6 +780,7 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
   const [activeLoan, setActiveLoan] = React.useState<string | null>(null);
   const [actionLog, setActionLog] = React.useState<{ ch: string; msg: string; time: string; status: 'sent' | 'pending' | 'error' }[]>([]);
   const [activeAction, setActiveAction] = React.useState<{ label: string; channel: string; steps: ActionStep[] } | null>(null);
+  const [previewAction, setPreviewAction] = React.useState<{ name: string; score: number; reason: string; color: string; logo: string } | null>(null);
   const fmtIDR = (v: number) => `Rp ${v.toLocaleString('id-ID')}`;
 
   const executeAction = (channel: string, label: string, msg: string) => {
@@ -829,9 +830,11 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
 
   const nextActions: Record<string, { channel: string; icon: React.ElementType; label: string; msg: string; color: string; priority: 'high' | 'medium' | 'low' }[]> = {
     BudiSantoso: [
-      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp Cross-Sell', msg: 'Budi, motor lama mau di-refinance? Dana tambahan Rp 15jt cair dalam 3 hari. Klik 👉 fifgroup.id/refi', color: '#10b981', priority: 'high' },
+      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp Cross-Sell — DANASTRA', msg: 'Budi, motor lama mau di-refinance? Dana tambahan Rp 15jt cair dalam 3 hari. Klik 👉 fifgroup.id/refi', color: '#10b981', priority: 'high' },
       { channel: 'Push', icon: Bell, label: 'Push — DANASTRA Offer', msg: 'Tukar motor lama dapat dana tambahan! Promo refinance 0.5%/bulan. ☝️', color: '#f59e0b', priority: 'high' },
-      { channel: 'Email', icon: Envelope, label: 'Email — AMITRA Education', msg: 'Siapkan masa depan anak Anda dengan tabungan pendidikan AMITRA. Mulai Rp 200rb/bulan.', color: '#ec4899', priority: 'medium' },
+      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp — FINATRA Offer', msg: 'Budi, butuh modal usaha? FINATRA menawarkan dana Rp 25-200 juta untuk wiraswasta seperti Anda. Proses 3 hari! 👉 fifgroup.id/finatra', color: '#059669', priority: 'high' },
+      { channel: 'Email', icon: Envelope, label: 'Email — AMITRA Education', msg: 'Siapkan masa depan anak Anda dengan tabungan pendidikan AMITRA. Mulai Rp 200rb/bulan. 👉 fifgroup.id/amitra', color: '#ec4899', priority: 'medium' },
+      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp — AMITRA Offer', msg: 'Budi, pendidikan anak makin mahal. AMITRA bantu siapkan和教育基金 mulai Rp 200rb/bulan. ☎️ Hubungi kami!', color: '#ec4899', priority: 'medium' },
       { channel: 'SMS', icon: DeviceMobile, label: 'SMS Reminder', msg: 'Budi, angsuran FIFASTRA Rp 618rb jatuh tgl 10 Agust. Pastikan saldo cukup ya.', color: '#6b7280', priority: 'low' },
     ],
     SitiRahayu: [
@@ -1113,10 +1116,7 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
                   <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>{p.reason}</p>
                 </div>
                 <button
-                  onClick={() => {
-                    const act = actions.find(a => a.label.includes(p.name));
-                    if (act) executeAction(act.channel, act.label, act.msg);
-                  }}
+                  onClick={() => setPreviewAction({ name: p.name, score: p.score, reason: p.reason, color: p.color, logo: logo || '' })}
                   className="shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white transition-opacity hover:opacity-90"
                   style={{ background: p.color, opacity: 0.85 }}
                 >
@@ -1127,6 +1127,19 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
             })}
           </div>
         </div>
+      )}
+
+      {/* ── Offer Preview Modal ── */}
+      {previewAction && (
+        <OfferModal
+          profile={profile}
+          product={previewAction}
+          onClose={() => setPreviewAction(null)}
+          onExecute={(channel, msg) => {
+            setPreviewAction(null);
+            setTimeout(() => executeAction(channel, `${channel} — ${previewAction.name} Offer`, msg), 200);
+          }}
+        />
       )}
 
       {/* ── Action Automation Panel ── */}
@@ -1295,6 +1308,163 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
               </div>
             );
           })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type OfferModalProps = {
+  profile: IdentityMatch;
+  product: { name: string; score: number; reason: string; color: string; logo: string };
+  onClose: () => void;
+  onExecute: (channel: string, msg: string) => void;
+};
+
+function OfferModal({ profile, product, onClose, onExecute }: OfferModalProps) {
+  const [channel, setChannel] = React.useState<string>('WhatsApp');
+  const [message, setMessage] = React.useState('');
+  const fmtIDR = (v: number) => `Rp ${v.toLocaleString('id-ID')}`;
+
+  const CHANNELS = [
+    { id: 'WhatsApp', label: 'WhatsApp', color: '#25D366',
+      icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 6.987L.789 23.789l4.35-1.678A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg> },
+    { id: 'SMS', label: 'SMS', color: '#4f8ef7',
+      icon: <DeviceMobile size={16} style={{ color: 'white' }} /> },
+    { id: 'Email', label: 'Email', color: '#f59e0b',
+      icon: <Envelope size={16} style={{ color: 'white' }} /> },
+    { id: 'Push', label: 'Push Notif', color: '#10b981',
+      icon: <Bell size={16} style={{ color: 'white' }} /> },
+  ];
+
+  const PRESET_MESSAGES: Record<string, Record<string, string>> = {
+    FIFASTRA: {
+      WhatsApp: `Halo ${profile.name}! Promo spesial FIFASTRA buat Anda — bunga ringan, proses cepat, cair dalam 3 hari. Ajukan sekarang! 👉 fifgroup.id/fifastra`,
+      SMS: `${profile.name}, promo FIFASTRA: bunga ringan, cair 3 hari. Ajukan di fifgroup.id/fifastra`,
+      Email: `Hai ${profile.name},\n\nKami punya penawaran eksklusif FIFASTRA untuk Anda — salah satu produk terpopuler dari FIFGROUP. Bunga kompetitif, proses 100% digital.\n\nKlik untuk mengajukan: fifgroup.id/fifastra\n\nSalam,\nTim FIFGROUP`,
+      Push: `${profile.name}, promo FIFASTRA bunga ringan — ajukan sekarang! 👉`,
+    },
+    DANASTRA: {
+      WhatsApp: `${profile.name}, motor lama bisa ditukar jadi dana tambahan! Program refinance DANASTRA — cair cepat, bunga ringan. Info lengkap 👉 fifgroup.id/danastra`,
+      SMS: `${profile.name}, tukar motor lama dapat dana! Program refinance DANASTRA. fifgroup.id/danastra`,
+      Email: `Hai ${profile.name},\n\nMotor lama Anda bisa jadi sumber dana tambahan dengan program refinance DANASTRA dari FIFGROUP. Proses cepat dan bunga kompetitif.\n\nPelajari lebih lanjut: fifgroup.id/danastra\n\nSalam,\nTim FIFGROUP`,
+      Push: `${profile.name}, refinance motor lama — dana cair cepat! 👉`,
+    },
+    FINATRA: {
+      WhatsApp: `${profile.name}, butuh modal untuk usaha? FINATRA dari FIFGROUP menawarkan dana Rp 25-200 juta untuk pelaku usaha kecil & mikro. Proses 3-5 hari! 👉 fifgroup.id/finatra`,
+      SMS: `${profile.name}, modal usaha Rp 25-200 jt tersedia! FINATRA FIFGROUP. fifgroup.id/finatra`,
+      Email: `Hai ${profile.name},\n\nApakah Anda tahu FINATRA bisa membantu mengembangkan usaha Anda? FIFGROUP menawarkan pembiayaan modal kerja Rp 25-200 juta untuk pelaku usaha kecil dan mikro.\n\nAjukan sekarang: fifgroup.id/finatra\n\nSalam,\nTim FIFGROUP`,
+      Push: `${profile.name}, modal usaha tersedia — FINATRA FIFGROUP! 👉`,
+    },
+    SPEKTRA: {
+      WhatsApp: `${profile.name}! SPEKTRA — pinjaman mikro tanpa agunan, proses 100% di HP, bunga 0% untuk 30 hari pertama. Ajukan sekarang! 👉 fifgroup.id/spektra`,
+      SMS: `${profile.name}, pinjam Rp 5jt tanpa agunan! SPEKTRA — proses di HP, bunga 0%. fifgroup.id/spektra`,
+      Email: `Hai ${profile.name},\n\nSPEKTRA dari FIFGROUP adalah solusi tepat untuk kebutuhan mendesak Anda — pinjaman mikro tanpa agunan, proses 100% digital, dan bunga 0% untuk 30 hari pertama.\n\nAjukan di: fifgroup.id/spektra\n\nSalam,\nTim FIFGROUP`,
+      Push: `${profile.name}, SPEKTRA: pinjam tanpa agunan, proses di HP! 👉`,
+    },
+    AMITRA: {
+      WhatsApp: `${profile.name}, siapkan masa depan anak Anda dengan AMITRA — tabungan pendidikan dari FIFGROUP. Mulai Rp 200rb/bulan, tanpa biaya tersembunyi. Info 👉 fifgroup.id/amitra`,
+      SMS: `${profile.name}, tabungan pendidikan AMITRA mulai Rp 200rb/bulan. fifgroup.id/amitra`,
+      Email: `Hai ${profile.name},\n\nPendidikan anak adalah investasi jangka panjang. AMITRA dari FIFGROUP membantu Anda merencanakan dan menabung untuk masa depan pendidikan mereka sejak dini.\n\nPelajari lebih lanjut: fifgroup.id/amitra\n\nSalam,\nTim FIFGROUP`,
+      Push: `${profile.name}, AMITRA — tabungan pendidikan untuk masa depan anak! 👉`,
+    },
+  };
+
+  React.useEffect(() => {
+    setMessage(PRESET_MESSAGES[product.name]?.[channel] || `Halo ${profile.name}, ada penawaran spesial produk ${product.name} dari FIFGROUP untuk Anda!`);
+  }, [channel, product.name, profile.name]);
+
+  const activeChannel = CHANNELS.find(c => c.id === channel)!;
+  const maxChars = channel === 'SMS' ? 160 : channel === 'Push' ? 60 : 1000;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
+      <div className="absolute inset-0" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center gap-3 p-5 border-b" style={{ borderColor: '#f3f4f6', background: `${product.color}08` }}>
+          <div className="w-12 h-10 rounded-xl flex items-center justify-center overflow-hidden shrink-0" style={{ background: '#fff' }}>
+            {product.logo && <img src={product.logo} alt={product.name} className="object-contain" style={{ height: 28, width: 'auto', maxWidth: 52 }} />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-extrabold" style={{ color: '#111827' }}>Send Offer — {product.name}</h3>
+            <p className="text-[11px]" style={{ color: '#9ca3af' }}>To: {profile.name} · {profile.identifiers.phone}</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#f3f4f6', color: '#6b7280' }}>✕</button>
+        </div>
+
+        {/* Channel selector */}
+        <div className="p-5 border-b" style={{ borderColor: '#f3f4f6' }}>
+          <p className="text-[11px] font-semibold uppercase tracking-wide mb-3" style={{ color: '#9ca3af' }}>Select Channel</p>
+          <div className="grid grid-cols-4 gap-2">
+            {CHANNELS.map(ch => (
+              <button
+                key={ch.id}
+                onClick={() => setChannel(ch.id)}
+                className="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all"
+                style={{ borderColor: channel === ch.id ? ch.color : '#f3f4f6', background: channel === ch.id ? `${ch.color}12` : '#f9fafb' }}
+              >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: ch.color }}>{ch.icon}</div>
+                <span className="text-[10px] font-bold" style={{ color: channel === ch.id ? ch.color : '#9ca3af' }}>{ch.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Customer context */}
+        <div className="p-5 border-b" style={{ borderColor: '#f3f4f6' }}>
+          <p className="text-[11px] font-semibold uppercase tracking-wide mb-3" style={{ color: '#9ca3af' }}>Customer Context</p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { label: 'Name', value: profile.name },
+              { label: 'Phone', value: profile.identifiers.phone },
+              { label: 'City', value: profile.city || '—' },
+              { label: 'Occupation', value: profile.occupation || '—' },
+              { label: 'Fit Score', value: `${product.score}%` },
+              { label: 'Product', value: product.name },
+            ].map(row => (
+              <div key={row.label} className="p-2.5 rounded-lg" style={{ background: '#f9fafb' }}>
+                <p className="text-[9px] mb-0.5" style={{ color: '#9ca3af' }}>{row.label}</p>
+                <p className="text-xs font-semibold" style={{ color: '#374151' }}>{row.value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-2 p-2.5 rounded-lg" style={{ background: '#f9fafb' }}>
+            <p className="text-[9px] mb-0.5" style={{ color: '#9ca3af' }}>Why recommended</p>
+            <p className="text-xs" style={{ color: '#374151' }}>{product.reason}</p>
+          </div>
+        </div>
+
+        {/* Message composer */}
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: '#9ca3af' }}>Message Preview</p>
+            <span className="text-[10px]" style={{ color: message.length > maxChars ? '#dc2626' : '#9ca3af' }}>{message.length}/{maxChars}</span>
+          </div>
+          <textarea
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            rows={5}
+            className="w-full p-3 rounded-xl border text-sm resize-none focus:outline-none"
+            style={{ borderColor: message.length > maxChars ? '#dc2626' : '#e5e7eb', background: '#f9fafb', color: '#374151' }}
+          />
+          {message.length > maxChars && (
+            <p className="text-[10px] mt-1" style={{ color: '#dc2626' }}>
+              ⚠ {channel === 'SMS' ? 'SMS akan terpisah jadi 2 pesan' : channel === 'Push' ? 'Push notification akan terpotong' : 'Pesan terlalu panjang'}
+            </p>
+          )}
+          <div className="mt-3 p-3 rounded-xl" style={{ background: '#f0fdf4', border: '1px solid #10b98130' }}>
+            <p className="text-[10px] font-semibold mb-1" style={{ color: '#10b981' }}>Preview — {channel}</p>
+            <p className="text-xs leading-relaxed whitespace-pre-wrap" style={{ color: '#374151' }}>{message}</p>
+          </div>
+          <button
+            onClick={() => onExecute(channel, message)}
+            disabled={message.length > maxChars}
+            className="w-full mt-4 py-3 rounded-xl font-bold text-sm text-white"
+            style={{ background: message.length > maxChars ? '#d1d5db' : activeChannel.color }}
+          >
+            {message.length > maxChars ? '✕ Message Too Long' : `Send via ${channel}`}
+          </button>
         </div>
       </div>
     </div>
