@@ -31,9 +31,16 @@ const SEVERITY_CONFIG: Record<Severity, { bg: string; border: string; text: stri
   HEALTHY: { bg: '#f0fdf4', border: '#bbf7d0', text: '#059669', icon: CheckCircle },
 };
 
-function AlertCard({ alert }: { alert: Alert }) {
+const AlertCard = React.memo(function AlertCard({
+  alert,
+  onAck,
+  acked,
+}: {
+  alert: Alert;
+  onAck: (id: number) => void;
+  acked: boolean;
+}) {
   const [expanded, setExpanded] = React.useState(false);
-  const [acked, setAcked] = React.useState(alert.status === 'resolved');
   const cfg = SEVERITY_CONFIG[alert.severity];
   const Icon = cfg.icon;
 
@@ -76,7 +83,7 @@ function AlertCard({ alert }: { alert: Alert }) {
             <div className="flex items-center gap-2 shrink-0">
               {alert.severity !== 'HEALTHY' && !acked && (
                 <button
-                  onClick={() => setAcked(true)}
+                  onClick={() => onAck(alert.id)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                   style={{ background: 'white', color: '#374151', border: '1px solid #e5e7eb' }}
                 >
@@ -137,16 +144,29 @@ function AlertCard({ alert }: { alert: Alert }) {
       )}
     </div>
   );
-}
+});
 
 export default function AlertsPage() {
   const [filter, setFilter] = React.useState<'all' | 'triggered' | 'resolved'>('all');
+  const [ackedIds, setAckedIds] = React.useState<Set<number>>(new Set());
   const { data: fifadaMetrics } = useRealtime(() => getAppHealthMetrics('fifada'), 30_000);
 
   // Derive live values from data-sim (with sensible fallbacks)
   const crashRate = fifadaMetrics?.metrics.find(m => m.label === 'Crash Rate')?.value ?? '0.8%';
   const errorRate = fifadaMetrics?.metrics.find(m => m.label === 'Error Rate')?.value ?? '1.4%';
   const pushDel   = fifadaMetrics?.metrics.find(m => m.label === 'Push Delivery')?.value ?? '94.2%';
+
+  const handleAck = React.useCallback((id: number) => {
+    setAckedIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
+
+  const handleFilter = React.useCallback((f: 'all' | 'triggered' | 'resolved') => {
+    setFilter(f);
+  }, []);
 
   const ALERTS_DYNAMIC: Alert[] = [
     {
@@ -295,7 +315,7 @@ export default function AlertsPage() {
         {(['all', 'triggered', 'resolved'] as const).map(f => (
           <button
             key={f}
-            onClick={() => setFilter(f)}
+            onClick={() => handleFilter(f)}
             className="px-4 py-2 rounded-xl text-xs font-semibold transition-all border"
             style={
               filter === f
@@ -317,7 +337,7 @@ export default function AlertsPage() {
             <p className="text-sm mt-1" style={{ color: '#9ca3af' }}>No alerts in this category</p>
           </div>
         ) : (
-          displayed.map(alert => <AlertCard key={alert.id} alert={alert} />)
+          displayed.map(alert => <AlertCard key={alert.id} alert={alert} onAck={handleAck} acked={ackedIds.has(alert.id) || alert.status === 'resolved'} />)
         )}
       </div>
 
