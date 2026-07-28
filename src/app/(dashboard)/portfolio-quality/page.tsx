@@ -14,8 +14,12 @@ import {
 import { getPortfolioQuality } from '@/lib/data-sim';
 import { useRealtime } from '@/lib/use-realtime';
 
-const LOB_COLORS: Record<string, string> = {
-  FIFASTRA: '#1e3a5f', SPEKTRA: '#dc2626', DANASTRA: '#06b6d4', FINATRA: '#f59e0b', AMITRA: '#10b981',
+const LOB_META: Record<string, { color: string; abbr: string }> = {
+  FIFASTRA: { color: '#1e3a5f', abbr: 'FIF' },
+  SPEKTRA:  { color: '#dc2626', abbr: 'SPE' },
+  DANASTRA: { color: '#06b6d4', abbr: 'DAN' },
+  FINATRA:  { color: '#f59e0b', abbr: 'FIN' },
+  AMITRA:   { color: '#10b981', abbr: 'AMI' },
 };
 
 export default function PortfolioQualityPage() {
@@ -52,8 +56,6 @@ export default function PortfolioQualityPage() {
   const worstPAR30 = [...byLoB].sort((a, b) => b.par30 - a.par30)[0];
 
   const fmtIDR = (v: number) => {
-    if (v >= 1_000_000_000_000) return `Rp ${(v / 1_000_000_000_000).toFixed(2)}T`;
-    if (v >= 1_000_000_000) return `Rp ${(v / 1_000_000_000).toFixed(1)}B`;
     return `Rp ${v.toLocaleString('id-ID')}`;
   };
 
@@ -205,8 +207,8 @@ export default function PortfolioQualityPage() {
                   <tr key={lob.lob} style={{ borderBottom: '1px solid #f9fafb' }}>
                     <td className="py-4 pl-6 pr-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-extrabold text-white" style={{ background: LOB_COLORS[lob.lob] }}>
-                          {lob.lob[0]}
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-extrabold text-white shrink-0" style={{ background: LOB_META[lob.lob]?.color ?? '#1e3a5f' }}>
+                          {LOB_META[lob.lob]?.abbr ?? lob.lob[0]}
                         </div>
                         <span className="text-sm font-bold" style={{ color: '#111827' }}>{lob.lob}</span>
                       </div>
