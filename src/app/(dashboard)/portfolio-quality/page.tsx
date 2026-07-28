@@ -14,12 +14,12 @@ import {
 import { getPortfolioQuality } from '@/lib/data-sim';
 import { useRealtime } from '@/lib/use-realtime';
 
-const LOB_META: Record<string, { color: string; abbr: string }> = {
-  FIFASTRA: { color: '#1e3a5f', abbr: 'FIF' },
-  SPEKTRA:  { color: '#dc2626', abbr: 'SPE' },
-  DANASTRA: { color: '#06b6d4', abbr: 'DAN' },
-  FINATRA:  { color: '#f59e0b', abbr: 'FIN' },
-  AMITRA:   { color: '#10b981', abbr: 'AMI' },
+const LOB_LOGOS: Record<string, string> = {
+  FIFASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FIFASTRA-1780538519035.png',
+  SPEKTRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20SPEKTRA-1780538544863.png',
+  DANASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20DANASTRA-1780538584771.png',
+  FINATRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FINATRA-1780538626287.png',
+  AMITRA:   'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20AMITRA-1780538604037.png',
 };
 
 export default function PortfolioQualityPage() {
@@ -207,9 +207,12 @@ export default function PortfolioQualityPage() {
                   <tr key={lob.lob} style={{ borderBottom: '1px solid #f9fafb' }}>
                     <td className="py-4 pl-6 pr-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-extrabold text-white shrink-0" style={{ background: LOB_META[lob.lob]?.color ?? '#1e3a5f' }}>
-                          {LOB_META[lob.lob]?.abbr ?? lob.lob[0]}
-                        </div>
+                        <img
+                          src={LOB_LOGOS[lob.lob]}
+                          alt={lob.lob}
+                          className="w-8 h-8 object-contain"
+                          style={{ filter: 'brightness(0) saturate(100%)' }}
+                        />
                         <span className="text-sm font-bold" style={{ color: '#111827' }}>{lob.lob}</span>
                       </div>
                     </td>
