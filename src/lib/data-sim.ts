@@ -487,3 +487,302 @@ export async function getLiveTick() {
     lastUpdated: new Date().toISOString(),
   };
 }
+
+// ─── Portfolio Quality ─────────────────────────────────────────────────────────
+
+export async function getPortfolioQuality(period: 'mtd' | 'qtd' | 'ytd' = 'mtd') {
+  const multiplier = period === 'qtd' ? 3 : period === 'ytd' ? 12 : 1;
+  const variance = () => (Math.random() - 0.5) * 0.4;
+
+  return {
+    period,
+    asOfDate: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }),
+    headline: {
+      totalDisbursement: 89_200_000_000 * multiplier,
+      totalOutstanding: 1_240_000_000_000,
+      npfRate: +(2.1 + variance()).toFixed(2),
+      par30: +(4.8 + variance()).toFixed(2),
+      par90: +(1.9 + variance()).toFixed(2),
+      collectionRate: +(87.2 + variance()).toFixed(1),
+    },
+    disbursementTarget: 120_000_000_000,
+    disbursementYTD: 1_042_000_000_000,
+    disbursementTargetYTD: 1_200_000_000_000,
+    byLoB: [
+      {
+        lob: 'FIFASTRA',
+        disbursement: 38_400_000_000 * multiplier,
+        outstanding: 480_000_000_000,
+        npfRate: 1.8,
+        par30: 3.9,
+        par90: 1.4,
+        collectionRate: 91.2,
+        activeLoan: 168_480,
+        targetDisbursement: 42_000_000_000 * multiplier,
+        bucket: [
+          { label: 'Current', pct: 92.1, color: '#10b981' },
+          { label: '1-30 DPD', pct: 4.2, color: '#f59e0b' },
+          { label: '31-60 DPD', pct: 2.1, color: '#f97316' },
+          { label: '61-90 DPD', pct: 0.9, color: '#dc2626' },
+          { label: '>90 DPD', pct: 0.7, color: '#7f1d1d' },
+        ],
+      },
+      {
+        lob: 'SPEKTRA',
+        disbursement: 4_200_000_000 * multiplier,
+        outstanding: 98_000_000_000,
+        npfRate: 4.2,
+        par30: 9.1,
+        par90: 3.8,
+        collectionRate: 78.4,
+        activeLoan: 65_520,
+        targetDisbursement: 5_000_000_000 * multiplier,
+        bucket: [
+          { label: 'Current', pct: 78.4, color: '#10b981' },
+          { label: '1-30 DPD', pct: 10.2, color: '#f59e0b' },
+          { label: '31-60 DPD', pct: 6.4, color: '#f97316' },
+          { label: '61-90 DPD', pct: 2.9, color: '#dc2626' },
+          { label: '>90 DPD', pct: 2.1, color: '#7f1d1d' },
+        ],
+      },
+      {
+        lob: 'DANASTRA',
+        disbursement: 24_600_000_000 * multiplier,
+        outstanding: 310_000_000_000,
+        npfRate: 2.3,
+        par30: 5.2,
+        par90: 2.1,
+        collectionRate: 88.6,
+        activeLoan: 142_740,
+        targetDisbursement: 28_000_000_000 * multiplier,
+        bucket: [
+          { label: 'Current', pct: 88.6, color: '#10b981' },
+          { label: '1-30 DPD', pct: 5.8, color: '#f59e0b' },
+          { label: '31-60 DPD', pct: 3.2, color: '#f97316' },
+          { label: '61-90 DPD', pct: 1.4, color: '#dc2626' },
+          { label: '>90 DPD', pct: 1.0, color: '#7f1d1d' },
+        ],
+      },
+      {
+        lob: 'FINATRA',
+        disbursement: 12_800_000_000 * multiplier,
+        outstanding: 198_000_000_000,
+        npfRate: 1.9,
+        par30: 4.4,
+        par90: 1.7,
+        collectionRate: 90.1,
+        activeLoan: 105_300,
+        targetDisbursement: 15_000_000_000 * multiplier,
+        bucket: [
+          { label: 'Current', pct: 90.1, color: '#10b981' },
+          { label: '1-30 DPD', pct: 5.1, color: '#f59e0b' },
+          { label: '31-60 DPD', pct: 2.8, color: '#f97316' },
+          { label: '61-90 DPD', pct: 1.2, color: '#dc2626' },
+          { label: '>90 DPD', pct: 0.8, color: '#7f1d1d' },
+        ],
+      },
+      {
+        lob: 'AMITRA',
+        disbursement: 9_200_000_000 * multiplier,
+        outstanding: 154_000_000_000,
+        npfRate: 2.8,
+        par30: 6.3,
+        par90: 2.6,
+        collectionRate: 84.9,
+        activeLoan: 121_680,
+        targetDisbursement: 12_000_000_000 * multiplier,
+        bucket: [
+          { label: 'Current', pct: 84.9, color: '#10b981' },
+          { label: '1-30 DPD', pct: 7.4, color: '#f59e0b' },
+          { label: '31-60 DPD', pct: 4.1, color: '#f97316' },
+          { label: '61-90 DPD', pct: 2.0, color: '#dc2626' },
+          { label: '>90 DPD', pct: 1.6, color: '#7f1d1d' },
+        ],
+      },
+    ],
+    monthlyTrend: Array.from({ length: 12 }, (_, i) => {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return {
+        month: months[i],
+        disbursement: (70_000_000_000 + Math.random() * 30_000_000_000),
+        npf: +(1.8 + Math.random() * 1.2).toFixed(1),
+        par30: +(4.0 + Math.random() * 2.0).toFixed(1),
+        collection: +(85 + Math.random() * 6).toFixed(1),
+      };
+    }),
+    collectionBuckets: [
+      { bucket: 'Current (0 DPD)', disbursed: 892_000_000_000, outstanding: 0, npfCount: 0, color: '#10b981' },
+      { bucket: '1-30 DPD', disbursed: 0, outstanding: 52_080_000_000, npfCount: 3_248, color: '#f59e0b' },
+      { bucket: '31-60 DPD', disbursed: 0, outstanding: 27_280_000_000, npfCount: 2_840, color: '#f97316' },
+      { bucket: '61-90 DPD', disbursed: 0, outstanding: 14_860_000_000, npfCount: 1_920, color: '#dc2626' },
+      { bucket: '>90 DPD (NPF)', disbursed: 0, outstanding: 10_240_000_000, npfCount: 4_210, color: '#7f1d1d' },
+    ],
+  };
+}
+
+// ─── Escalation / Alert System ────────────────────────────────────────────────
+
+export type EscalationChannel = 'email' | 'whatsapp' | 'teams';
+
+export interface EscalationTicket {
+  id: string;
+  title: string;
+  description: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  status: 'pending' | 'sent' | 'delivered' | 'failed';
+  channel: EscalationChannel;
+  recipient: string;
+  sentAt?: string;
+  createdAt: string;
+  fromMenu: string;
+  metadata?: Record<string, string>;
+}
+
+let _escalationId = 100;
+export async function createEscalationTicket(payload: {
+  title: string;
+  description: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  channel: EscalationChannel;
+  recipient: string;
+  fromMenu: string;
+  metadata?: Record<string, string>;
+}): Promise<EscalationTicket> {
+  // Simulate async send
+  await new Promise(r => setTimeout(r, 800));
+  const statuses: Record<EscalationChannel, EscalationTicket['status']> = {
+    email: Math.random() > 0.05 ? 'sent' : 'failed',
+    whatsapp: Math.random() > 0.05 ? 'delivered' : Math.random() > 0.5 ? 'sent' : 'failed',
+    teams: Math.random() > 0.03 ? 'delivered' : 'failed',
+  };
+  return {
+    id: `ESC-${++_escalationId}`,
+    ...payload,
+    status: statuses[payload.channel],
+    sentAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+  };
+}
+
+export async function getEscalationTickets(): Promise<EscalationTicket[]> {
+  return [
+    {
+      id: 'ESC-099',
+      title: 'FIFADA Crash Rate Alert — CRITICAL',
+      description: 'FIFADA crash rate detected at 1.4% — above 0.5% threshold. Escalated to Mobile Engineering Lead.',
+      severity: 'critical',
+      status: 'delivered',
+      channel: 'teams',
+      recipient: 'mobile-engineering@group.fif.co.id',
+      sentAt: '2026-07-23T14:35:00Z',
+      createdAt: '2026-07-23T14:35:00Z',
+      fromMenu: 'Portfolio Quality',
+    },
+    {
+      id: 'ESC-098',
+      title: 'SPEKTRA NPF Rate Escalation',
+      description: 'SPEKTRA NPF at 4.2% — approaching 5% limit. Operations review required.',
+      severity: 'high',
+      status: 'delivered',
+      channel: 'email',
+      recipient: 'ops-director@group.fif.co.id',
+      sentAt: '2026-07-22T09:00:00Z',
+      createdAt: '2026-07-22T09:00:00Z',
+      fromMenu: 'Portfolio Quality',
+    },
+    {
+      id: 'ESC-097',
+      title: 'AMITRA Disbursement SLA Miss',
+      description: 'AMITRA avg 4.8 days vs 5-day target. Flagged for ops review.',
+      severity: 'medium',
+      status: 'sent',
+      channel: 'whatsapp',
+      recipient: '+62-812-XXXX-XXXX (Ops Team)',
+      sentAt: '2026-07-21T16:45:00Z',
+      createdAt: '2026-07-21T16:45:00Z',
+      fromMenu: 'Portfolio Quality',
+    },
+  ];
+}
+
+// ─── Geographic / Regional ─────────────────────────────────────────────────────
+
+export async function getGeographicData() {
+  return {
+    regions: [
+      { region: 'Jawa', disbursement: 48_800_000_000, activeLoan: 298_400, npfRate: 1.9, color: '#4f8ef7' },
+      { region: 'Sumatera', disbursement: 18_200_000_000, activeLoan: 108_200, npfRate: 2.4, color: '#10b981' },
+      { region: 'Kalimantan', disbursement: 9_600_000_000, activeLoan: 52_800, npfRate: 2.1, color: '#f59e0b' },
+      { region: 'Sulawesi', disbursement: 7_800_000_000, activeLoan: 44_600, npfRate: 2.8, color: '#8b5cf6' },
+      { region: 'Bali & Nusa Tenggara', disbursement: 3_200_000_000, activeLoan: 22_400, npfRate: 1.6, color: '#06b6d4' },
+      { region: 'Papua & Maluku', disbursement: 1_600_000_000, activeLoan: 12_800, npfRate: 3.4, color: '#ec4899' },
+    ],
+    provinces: [
+      { province: 'DKI Jakarta', disbursement: 14_200_000_000, activeLoan: 84_200, npfRate: 1.4 },
+      { province: 'Jawa Barat', disbursement: 12_400_000_000, activeLoan: 76_400, npfRate: 2.1 },
+      { province: 'Jawa Timur', disbursement: 9_800_000_000, activeLoan: 62_800, npfRate: 2.3 },
+      { province: 'Sumatera Utara', disbursement: 8_200_000_000, activeLoan: 48_200, npfRate: 2.6 },
+      { province: 'Jawa Tengah', disbursement: 7_400_000_000, activeLoan: 48_400, npfRate: 1.9 },
+      { province: 'Sulawesi Selatan', disbursement: 5_200_000_000, activeLoan: 28_400, npfRate: 2.9 },
+      { province: 'Kalimantan Selatan', disbursement: 4_800_000_000, activeLoan: 24_800, npfRate: 2.0 },
+      { province: 'Bali', disbursement: 3_200_000_000, activeLoan: 22_400, npfRate: 1.6 },
+    ],
+    topBranches: [
+      { name: 'Cabang Utama Jakarta', region: 'Jawa', disbursement: 8_400_000_000, npfRate: 1.2 },
+      { name: 'Cabang Bandung', region: 'Jawa', disbursement: 5_200_000_000, npfRate: 1.8 },
+      { name: 'Cabang Surabaya', region: 'Jawa', disbursement: 4_800_000_000, npfRate: 2.1 },
+      { name: 'Cabang Medan', region: 'Sumatera', disbursement: 4_200_000_000, npfRate: 2.4 },
+      { name: 'Cabang Makassar', region: 'Sulawesi', disbursement: 3_200_000_000, npfRate: 2.8 },
+    ],
+  };
+}
+
+// ─── Competitors ──────────────────────────────────────────────────────────────
+
+export async function getCompetitorsData() {
+  return {
+    marketShare: [
+      { company: 'FIFGROUP (FIFASTRA)', share: 28.4, trend: '+0.8', color: '#1e3a5f' },
+      { company: 'Adira Finance', share: 18.2, trend: '-0.3', color: '#4f8ef7' },
+      { company: 'BFI Finance', share: 14.1, trend: '+0.2', color: '#10b981' },
+      { company: 'BAF', share: 11.8, trend: '+0.5', color: '#f59e0b' },
+      { company: 'WOM Finance', share: 7.4, trend: '-0.1', color: '#8b5cf6' },
+      { company: 'MNC Finance', share: 5.2, trend: '+0.1', color: '#06b6d4' },
+      { company: 'Others', share: 14.9, trend: '-1.2', color: '#94a3b8' },
+    ],
+    products: [
+      {
+        company: 'FIFGROUP',
+        products: [
+          { name: 'FIFASTRA', rate: '12-18%', tenor: '12-48 bln', maxLoan: 'Rp 200 jt', strength: 'Wide branch network' },
+          { name: 'SPEKTRA', rate: '18-24%', tenor: '6-24 bln', maxLoan: 'Rp 50 jt', strength: 'Fast approval' },
+          { name: 'DANASTRA', rate: '15-20%', tenor: '12-36 bln', maxLoan: 'Rp 100 jt', strength: 'Multi-industry' },
+          { name: 'FINATRA', rate: '8-12%', tenor: '12-60 bln', maxLoan: 'Rp 500 jt', strength: 'Home ownership' },
+          { name: 'AMITRA', rate: '20-28%', tenor: '6-12 bln', maxLoan: 'Rp 25 jt', strength: 'Payroll deduction' },
+        ],
+      },
+      {
+        company: 'Adira Finance',
+        products: [
+          { name: 'Adira Motorcycle', rate: '9-15%', tenor: '12-48 bln', maxLoan: 'Rp 80 jt', strength: 'Low rate' },
+          { name: 'Adira Mobil', rate: '7-12%', tenor: '12-60 bln', maxLoan: 'Rp 1 M', strength: 'Car specialty' },
+        ],
+      },
+      {
+        company: 'BFI Finance',
+        products: [
+          { name: 'BFI Motor', rate: '14-18%', tenor: '12-36 bln', maxLoan: 'Rp 100 jt', strength: 'Fast disbursement' },
+          { name: 'BFI Mikro', rate: '24-36%', tenor: '6-12 bln', maxLoan: 'Rp 20 jt', strength: 'Micro lending' },
+        ],
+      },
+    ],
+    digitalComparison: [
+      { metric: 'Mobile App Rating', fifgroup: 4.2, adira: 4.0, bfi: 3.7 },
+      { metric: 'App Downloads', fifgroup: 850_000, adira: 620_000, bfi: 340_000 },
+      { metric: 'Digital Disbursement %', fifgroup: 67, adira: 48, bfi: 31 },
+      { metric: 'Avg Days to Disburse', fifgroup: 3.8, adira: 4.2, bfi: 5.1 },
+      { metric: 'Push Notification CTR', fifgroup: 12.4, adira: 8.2, bfi: 6.1 },
+      { metric: 'NPS Score', fifgroup: 62, adira: 54, bfi: 48 },
+    ],
+  };
+}

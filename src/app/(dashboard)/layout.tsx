@@ -8,6 +8,8 @@ import {
   ChartBar, Star, Stack,
   CurrencyCircleDollar, Globe,
   Megaphone, Database, Pulse, Brain,
+  Trophy, MapPin, Bell, DeviceMobile,
+  ChartLine, ShieldCheck, ArrowsClockwise,
 } from '@phosphor-icons/react';
 
 const FIFGROUP_LOGO = 'https://www.fifgroup.co.id/assets/images/png/fifgroup-logo-v2-20260423.png';
@@ -29,31 +31,44 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Executive',
     items: [
-      { href: '/',                     label: 'Portfolio Overview',     icon: ChartBar,           color: '#1e3a5f' },
+      { href: '/',                    label: 'Portfolio Overview',    icon: ChartLine,              color: '#1e3a5f' },
+      { href: '/portfolio-quality',   label: 'Portfolio Quality',     icon: Trophy,                 color: '#10b981' },
+      { href: '/geographic',         label: 'Geographic',            icon: MapPin,                 color: '#8b5cf6' },
     ],
   },
   {
     label: 'Digital Products',
     items: [
-      { href: '/fifgo',    label: 'FIFGO App',          icon: Star,               color: '#06b6d4' },
-      { href: '/fifada',  label: 'FIFADA App',         icon: Star,              color: '#f59e0b' },
-      { href: '/lob',     label: 'LoB Performance',    icon: Stack,             color: '#8b5cf6' },
+      { href: '/fifgo',   label: 'FIFGO App',        icon: DeviceMobile,  color: '#06b6d4' },
+      { href: '/fifada',  label: 'FIFADA App',       icon: Star,          color: '#f59e0b' },
     ],
   },
   {
-    label: 'Commercial',
+    label: 'Marketing',
     items: [
-      { href: '/sales',        label: 'Sales & Disbursement', icon: CurrencyCircleDollar, color: '#10b981' },
-      { href: '/competitors',  label: 'Competitors',          icon: Globe,               color: '#64748b' },
+      { href: '/push-notification', label: 'Push Notification', icon: Megaphone,     color: '#f97316' },
+      { href: '/journey',          label: 'Journey',            icon: ArrowsClockwise, color: '#6366f1' },
     ],
   },
   {
-    label: 'Growth & CDP',
+    label: 'Performance',
     items: [
-      { href: '/marketing',       label: 'Marketing & Campaigns', icon: Megaphone,  color: '#f97316' },
-      { href: '/cdp',          label: 'CDP & Journeys',       icon: Database,  color: '#6366f1' },
-      { href: '/events',       label: 'Events Monitor',        icon: Pulse,     color: '#14b8a6' },
-      { href: '/recommendations', label: 'AI Insights',        icon: Brain,     color: '#a855f7' },
+      { href: '/app-analytics', label: 'App Analytics', icon: ChartBar,      color: '#14b8a6' },
+      { href: '/app-store',     label: 'App Store',     icon: Star,          color: '#64748b' },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { href: '/error-tracking', label: 'Error Tracking', icon: ShieldCheck,  color: '#64748b' },
+      { href: '/competitors',    label: 'Competitors',    icon: Globe,         color: '#64748b' },
+    ],
+  },
+  {
+    label: 'Tools',
+    items: [
+      { href: '/escalation', label: 'Escalation',  icon: Bell,          color: '#dc2626' },
+      { href: '/tv-mode',    label: 'TV Mode',     icon: DeviceMobile,  color: '#1e3a5f' },
     ],
   },
 ];
