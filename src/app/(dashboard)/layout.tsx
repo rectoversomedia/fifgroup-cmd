@@ -78,7 +78,6 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/alerts',     label: 'Alerts',     icon: Bell,           color: '#dc2626' },
       { href: '/escalation', label: 'Escalation', icon: Bell,           color: '#dc2626' },
-      { href: '/tv-mode',   label: 'TV Mode',    icon: DeviceMobile,    color: '#1e3a5f' },
     ],
   },
 ];
