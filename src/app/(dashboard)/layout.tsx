@@ -48,7 +48,6 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Marketing',
     items: [
       { href: '/push-notification', label: 'Push Notification', icon: Megaphone,     color: '#f97316' },
-      { href: '/journey',         label: 'Journey',             icon: ArrowsClockwise, color: '#6366f1' },
       { href: '/marketing',      label: 'Marketing',           icon: TrendUp,        color: '#f59e0b' },
     ],
   },
