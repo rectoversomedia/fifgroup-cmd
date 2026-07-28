@@ -7,7 +7,7 @@ import {
   List, User,
   ChartBar, Star, Stack,
   CurrencyCircleDollar, Globe,
-  Megaphone, Database, Pulse, Brain,
+  Megaphone, Database, Pulse,
   Trophy, MapPin, Bell, DeviceMobile,
   ChartLine, ShieldCheck, ArrowsClockwise, PushPin,
   TrendUp, TrendDown,
@@ -63,7 +63,6 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/lob',           label: 'LoB Performance', icon: ChartBar,      color: '#8b5cf6' },
       { href: '/sales',         label: 'Sales',           icon: CurrencyCircleDollar, color: '#10b981' },
-      { href: '/recommendations',label: 'AI Insights',    icon: Brain,         color: '#a855f7' },
     ],
   },
   {
