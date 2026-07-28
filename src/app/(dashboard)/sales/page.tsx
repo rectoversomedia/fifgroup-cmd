@@ -194,10 +194,7 @@ function DrillDownModal({ stage, onClose }: { stage: string; onClose: () => void
 }
 
 function fmt(n: number) {
-  if (n >= 1_000_000_000) return `Rp ${(n / 1_000_000_000).toFixed(1)}B`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(0)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-  return String(n);
+  return n.toLocaleString('id-ID');
 }
 
 function Skeleton({ className = '' }: { className?: string }) {

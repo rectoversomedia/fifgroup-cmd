@@ -34,7 +34,7 @@ export default function GeographicPage() {
   }, []);
 
   const fmtIDR = (v: number) => {
-    if (v >= 1_000_000_000) return `Rp ${(v / 1_000_000_000).toFixed(1)}B`;
+    if (v >= 1_000_000_000) return `Rp ${v.toLocaleString('id-ID')}`;
     return `Rp ${v.toLocaleString('id-ID')}`;
   };
 

@@ -129,7 +129,7 @@ export default function TVModePage() {
       {/* Main KPI Grid */}
       <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-6 px-8 py-6">
         {(kpiData ? [
-          { label: 'Disbursement', value: `Rp ${(kpiData.disbursement / 1_000_000_000).toFixed(1)}B`, change: `+${kpiData.disbursementChange}%`, up: true,  color: '#10b981', icon: TrendUp },
+          { label: 'Disbursement', value: `Rp ${kpiData.disbursement.toLocaleString('id-ID')}`, change: `+${kpiData.disbursementChange}%`, up: true,  color: '#10b981', icon: TrendUp },
           { label: 'MAU (FIFGO)',  value: fmtNum(kpiData.mauFifgo),                          change: `+${kpiData.mauChange}%`,      up: true,  color: '#06b6d4', icon: Users },
           { label: 'Conv. Rate',   value: `${kpiData.conversionRate}%`,                      change: `+${kpiData.convChange}%`,    up: true,  color: '#8b5cf6', icon: Pulse },
           { label: 'NPF Rate',    value: '2.1%',                                           change: '+0.1%',                       up: false, color: '#f43f5e', icon: TrendDown },

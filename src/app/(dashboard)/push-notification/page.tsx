@@ -52,8 +52,8 @@ export default function PushNotificationPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Spend',     value: `Rp ${(totalSpend / 1_000_000_000).toFixed(1)}B`, icon: CurrencyCircleDollar, color: '#1e3a5f', sub: 'All channels' },
-          { label: 'Total Reach',    value: (summary.totalReach / 1_000_000).toFixed(1) + 'M', icon: Eye,                 color: '#6366f1', sub: 'Unique users' },
+          { label: 'Total Spend',     value: `Rp ${totalSpend.toLocaleString('id-ID')}`, icon: CurrencyCircleDollar, color: '#1e3a5f', sub: 'All channels' },
+          { label: 'Total Reach',    value: summary.totalReach.toLocaleString('id-ID'), icon: Eye,                 color: '#6366f1', sub: 'Unique users' },
           { label: 'Avg ROAS',      value: summary.avgRoas.toFixed(1) + 'x',                    icon: TrendUp,           color: '#10b981', sub: 'Return on ad spend' },
           { label: 'Best Channel',  value: summary.bestChannel,                                   icon: CheckCircle,       color: '#f59e0b', sub: 'Highest ROAS' },
         ].map(m => (
@@ -100,10 +100,10 @@ export default function PushNotificationPage() {
                       </div>
                     </td>
                     <td className="py-4 pr-4 text-right">
-                      <span className="text-sm font-semibold" style={{ color: '#111827' }}>Rp {(ch.spend / 1_000_000).toFixed(0)}M</span>
+                      <span className="text-sm font-semibold" style={{ color: '#111827' }}>Rp {ch.spend.toLocaleString('id-ID')}</span>
                     </td>
                     <td className="py-4 pr-4 text-right">
-                      <span className="text-sm font-semibold" style={{ color: '#374151' }}>{(ch.reach / 1_000).toFixed(0)}K</span>
+                      <span className="text-sm font-semibold" style={{ color: '#374151' }}>{ch.reach.toLocaleString('id-ID')}</span>
                     </td>
                     <td className="py-4 pr-4 text-right">
                       <span className="text-sm font-semibold" style={{ color: '#374151' }}>{ch.conv.toLocaleString('id-ID')}</span>
