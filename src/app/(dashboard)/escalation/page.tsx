@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import {
-  PaperPlaneTilt, Envelope, LogoWhatsapp, ShareNetwork,
+  PaperPlaneTilt, Envelope, Chats, ShareNetwork,
   CheckCircle, Warning, Clock, ArrowRight,
   CaretDown, CaretUp, Plus, Funnel,
 } from '@phosphor-icons/react';
@@ -13,7 +13,7 @@ import {
 
 const CHANNEL_META: Record<EscalationChannel, { label: string; icon: React.ElementType; color: string; placeholder: string }> = {
   email:    { label: 'Email',    icon: Envelope,          color: '#4f8ef7', placeholder: 'ops-director@group.fif.co.id' },
-  whatsapp: { label: 'WhatsApp', icon: WhatsappLogo,      color: '#10b981', placeholder: '+62-812-XXXX-XXXX' },
+  whatsapp: { label: 'WhatsApp', icon: Chats,      color: '#10b981', placeholder: '+62-812-XXXX-XXXX' },
   teams:    { label: 'MS Teams', icon: ShareNetwork, color: '#6366f1', placeholder: 'fifgroup-operations' },
 };
 

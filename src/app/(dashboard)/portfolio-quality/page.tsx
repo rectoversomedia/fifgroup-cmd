@@ -161,9 +161,11 @@ export default function PortfolioQualityPage() {
             <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1e9).toFixed(0)}B`} />
             <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} domain={[0, 6]} />
             <Tooltip contentStyle={{ background: 'white', border: '1px solid #f3f4f6', borderRadius: 12, fontSize: 12 }}
-              formatter={(v: number, name: string) => {
-                if (name === 'disbursement') return [fmtIDR(v), 'Disbursement'];
-                return [`${v}%`, name === 'npf' ? 'NPF' : name === 'par30' ? 'PAR30' : 'Collection'];
+              formatter={(v: unknown, name: unknown) => {
+                const n = name as string;
+                const val = v as number;
+                if (n === 'disbursement') return [fmtIDR(val), 'Disbursement'];
+                return [`${val}%`, n === 'npf' ? 'NPF' : n === 'par30' ? 'PAR30' : 'Collection'];
               }} />
             <Legend formatter={(v) => v === 'disbursement' ? 'Disbursement' : `${v.toUpperCase()} %`} />
             <Line yAxisId="left" type="monotone" dataKey="disbursement" stroke="#1e3a5f" strokeWidth={2} dot={{ r: 3 }} />

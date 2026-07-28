@@ -4,7 +4,7 @@ import * as React from 'react';
 import {
   PaperPlaneTilt, ChatCircle, MegaphoneSimple,
   CheckCircle, Warning, Clock, ArrowRight,
-  CaretDown, CaretUp, Envelope, LogoWhatsapp, ShareNetwork,
+  CaretDown, CaretUp, Envelope, Chats, ShareNetwork,
 } from '@phosphor-icons/react';
 import {
   getEscalationTickets, createEscalationTicket,
@@ -99,8 +99,8 @@ const SEV = {
 
 const CHANNEL_META: Record<EscalationChannel, { label: string; icon: React.ElementType; color: string }> = {
   email:    { label: 'Email',    icon: Envelope,          color: '#4f8ef7' },
-  whatsapp: { label: 'WhatsApp', icon: WhatsappLogo,      color: '#10b981' },
-  teams:    { label: 'MS Teams', icon: ShareNetworkLogo, color: '#6366f1' },
+  whatsapp: { label: 'WhatsApp', icon: Chats,      color: '#10b981' },
+  teams:    { label: 'MS Teams', icon: ShareNetwork, color: '#6366f1' },
 };
 
 const DEFAULT_CURRENTS: Record<number, string> = {

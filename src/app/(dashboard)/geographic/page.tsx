@@ -94,8 +94,8 @@ export default function GeographicPage() {
               <Pie data={regions} dataKey="disbursement" nameKey="region" cx="50%" cy="50%" outerRadius={90} innerRadius={40} paddingAngle={3}>
                 {regions.map((r, i) => <Cell key={r.region} fill={r.color} />)}
               </Pie>
-              <Tooltip formatter={(v: number) => [fmtIDR(v), 'Disbursement']} contentStyle={{ background: 'white', border: '1px solid #f3f4f6', borderRadius: 12, fontSize: 12 }} />
-              <Legend formatter={(v) => <span style={{ color: '#374151', fontSize: 12 }}>{v}</span>} />
+              <Tooltip formatter={(v: unknown) => [fmtIDR(v as number), 'Disbursement']} contentStyle={{ background: 'white', border: '1px solid #f3f4f6', borderRadius: 12, fontSize: 12 }} />
+              <Legend formatter={(v: unknown) => <span style={{ color: '#374151', fontSize: 12 }}>{String(v)}</span>} />
             </PieChart>
           </ResponsiveContainer>
           <div className="space-y-2 mt-2">
@@ -125,7 +125,7 @@ export default function GeographicPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
               <XAxis dataKey="region" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} domain={[0, 5]} />
-              <Tooltip formatter={(v: number) => [`${v}%`, 'NPF Rate']} contentStyle={{ background: 'white', border: '1px solid #f3f4f6', borderRadius: 12, fontSize: 12 }} />
+              <Tooltip formatter={(v: unknown) => [`${v}%`, 'NPF Rate']} contentStyle={{ background: 'white', border: '1px solid #f3f4f6', borderRadius: 12, fontSize: 12 }} />
               <Bar dataKey="npfRate" radius={[6, 6, 0, 0]}>
                 {regions.map(r => (
                   <Cell key={r.region} fill={r.npfRate > 3 ? '#dc2626' : r.npfRate > 2 ? '#f59e0b' : '#10b981'} />
