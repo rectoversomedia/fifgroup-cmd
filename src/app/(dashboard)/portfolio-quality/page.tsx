@@ -28,10 +28,11 @@ export default function PortfolioQualityPage() {
     return () => clearInterval(t);
   }, []);
 
-  const { data, isLoading } = useRealtime(
+  const fetcher = React.useCallback(
     () => getPortfolioQuality(period),
-    60_000,
+    [period],
   );
+  const { data, isLoading } = useRealtime(fetcher, 60_000);
 
   if (isLoading || !data) {
     return (
