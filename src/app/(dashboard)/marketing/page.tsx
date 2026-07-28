@@ -1,14 +1,29 @@
 'use client';
 
 import * as React from 'react';
-import { Lightning, Users, CheckCircle, TrendUp, Envelope, Bell, Rocket, ChartBar, CurrencyCircleDollar, Calendar } from '@phosphor-icons/react';
+import { Lightning, Users, CheckCircle, TrendUp, Bell, Rocket, ChartBar, CurrencyCircleDollar, Calendar } from '@phosphor-icons/react';
+
+const WA_SVG = 'https://upload.wikimedia.org/wikipedia/commons/6/65/WhatsApp.svg';
+const EMAIL_SVG = 'https://ssl.gstatic.com/images/branding/product/1x/gmail_2020q4_512dp.png';
+const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/messagebird.svg';
+const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/googlecloudnotifications.svg';
+
+function MktIcon({ channel, size = 16 }: { channel: string; size?: number }) {
+  switch (channel) {
+    case 'WhatsApp': return <img src={WA_SVG} alt="WhatsApp" width={size} height={size} />;
+    case 'Email': return <img src={EMAIL_SVG} alt="Email" width={size} height={size} />;
+    case 'SMS': return <img src={SMS_SVG} alt="SMS" width={size} height={size} style={{ filter: 'brightness(0) saturate(100%)' }} />;
+    case 'Push Notification': case 'In-App Message': return <img src={PUSH_SVG} alt="Push" width={size} height={size} style={{ filter: 'brightness(0) saturate(100%)' }} />;
+    default: return <Bell size={size} />;
+  }
+}
 
 const CHANNELS = [
-  { channel: 'Push Notification', icon: Bell, sent: 189000, delivered: 182430, opened: 91215, clicked: 13682, converted: 4561, color: '#4f8ef7', cost: 'Rp 12.4M', revenue: 'Rp 8.2B' },
-  { channel: 'In-App Message', icon: Bell, sent: 234000, delivered: 234000, opened: 117000, clicked: 21060, converted: 7020, color: '#8b5cf6', cost: 'Rp 0', revenue: 'Rp 12.6B' },
-  { channel: 'SMS', icon: Lightning, sent: 45600, delivered: 43600, opened: 0, clicked: 3928, converted: 1309, color: '#06b6d4', cost: 'Rp 45.6M', revenue: 'Rp 2.4B' },
-  { channel: 'Email', icon: Envelope, sent: 89000, delivered: 80100, opened: 20025, clicked: 4005, converted: 801, color: '#f59e0b', cost: 'Rp 8.9M', revenue: 'Rp 1.4B' },
-  { channel: 'Branch / Walk-in', icon: Users, sent: 2800, delivered: 2800, opened: 2800, clicked: 1400, converted: 840, color: '#10b981', cost: 'Rp 280M', revenue: 'Rp 1.5B' },
+  { channel: 'Push Notification', icon: 'Push Notification', sent: 189000, delivered: 182430, opened: 91215, clicked: 13682, converted: 4561, color: '#4f8ef7', cost: 'Rp 12.4M', revenue: 'Rp 8.2B' },
+  { channel: 'In-App Message', icon: 'In-App Message', sent: 234000, delivered: 234000, opened: 117000, clicked: 21060, converted: 7020, color: '#8b5cf6', cost: 'Rp 0', revenue: 'Rp 12.6B' },
+  { channel: 'SMS', icon: 'SMS', sent: 45600, delivered: 43600, opened: 0, clicked: 3928, converted: 1309, color: '#06b6d4', cost: 'Rp 45.6M', revenue: 'Rp 2.4B' },
+  { channel: 'Email', icon: 'Email', sent: 89000, delivered: 80100, opened: 20025, clicked: 4005, converted: 801, color: '#f59e0b', cost: 'Rp 8.9M', revenue: 'Rp 1.4B' },
+  { channel: 'Branch / Walk-in', icon: 'Branch', sent: 2800, delivered: 2800, opened: 2800, clicked: 1400, converted: 840, color: '#10b981', cost: 'Rp 280M', revenue: 'Rp 1.5B' },
 ];
 
 const TEMPLATES = [
@@ -237,7 +252,7 @@ export default function MarketingPage() {
                         <td className="py-3.5 pr-4">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${c.color}15` }}>
-                              <c.icon size={16} style={{ color: c.color }} weight="fill" />
+                              <MktIcon channel={c.channel} size={16} />
                             </div>
                             <span className="text-sm font-semibold" style={{ color: c.color }}>{c.channel}</span>
                           </div>

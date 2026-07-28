@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Lightning, Users, ChartBar, Gear, Database, Brain, Warning, TrendUp, TrendDown, CheckCircle, MagnifyingGlass, ChatCircle, Bell, Envelope, DeviceMobile, PaperPlaneTilt } from '@phosphor-icons/react';
+import { Lightning, Users, ChartBar, Gear, Database, Brain, Warning, TrendUp, TrendDown, CheckCircle, MagnifyingGlass, Bell, DeviceMobile, PaperPlaneTilt } from '@phosphor-icons/react';
 
 const LOB_LOGOS: Record<string, string> = {
   FIFASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FIFASTRA-1780538519035.png',
@@ -10,6 +10,38 @@ const LOB_LOGOS: Record<string, string> = {
   FINATRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FINATRA-1780538626287.png',
   AMITRA:   'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20AMITRA-1780538604037.png',
 };
+
+const WA_SVG = 'https://upload.wikimedia.org/wikipedia/commons/6/65/WhatsApp.svg';
+const EMAIL_SVG = 'https://ssl.gstatic.com/images/branding/product/1x/gmail_2020q4_512dp.png';
+const TEAMS_SVG = 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg';
+const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/messagebird.svg';
+const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/googlecloudnotifications.svg';
+
+function WaIcon({ size = 16 }: { size?: number }) {
+  return <img src={WA_SVG} alt="WhatsApp" width={size} height={size} />;
+}
+function EmailIcon({ size = 16 }: { size?: number }) {
+  return <img src={EMAIL_SVG} alt="Email" width={size} height={size} />;
+}
+function TeamsIcon({ size = 16 }: { size?: number }) {
+  return <img src={TEAMS_SVG} alt="MS Teams" width={size} height={size} />;
+}
+function SmsIcon({ size = 16 }: { size?: number }) {
+  return <img src={SMS_SVG} alt="SMS" width={size} height={size} style={{ filter: 'brightness(0) saturate(100%)' }} />;
+}
+function PushIcon({ size = 16 }: { size?: number }) {
+  return <img src={PUSH_SVG} alt="Push" width={size} height={size} style={{ filter: 'brightness(0) saturate(100%)' }} />;
+}
+function ChannelIcon({ channel, size = 16 }: { channel: string; size?: number }) {
+  switch (channel) {
+    case 'WhatsApp': return <WaIcon size={size} />;
+    case 'Email': return <EmailIcon size={size} />;
+    case 'MS Teams': return <TeamsIcon size={size} />;
+    case 'SMS': return <SmsIcon size={size} />;
+    case 'Push': return <PushIcon size={size} />;
+    default: return <Bell size={size} />;
+  }
+}
 
 type ActionStep = { step: number; status: 'pending' | 'sending' | 'done' | 'error'; label: string; detail: string; time?: string };
 
@@ -829,23 +861,23 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
     payment: '#10b981', inquiry: '#4f8ef7', late: '#f59e0b', escalation: '#dc2626',
   };
 
-  const nextActions: Record<string, { channel: string; icon: React.ElementType; label: string; msg: string; color: string; priority: 'high' | 'medium' | 'low' }[]> = {
+  const nextActions: Record<string, { channel: string; icon: string; label: string; msg: string; color: string; priority: 'high' | 'medium' | 'low' }[]> = {
     BudiSantoso: [
-      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp Cross-Sell — DANASTRA', msg: 'Budi, motor lama mau di-refinance? Dana tambahan Rp 15jt cair dalam 3 hari. Klik 👉 fifgroup.id/refi', color: '#10b981', priority: 'high' },
-      { channel: 'Push', icon: Bell, label: 'Push — DANASTRA Offer', msg: 'Tukar motor lama dapat dana tambahan! Promo refinance 0.5%/bulan. ☝️', color: '#f59e0b', priority: 'high' },
-      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp — FINATRA Offer', msg: 'Budi, butuh modal usaha? FINATRA menawarkan dana Rp 25-200 juta untuk wiraswasta seperti Anda. Proses 3 hari! 👉 fifgroup.id/finatra', color: '#059669', priority: 'high' },
-      { channel: 'Email', icon: Envelope, label: 'Email — AMITRA Education', msg: 'Siapkan masa depan anak Anda dengan tabungan pendidikan AMITRA. Mulai Rp 200rb/bulan. 👉 fifgroup.id/amitra', color: '#ec4899', priority: 'medium' },
-      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp — AMITRA Offer', msg: 'Budi, pendidikan anak makin mahal. AMITRA bantu siapkan和教育基金 mulai Rp 200rb/bulan. ☎️ Hubungi kami!', color: '#ec4899', priority: 'medium' },
-      { channel: 'SMS', icon: DeviceMobile, label: 'SMS Reminder', msg: 'Budi, angsuran FIFASTRA Rp 618rb jatuh tgl 10 Agust. Pastikan saldo cukup ya.', color: '#6b7280', priority: 'low' },
+      { channel: 'WhatsApp', icon: 'WhatsApp', label: 'WhatsApp Cross-Sell — DANASTRA', msg: 'Budi, motor lama mau di-refinance? Dana tambahan Rp 15jt cair dalam 3 hari. Klik 👉 fifgroup.id/refi', color: '#10b981', priority: 'high' },
+      { channel: 'Push', icon: 'Push', label: 'Push — DANASTRA Offer', msg: 'Tukar motor lama dapat dana tambahan! Promo refinance 0.5%/bulan. ☝️', color: '#f59e0b', priority: 'high' },
+      { channel: 'WhatsApp', icon: 'WhatsApp', label: 'WhatsApp — FINATRA Offer', msg: 'Budi, butuh modal usaha? FINATRA menawarkan dana Rp 25-200 juta untuk wiraswasta seperti Anda. Proses 3 hari! 👉 fifgroup.id/finatra', color: '#059669', priority: 'high' },
+      { channel: 'Email', icon: 'Email', label: 'Email — AMITRA Education', msg: 'Siapkan masa depan anak Anda dengan tabungan pendidikan AMITRA. Mulai Rp 200rb/bulan. 👉 fifgroup.id/amitra', color: '#ec4899', priority: 'medium' },
+      { channel: 'WhatsApp', icon: 'WhatsApp', label: 'WhatsApp — AMITRA Offer', msg: 'Budi, pendidikan anak makin mahal. AMITRA bantu siapkan和教育基金 mulai Rp 200rb/bulan. ☎️ Hubungi kami!', color: '#ec4899', priority: 'medium' },
+      { channel: 'SMS', icon: 'SMS', label: 'SMS Reminder', msg: 'Budi, angsuran FIFASTRA Rp 618rb jatuh tgl 10 Agust. Pastikan saldo cukup ya.', color: '#6b7280', priority: 'low' },
     ],
     SitiRahayu: [
-      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp — SPEKTRA Offer', msg: 'Siti! Pinjaman mikro tanpa agunan Rp 5jt, bunga 0% untuk 30 hari pertama. Proses 100% di HP 👉 fifgroup.id/spektra', color: '#8b5cf6', priority: 'high' },
-      { channel: 'Push', icon: Bell, label: 'Push — Greeting', msg: 'Selamat datang Siti! Ajukan pinjaman pertama Anda di FIFGO — proses cepat, bunga ringan.', color: '#4f8ef7', priority: 'medium' },
+      { channel: 'WhatsApp', icon: 'WhatsApp', label: 'WhatsApp — SPEKTRA Offer', msg: 'Siti! Pinjaman mikro tanpa agunan Rp 5jt, bunga 0% untuk 30 hari pertama. Proses 100% di HP 👉 fifgroup.id/spektra', color: '#8b5cf6', priority: 'high' },
+      { channel: 'Push', icon: 'Push', label: 'Push — Greeting', msg: 'Selamat datang Siti! Ajukan pinjaman pertama Anda di FIFGO — proses cepat, bunga ringan.', color: '#4f8ef7', priority: 'medium' },
     ],
     AhmadWijaya: [
-      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp — FINATRA Follow-up', msg: 'Pak Ahmad, pengajuan FINATRA Rp 50jt sedang diproses. Tim kami akan menghubungi besok. ☎️', color: '#059669', priority: 'high' },
-      { channel: 'Call', icon: DeviceMobile, label: 'Schedule Call', msg: 'Outbound call: follow-up FINATRA Rp 50jt — pengusaha toko elektronik Surabaya. Slot: besok 09:00-11:00 WIB.', color: '#1e3a5f', priority: 'high' },
-      { channel: 'Email', icon: Envelope, label: 'Email — FINATRA Docs', msg: 'Persiapkan dokumen FINATRA: NIB, Rekening 6 bln, Surat keterangan usaha dari Kelurahan.', color: '#6366f1', priority: 'medium' },
+      { channel: 'WhatsApp', icon: 'WhatsApp', label: 'WhatsApp — FINATRA Follow-up', msg: 'Pak Ahmad, pengajuan FINATRA Rp 50jt sedang diproses. Tim kami akan menghubungi besok. ☎️', color: '#059669', priority: 'high' },
+      { channel: 'Call', icon: 'Call', label: 'Schedule Call', msg: 'Outbound call: follow-up FINATRA Rp 50jt — pengusaha toko elektronik Surabaya. Slot: besok 09:00-11:00 WIB.', color: '#1e3a5f', priority: 'high' },
+      { channel: 'Email', icon: 'Email', label: 'Email — FINATRA Docs', msg: 'Persiapkan dokumen FINATRA: NIB, Rekening 6 bln, Surat keterangan usaha dari Kelurahan.', color: '#6366f1', priority: 'medium' },
     ],
   };
 
@@ -943,15 +975,18 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
               <p className="text-[10px] font-semibold mb-2" style={{ color: '#9ca3af' }}>Communication Preferences</p>
               <div className="flex gap-2 flex-wrap">
                 {Object.entries(profile.communicationPrefs).map(([ch, enabled]) => {
-                  const iconMap: Record<string, React.ReactNode> = {
-                    whatsapp: <svg width="12" height="12" viewBox="0 0 24 24" fill={enabled ? '#25D366' : '#d1d5db'}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 6.987L.789 23.789l4.35-1.678A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm5.894 17.803c-.386 1.082-1.978 1.99-3.166 2.147-.51.07-1.175.098-1.94.042a12.44 12.44 0 01-3.22-.77c-.24-.085-.416-.13-.594-.13s-.316.03-.463.055c-.147.025-.342-.035-.542-.185-1.78-1.34-2.96-3.47-3.056-3.67-.095-.2-1.01-1.31-1.01-2.5 0-1.19.64-1.78.868-2.02.23-.24.5-.3.666-.3.167 0 .333 0 .48.008.146.008.343-.055.523.4.182.455.618 1.575.672 1.69.054.115.09.248.03.395-.06.147-.09.26-.18.373-.09.115-.19.252-.27.337-.09.086-.18.18-.077.352.103.173.46.73.99 1.185.43.37.8.485 1.09.537.29.05.56.063.77-.09.21-.154.35-.39.45-.62.1-.23.21-.2.58-.07.37.13 2.36.96 2.77 1.79.41.83.41 1.54.29 1.69-.12.15-.43.24-.9.43z"/></svg>,
-                    sms: <DeviceMobile size={11} style={{ color: enabled ? '#4f8ef7' : '#d1d5db' }} />,
-                    email: <Envelope size={11} style={{ color: enabled ? '#f59e0b' : '#d1d5db' }} />,
-                    push: <Bell size={11} style={{ color: enabled ? '#10b981' : '#d1d5db' }} />,
-                  };
+                  const iconEl = (() => {
+                    switch (ch) {
+                      case 'whatsapp': return <img src={WA_SVG} alt="WhatsApp" width={12} height={12} />;
+                      case 'sms': return <SmsIcon size={11} />;
+                      case 'email': return <img src={EMAIL_SVG} alt="Email" width={11} height={11} />;
+                      case 'push': return <PushIcon size={11} />;
+                      default: return null;
+                    }
+                  })();
                   return (
                     <span key={ch} className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full" style={{ background: enabled ? '#f0fdf4' : '#f9fafb', color: enabled ? '#374151' : '#d1d5db' }}>
-                      {iconMap[ch]} {ch}
+                      {iconEl} {ch}
                     </span>
                   );
                 })}
@@ -1160,7 +1195,6 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
 
         <div className="space-y-2">
           {actions.map((action, i) => {
-            const Icon = action.icon;
             const state = getActionState(action.label);
             const sent = state === 'sent';
             return (
@@ -1170,7 +1204,7 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
                 opacity: sent ? 0.7 : 1,
               }}>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${action.color}15` }}>
-                  <Icon size={16} style={{ color: action.color }} weight="fill" />
+                  <ChannelIcon channel={action.channel} size={16} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -1333,7 +1367,7 @@ function OfferModal({ profile, product, onClose, onExecute }: OfferModalProps) {
     { id: 'SMS', label: 'SMS', color: '#4f8ef7',
       icon: <DeviceMobile size={16} style={{ color: 'white' }} /> },
     { id: 'Email', label: 'Email', color: '#f59e0b',
-      icon: <Envelope size={16} style={{ color: 'white' }} /> },
+      icon: <img src={EMAIL_SVG} alt="Email" width={16} height={16} /> },
     { id: 'Push', label: 'Push Notif', color: '#10b981',
       icon: <Bell size={16} style={{ color: 'white' }} /> },
   ];

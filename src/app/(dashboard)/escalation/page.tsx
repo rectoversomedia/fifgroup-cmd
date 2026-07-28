@@ -11,19 +11,24 @@ import {
   type EscalationTicket, type EscalationChannel,
 } from '@/lib/data-sim';
 
-const WHATSAPP_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/whatsapp.svg';
-const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/microsoftteams.svg';
+const WHATSAPP_SVG = 'https://upload.wikimedia.org/wikipedia/commons/6/65/WhatsApp.svg';
+const TEAMS_SVG = 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg';
+const EMAIL_SVG = 'https://ssl.gstatic.com/images/branding/product/1x/gmail_2020q4_512dp.png';
 
 function WhatsAppIcon({ size = 18, color = '#10b981' }: { size?: number; color?: string }) {
-  return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} style={{ filter: `brightness(0) saturate(100%) sepia(0) saturate(7500%) hue-rotate(150deg) brightness(90%)` }} />;
+  return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} />;
 }
 
 function TeamsIcon({ size = 18, color = '#6366f1' }: { size?: number; color?: string }) {
-  return <img src={TEAMS_SVG} alt="MS Teams" width={size} height={size} style={{ filter: `brightness(0) saturate(100%) sepia(0) saturate(6500%) hue-rotate(230deg) brightness(90%)` }} />;
+  return <img src={TEAMS_SVG} alt="MS Teams" width={size} height={size} />;
+}
+
+function EmailIcon({ size = 18, color = '#4f8ef7' }: { size?: number; color?: string }) {
+  return <img src={EMAIL_SVG} alt="Email" width={size} height={size} />;
 }
 
 const CHANNEL_META: Record<EscalationChannel, { label: string; icon: React.ElementType; color: string; placeholder: string }> = {
-  email:    { label: 'Email',    icon: Envelope,          color: '#4f8ef7', placeholder: 'ops-director@group.fif.co.id' },
+  email:    { label: 'Email',    icon: EmailIcon,       color: '#4f8ef7', placeholder: 'ops-director@group.fif.co.id' },
   whatsapp: { label: 'WhatsApp', icon: WhatsAppIcon,     color: '#10b981', placeholder: '+62-812-XXXX-XXXX' },
   teams:    { label: 'MS Teams', icon: TeamsIcon,         color: '#6366f1', placeholder: 'fifgroup-operations' },
 };
