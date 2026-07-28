@@ -102,14 +102,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="h-16 flex items-center justify-center shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
+      <div className="h-12 flex items-center justify-center shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
         {collapsed ? (
           // Collapsed: show favicon (Astra circle with star)
           <img
             src="https://www.fifgroup.co.id/favicon.ico"
             alt="FIFGROUP"
             className="object-contain"
-            style={{ height: 32, width: 32 }}
+            style={{ height: 26, width: 26 }}
           />
         ) : (
           // Expanded: show full logo in color
@@ -117,30 +117,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             src="https://www.fifgroup.co.id/assets/images/png/fifgroup-logo-v2-20260423.png"
             alt="FIFGROUP"
             className="object-contain"
-            style={{ height: 36, width: 'auto' }}
+            style={{ height: 28, width: 'auto' }}
           />
         )}
       </div>
 
       {/* Live Indicator */}
       {!collapsed && (
-        <div className="px-4 py-2 flex items-center gap-2 shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
-          <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot shrink-0" />
-          <span className="text-[10px]" style={{ color: '#9ca3af' }}>LIVE</span>
-          <span className="text-[10px] ml-auto" style={{ color: '#d1d5db' }}>{timeStr} WIB</span>
+        <div className="px-3 py-1.5 flex items-center gap-2 shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot shrink-0" />
+          <span className="text-[9px]" style={{ color: '#9ca3af' }}>LIVE</span>
+          <span className="text-[9px] ml-auto" style={{ color: '#d1d5db' }}>{timeStr} WIB</span>
         </div>
       )}
 
       {/* Nav groups */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
+      <nav className="flex-1 overflow-y-auto py-2 px-1.5 space-y-3">
         {NAV_GROUPS.map(group => (
           <div key={group.label}>
             {!collapsed && (
-              <p className="text-[9px] font-extrabold uppercase tracking-widest px-3 mb-1.5" style={{ color: '#d1d5db' }}>
+              <p className="text-[8px] font-extrabold uppercase tracking-widest px-2 mb-1" style={{ color: '#d1d5db' }}>
                 {group.label}
               </p>
             )}
-            <div className="space-y-0.5">
+            <div className="space-y-0">
               {group.items.map(item => {
                 const isActive = item.href === '/'
                   ? pathname === '/'
@@ -151,16 +151,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all md:text-[13px] text-sm"
+                    className="flex items-center gap-2 px-2 py-2 rounded-lg transition-all"
                     style={{
                       background: isActive ? `${item.color}12` : 'transparent',
                       color: isActive ? item.color : '#64748b',
                       fontWeight: isActive ? 700 : 500,
+                      fontSize: 11,
                     }}
                     title={collapsed ? item.label : undefined}
                   >
                     <Icon
-                      size={20}
+                      size={16}
                       weight={isActive ? 'fill' : 'regular'}
                       style={{ color: isActive ? item.color : '#94a3b8', flexShrink: 0 }}
                     />
@@ -174,11 +175,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </nav>
 
       {/* Collapse button */}
-      <div className="p-3 shrink-0 hidden md:block" style={{ borderTop: '1px solid #f3f4f6' }}>
+      <div className="p-2 shrink-0 hidden md:block" style={{ borderTop: '1px solid #f3f4f6' }}>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center py-2 rounded-xl transition-all"
-          style={{ background: '#f8fafc', color: '#94a3b8', fontSize: 12 }}
+          className="w-full flex items-center justify-center py-1.5 rounded-lg transition-all"
+          style={{ background: '#f8fafc', color: '#94a3b8', fontSize: 11 }}
         >
           {collapsed ? '→' : '← Collapse'}
         </button>

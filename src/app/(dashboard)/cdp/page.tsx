@@ -172,12 +172,12 @@ export default function CDPPage() {
   }, []);
 
   return (
-    <div className="p-4 sm:p-6 space-y-5 bg-gray-50 min-h-screen">
+    <div className="p-3 sm:p-4 space-y-3 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-2xl font-extrabold" style={{ color: '#111827' }}>CDP & Journeys</h1>
-          <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>Customer Data Platform — journeys, segments & AI insights · July 2026</p>
+          <h1 className="text-xl font-extrabold" style={{ color: '#111827' }}>CDP &amp; Journeys</h1>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>Customer Data Platform · July 2026</p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-gray-200">
           <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" />
@@ -188,11 +188,11 @@ export default function CDPPage() {
       </div>
 
       {/* Status badges */}
-      <div className="flex gap-2 flex-wrap">
-        <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-emerald-50" style={{ color: '#059669' }}>{totalActive} Active</span>
-        <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-amber-50" style={{ color: '#d97706' }}>1 Paused</span>
-        <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-blue-50" style={{ color: '#1d4ed8' }}>1 Draft</span>
-        <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-gray-100" style={{ color: '#6b7280' }}>{totalUsers.toLocaleString()} Total Users</span>
+      <div className="flex gap-1.5 flex-wrap">
+        <span className="text-[10px] px-2.5 py-1 rounded-full font-medium bg-emerald-50" style={{ color: '#059669' }}>{totalActive} Active</span>
+        <span className="text-[10px] px-2.5 py-1 rounded-full font-medium bg-amber-50" style={{ color: '#d97706' }}>1 Paused</span>
+        <span className="text-[10px] px-2.5 py-1 rounded-full font-medium bg-blue-50" style={{ color: '#1d4ed8' }}>1 Draft</span>
+        <span className="text-[10px] px-2.5 py-1 rounded-full font-medium bg-gray-100" style={{ color: '#6b7280' }}>{totalUsers.toLocaleString()} Total Users</span>
       </div>
 
       {/* Tabs */}
@@ -201,7 +201,7 @@ export default function CDPPage() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className="px-4 py-2 rounded-lg text-xs font-semibold transition-all shrink-0"
+            className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all shrink-0"
             style={tab === t.id
               ? { background: '#6366f1', color: '#fff' }
               : { background: 'transparent', color: '#6b7280' }
@@ -214,62 +214,63 @@ export default function CDPPage() {
 
       {/* ─── OVERVIEW TAB ─── */}
       {tab === 'overview' && (
-        <div className="space-y-5">
+        <div className="space-y-3">
           {/* KPIs */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-4 gap-3">
             {[
               { icon: Users, label: 'Total Known Users', value: totalUsers.toLocaleString(), color: '#4f8ef7' },
               { icon: Lightning, label: 'Active Journeys', value: `${totalActive}/5`, color: '#10b981' },
-              { icon: ChartBar, label: 'Events Tracked', value: '12', sub: 'Real-time event types', color: '#8b5cf6' },
-              { icon: Database, label: 'Data Sources', value: '6', sub: 'FIFGO, FIFADA, CDP, Branch', color: '#f59e0b' },
+              { icon: ChartBar, label: 'Events Tracked', value: '12', sub: 'Real-time types', color: '#8b5cf6' },
+              { icon: Database, label: 'Data Sources', value: '6', sub: 'FIFGO, FIFADA, Branch', color: '#f59e0b' },
             ].map(m => (
-              <div key={m.label} className="bg-white rounded-2xl p-5 border border-gray-200 flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: `${m.color}15` }}>
-                  <m.icon size={22} style={{ color: m.color }} weight="fill" />
+              <div key={m.label} className="bg-white rounded-xl p-3 border border-gray-200 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${m.color}15` }}>
+                  <m.icon size={16} style={{ color: m.color }} weight="fill" />
                 </div>
-                <p className="text-2xl font-extrabold mb-0.5" style={{ color: '#111827' }}>{m.value}</p>
-                <p className="text-xs" style={{ color: '#9ca3af' }}>{m.label}</p>
-                {m.sub && <p className="text-[11px] mt-0.5" style={{ color: '#9ca3af' }}>{m.sub}</p>}
+                <div className="min-w-0">
+                  <p className="text-base font-extrabold leading-tight" style={{ color: '#111827' }}>{m.value}</p>
+                  <p className="text-[10px] truncate" style={{ color: '#9ca3af' }}>{m.label}</p>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Data Sources */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <h3 className="text-sm font-bold mb-5" style={{ color: '#111827' }}>Data Sources Integrated</h3>
-            <div className="grid grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl border border-gray-200 p-3">
+            <h3 className="text-xs font-bold mb-2" style={{ color: '#111827' }}>Data Sources Integrated</h3>
+            <div className="grid grid-cols-4 gap-2">
               {[
                 { name: 'FIFGO App', type: 'Mobile App', events: '4,200K/day', color: '#10b981' },
                 { name: 'FIFADA App', type: 'Mobile App', events: '620K/day', color: '#4f8ef7' },
                 { name: 'Branch CRM', type: 'Offline', events: '2,800/day', color: '#8b5cf6' },
                 { name: 'Marketing Cloud', type: 'Push/SMS/Email', events: '312K/day', color: '#f59e0b' },
               ].map(s => (
-                <div key={s.name} className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2" style={{ background: `${s.color}15` }}>
-                    <Database size={16} style={{ color: s.color }} weight="fill" />
+                <div key={s.name} className="bg-gray-50 rounded-xl p-3 border border-gray-100 flex flex-col items-center text-center">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-1.5" style={{ background: `${s.color}15` }}>
+                    <Database size={13} style={{ color: s.color }} weight="fill" />
                   </div>
-                  <p className="text-xs font-bold" style={{ color: '#111827' }}>{s.name}</p>
-                  <p className="text-[10px] mb-2" style={{ color: '#9ca3af' }}>{s.type}</p>
-                  <span className="text-[10px] font-medium" style={{ color: s.color }}>{s.events}</span>
+                  <p className="text-[10px] font-bold" style={{ color: '#111827' }}>{s.name}</p>
+                  <p className="text-[9px] mb-1.5" style={{ color: '#9ca3af' }}>{s.type}</p>
+                  <span className="text-[9px] font-medium" style={{ color: s.color }}>{s.events}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* CDP Features */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <h3 className="text-sm font-bold mb-5" style={{ color: '#111827' }}>CDP Platform Capabilities</h3>
-            <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl border border-gray-200 p-3">
+            <h3 className="text-xs font-bold mb-2" style={{ color: '#111827' }}>CDP Platform Capabilities</h3>
+            <div className="grid grid-cols-3 gap-2">
               {CDP_FEATURES.map(f => {
                 const Icon = f.icon;
                 return (
-                  <div key={f.name} className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center text-center">
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-3" style={{ background: `${f.color}15` }}>
-                      <Icon size={18} style={{ color: f.color }} weight="fill" />
+                  <div key={f.name} className="bg-gray-50 rounded-xl p-3 border border-gray-100 flex flex-col items-center text-center">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2" style={{ background: `${f.color}15` }}>
+                      <Icon size={14} style={{ color: f.color }} weight="fill" />
                     </div>
-                    <p className="text-xs font-bold mb-1" style={{ color: '#111827' }}>{f.name}</p>
-                    <p className="text-[10px] mb-3" style={{ color: '#9ca3af' }}>{f.desc}</p>
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                    <p className="text-[10px] font-bold mb-1" style={{ color: '#111827' }}>{f.name}</p>
+                    <p className="text-[9px] mb-2" style={{ color: '#9ca3af' }}>{f.desc}</p>
+                    <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${
                       f.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                     }`}>{f.status.toUpperCase()}</span>
                   </div>
@@ -282,9 +283,9 @@ export default function CDPPage() {
 
       {/* ─── JOURNEYS TAB ─── */}
       {tab === 'journeys' && (
-        <div className="space-y-5">
+        <div className="space-y-3">
           {/* Journey Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
             {JOURNEYS.map(j => {
               const JIcon = ICON_MAP[j.icon] || Users;
               const isSelected = selectedJourney === j.id;
@@ -292,30 +293,30 @@ export default function CDPPage() {
                 <div
                   key={j.id}
                   onClick={() => setSelectedJourney(j.id)}
-                  className="rounded-2xl p-4 border cursor-pointer transition-all flex flex-col items-center text-center hover:shadow-sm"
+                  className="rounded-xl p-3 border cursor-pointer transition-all flex flex-col items-center text-center hover:shadow-sm"
                   style={{
                     background: isSelected ? `${j.color}08` : 'white',
                     border: `1px solid ${isSelected ? j.color + '80' : '#e5e7eb'}`,
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: `${j.color}15` }}>
-                    <JIcon size={18} style={{ color: j.color }} weight="fill" />
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2" style={{ background: `${j.color}15` }}>
+                    <JIcon size={16} style={{ color: j.color }} weight="fill" />
                   </div>
-                  <p className="text-xs font-bold mb-0.5" style={{ color: '#111827' }}>{j.name}</p>
-                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold mb-3 ${
+                  <p className="text-[10px] font-bold mb-0.5" style={{ color: '#111827' }}>{j.name}</p>
+                  <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold mb-2 ${
                     j.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
                     j.status === 'paused' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
                   }`}>{j.status}</span>
                   <div className="w-full space-y-1 mt-auto">
                     <div className="flex justify-between">
-                      <span className="text-[10px]" style={{ color: '#9ca3af' }}>Users</span>
+                      <span className="text-[9px]" style={{ color: '#9ca3af' }}>Users</span>
                       <span className="text-[10px] font-bold" style={{ color: '#374151' }}>{j.users > 0 ? j.users.toLocaleString() : '—'}</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                    <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
                       <div className="h-full rounded-full" style={{ width: `${j.convRate}%`, background: j.color }} />
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[10px]" style={{ color: '#9ca3af' }}>Conv.</span>
+                      <span className="text-[9px]" style={{ color: '#9ca3af' }}>Conv.</span>
                       <span className="text-[10px] font-bold" style={{ color: j.color }}>{j.convRate > 0 ? `${j.convRate}%` : '—'}</span>
                     </div>
                   </div>
@@ -325,65 +326,65 @@ export default function CDPPage() {
           </div>
 
           {/* Selected Journey Detail */}
-          <div className="bg-white rounded-2xl border overflow-hidden" style={{ borderColor: `${journey.color}40` }}>
-            <div className="p-5 flex items-start gap-4 flex-wrap" style={{ background: `${journey.color}08`, borderBottom: `1px solid ${journey.color}20` }}>
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${journey.color}15` }}>
+          <div className="bg-white rounded-xl border overflow-hidden" style={{ borderColor: `${journey.color}40` }}>
+            <div className="p-3 flex items-start gap-3 flex-wrap" style={{ background: `${journey.color}08`, borderBottom: `1px solid ${journey.color}20` }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${journey.color}15` }}>
                 {(ICON_MAP[journey.icon] || Users).render
-                  ? React.createElement(ICON_MAP[journey.icon] || Users, { size: 22, style: { color: journey.color }, weight: 'fill' })
-                  : <Users size={22} style={{ color: journey.color }} weight="fill" />
+                  ? React.createElement(ICON_MAP[journey.icon] || Users, { size: 18, style: { color: journey.color }, weight: 'fill' })
+                  : <Users size={18} style={{ color: journey.color }} weight="fill" />
                 }
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                  <h2 className="text-lg font-extrabold" style={{ color: '#111827' }}>{journey.name}</h2>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  <h2 className="text-base font-extrabold" style={{ color: '#111827' }}>{journey.name}</h2>
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
                     journey.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
                     journey.status === 'paused' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
                   }`}>{journey.status}</span>
                 </div>
-                <p className="text-xs" style={{ color: '#6b7280' }}>Impact: <strong style={{ color: '#10b981' }}>{journey.potential}</strong> · {journey.desc}</p>
+                <p className="text-[10px]" style={{ color: '#6b7280' }}>Impact: <strong style={{ color: '#10b981' }}>{journey.potential}</strong> · {journey.desc}</p>
               </div>
-              <div className="flex gap-6 flex-wrap">
+              <div className="flex gap-4 flex-wrap">
                 {[
                   { label: 'Users In', value: journey.users > 0 ? journey.users.toLocaleString() : '—' },
                   { label: 'Conversions', value: journey.convRate > 0 ? `${Math.round(journey.users * journey.convRate / 100).toLocaleString()}` : '—' },
                   { label: 'Conv. Rate', value: journey.convRate > 0 ? `${journey.convRate}%` : '—' },
                 ].map(m => (
                   <div key={m.label} className="text-center">
-                    <p className="text-lg font-extrabold" style={{ color: '#111827' }}>{m.value}</p>
-                    <p className="text-[10px]" style={{ color: '#9ca3af' }}>{m.label}</p>
+                    <p className="text-sm font-extrabold" style={{ color: '#111827' }}>{m.value}</p>
+                    <p className="text-[9px]" style={{ color: '#9ca3af' }}>{m.label}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="p-5">
-              <div className="p-3 rounded-xl text-[11px] mb-5 font-mono" style={{ background: '#f9fafb', border: '1px solid #f3f4f6', color: '#4f8ef7' }}>
+            <div className="p-3">
+              <div className="p-2 rounded-lg text-[10px] mb-3 font-mono" style={{ background: '#f9fafb', border: '1px solid #f3f4f6', color: '#4f8ef7' }}>
                 Trigger: {journey.trigger}
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {journey.steps.map((step, i) => (
-                  <div key={i} className="flex items-start gap-4">
+                  <div key={i} className="flex items-start gap-3">
                     <div className="flex flex-col items-center shrink-0">
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: journey.color }}>{i + 1}</div>
-                      {i < journey.steps.length - 1 && <div className="w-px flex-1 my-1 bg-gray-200" />}
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: journey.color }}>{i + 1}</div>
+                      {i < journey.steps.length - 1 && <div className="w-px flex-1 my-0.5 bg-gray-200" />}
                     </div>
-                    <div className="flex-1 p-4 rounded-xl" style={{ background: '#f9fafb', border: '1px solid #f3f4f6' }}>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#111827' }}>{step.action}</p>
+                    <div className="flex-1 p-3 rounded-lg" style={{ background: '#f9fafb', border: '1px solid #f3f4f6' }}>
+                      <p className="text-[11px] font-semibold mb-2" style={{ color: '#111827' }}>{step.action}</p>
                       {step.sent > 0 && (
-                        <div className="grid grid-cols-4 gap-3">
+                        <div className="grid grid-cols-4 gap-2">
                           {[
                             { label: 'Sent', value: step.sent },
                             { label: 'Opened', value: step.opened },
                             { label: 'Converted', value: step.conv },
                           ].map(s => (
                             <div key={s.label} className="text-center">
-                              <p className="text-xs font-bold" style={{ color: '#111827' }}>{s.value.toLocaleString()}</p>
-                              <p className="text-[10px]" style={{ color: '#9ca3af' }}>{s.label}</p>
+                              <p className="text-[10px] font-bold" style={{ color: '#111827' }}>{s.value.toLocaleString()}</p>
+                              <p className="text-[9px]" style={{ color: '#9ca3af' }}>{s.label}</p>
                             </div>
                           ))}
                           <div className="text-center">
-                            <p className="text-xs font-bold" style={{ color: '#10b981' }}>{step.openRate}%</p>
-                            <p className="text-[10px]" style={{ color: '#9ca3af' }}>Open Rate</p>
+                            <p className="text-[10px] font-bold" style={{ color: '#10b981' }}>{step.openRate}%</p>
+                            <p className="text-[9px]" style={{ color: '#9ca3af' }}>Open Rate</p>
                           </div>
                         </div>
                       )}
@@ -398,20 +399,20 @@ export default function CDPPage() {
 
       {/* ─── SEGMENTS TAB ─── */}
       {tab === 'segments' && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="text-sm font-bold mb-5" style={{ color: '#111827' }}>User Segments</h3>
-          <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-3">
+          <h3 className="text-xs font-bold mb-3" style={{ color: '#111827' }}>User Segments</h3>
+          <div className="grid grid-cols-3 gap-2">
             {SEGMENTS.map(seg => (
-              <div key={seg.id} className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center text-center">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-3" style={{ background: `${seg.color}15` }}>
-                  <Users size={18} style={{ color: seg.color }} weight="fill" />
+              <div key={seg.id} className="bg-gray-50 rounded-xl p-3 border border-gray-100 flex flex-col items-center text-center">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2" style={{ background: `${seg.color}15` }}>
+                  <Users size={14} style={{ color: seg.color }} weight="fill" />
                 </div>
-                <p className="text-xs font-bold mb-1" style={{ color: '#111827' }}>{seg.name}</p>
-                <p className="text-[10px] mb-3" style={{ color: '#9ca3af' }}>{seg.description}</p>
-                <div className="w-full h-1.5 rounded-full bg-gray-200 overflow-hidden mb-2">
+                <p className="text-[10px] font-bold mb-1" style={{ color: '#111827' }}>{seg.name}</p>
+                <p className="text-[9px] mb-2" style={{ color: '#9ca3af' }}>{seg.description}</p>
+                <div className="w-full h-1 rounded-full bg-gray-200 overflow-hidden mb-1.5">
                   <div className="h-full rounded-full" style={{ width: `${Math.round(seg.count / totalUsers * 100)}%`, background: seg.color }} />
                 </div>
-                <span className="text-sm font-extrabold" style={{ color: seg.color }}>{seg.count.toLocaleString()}</span>
+                <span className="text-xs font-extrabold" style={{ color: seg.color }}>{seg.count.toLocaleString()}</span>
               </div>
             ))}
           </div>
@@ -420,9 +421,9 @@ export default function CDPPage() {
 
       {/* ─── HYBRID CHANNEL TAB ─── */}
       {tab === 'hybrid' && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="text-sm font-bold mb-5" style={{ color: '#111827' }}>Omnichannel Integration Map</h3>
-          <div className="space-y-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-3">
+          <h3 className="text-xs font-bold mb-3" style={{ color: '#111827' }}>Omnichannel Integration Map</h3>
+          <div className="space-y-2">
             {[
               { segment: 'New Users (0-30d)', count: 28400, channels: ['Push', 'In-App', 'Email'], priority: 'high', color: '#4f8ef7' },
               { segment: 'Active Borrowers', count: 168000, channels: ['Push', 'SMS', 'In-App'], priority: 'high', color: '#10b981' },
@@ -431,18 +432,18 @@ export default function CDPPage() {
               { segment: 'Dormant Users', count: 14200, channels: ['SMS', 'Email', 'Push'], priority: 'medium', color: '#f97316' },
               { segment: 'High Value Users', count: 12400, channels: ['In-App', 'Push', 'Branch'], priority: 'low', color: '#f59e0b' },
             ].map(seg => (
-              <div key={seg.segment} className="flex items-center gap-4 p-4 rounded-2xl" style={{ background: '#f9fafb', border: '1px solid #f3f4f6' }}>
-                <div className="w-3 h-3 rounded-full shrink-0" style={{ background: seg.color }} />
-                <div className="w-40 shrink-0">
-                  <p className="text-xs font-bold" style={{ color: '#111827' }}>{seg.segment}</p>
-                  <p className="text-[10px]" style={{ color: '#9ca3af' }}>{seg.count.toLocaleString()} users</p>
+              <div key={seg.segment} className="flex items-center gap-3 p-3 rounded-lg" style={{ background: '#f9fafb', border: '1px solid #f3f4f6' }}>
+                <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: seg.color }} />
+                <div className="w-36 shrink-0">
+                  <p className="text-[10px] font-bold" style={{ color: '#111827' }}>{seg.segment}</p>
+                  <p className="text-[9px]" style={{ color: '#9ca3af' }}>{seg.count.toLocaleString()} users</p>
                 </div>
-                <div className="flex-1 flex gap-2 flex-wrap">
+                <div className="flex-1 flex gap-1.5 flex-wrap">
                   {seg.channels.map(ch => (
-                    <span key={ch} className="text-[11px] px-2.5 py-1 rounded-full font-medium" style={{ background: `${seg.color}15`, color: seg.color }}>{ch}</span>
+                    <span key={ch} className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: `${seg.color}15`, color: seg.color }}>{ch}</span>
                   ))}
                 </div>
-                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
+                <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold shrink-0 ${
                   seg.priority === 'high' ? 'bg-red-100 text-red-700' :
                   seg.priority === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600'
                 }`}>{seg.priority.toUpperCase()}</span>
@@ -454,10 +455,10 @@ export default function CDPPage() {
 
       {/* ─── AI INSIGHTS TAB ─── */}
       {tab === 'ai' && (
-        <div className="space-y-4">
+        <div className="space-y-2">
           {/* Summary */}
-          <div className="rounded-2xl p-5 bg-white border border-gray-200">
-            <p className="text-sm leading-relaxed" style={{ color: '#374151' }}>
+          <div className="rounded-xl p-3 bg-white border border-gray-200">
+            <p className="text-[11px] leading-relaxed" style={{ color: '#374151' }}>
               <span className="font-bold" style={{ color: '#dc2626' }}>5 AI insights</span> generated this period.{' '}
               <span className="font-bold" style={{ color: '#10b981' }}>2 high priority actions</span> require immediate attention.{' '}
               Main opportunity: <span style={{ color: '#4f8ef7' }}>SPEKTRA document upload simplification</span> — potential +2,100 applications/month.
@@ -467,40 +468,40 @@ export default function CDPPage() {
           {AI_INSIGHTS.map(insight => {
             const Icon = insight.icon;
             return (
-              <div key={insight.id} className="bg-white rounded-2xl p-5 border border-gray-200">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${insight.color}15` }}>
-                    <Icon size={20} style={{ color: insight.color }} weight="fill" />
+              <div key={insight.id} className="bg-white rounded-xl p-3 border border-gray-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${insight.color}15` }}>
+                    <Icon size={14} style={{ color: insight.color }} weight="fill" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full uppercase"
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                      <span className="text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded-full uppercase"
                         style={{ background: insight.priority === 'high' ? '#fef2f2' : '#fffbeb', color: insight.priority === 'high' ? '#dc2626' : '#d97706' }}>
                         {insight.priority}
                       </span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">{insight.type}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">{insight.type}</span>
                       {insight.apps?.map(a => (
-                        <span key={a} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#eff6ff', color: '#4f8ef7' }}>{a.toUpperCase()}</span>
+                        <span key={a} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: '#eff6ff', color: '#4f8ef7' }}>{a.toUpperCase()}</span>
                       ))}
                       {insight.lobs?.map(l => (
-                        <span key={l} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#f5f3ff', color: '#8b5cf6' }}>{l}</span>
+                        <span key={l} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: '#f5f3ff', color: '#8b5cf6' }}>{l}</span>
                       ))}
                     </div>
-                    <h3 className="text-sm font-bold mb-2" style={{ color: '#111827' }}>{insight.title}</h3>
-                    <p className="text-xs mb-3 leading-relaxed" style={{ color: '#6b7280' }}>{insight.finding}</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: '#9ca3af' }}>Root Cause</p>
-                        <p className="text-xs" style={{ color: '#374151' }}>{insight.rootCause}</p>
+                    <h3 className="text-[11px] font-bold mb-1.5" style={{ color: '#111827' }}>{insight.title}</h3>
+                    <p className="text-[10px] mb-2 leading-relaxed" style={{ color: '#6b7280' }}>{insight.finding}</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div className="p-2 rounded-lg bg-gray-50 border border-gray-100">
+                        <p className="text-[9px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: '#9ca3af' }}>Root Cause</p>
+                        <p className="text-[10px]" style={{ color: '#374151' }}>{insight.rootCause}</p>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: '#9ca3af' }}>Based On</p>
-                        <p className="text-xs" style={{ color: '#374151' }}>{insight.basedOn}</p>
+                      <div className="p-2 rounded-lg bg-gray-50 border border-gray-100">
+                        <p className="text-[9px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: '#9ca3af' }}>Based On</p>
+                        <p className="text-[10px]" style={{ color: '#374151' }}>{insight.basedOn}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-3 pt-2" style={{ borderTop: '1px solid #f3f4f6' }}>
-                      <CheckCircle size={12} style={{ color: '#10b981' }} weight="fill" />
-                      <span className="text-[11px]" style={{ color: '#9ca3af' }}>AI Confidence: <strong style={{ color: '#10b981' }}>{insight.confidence}</strong></span>
+                    <div className="flex items-center gap-1.5 mt-2 pt-1.5" style={{ borderTop: '1px solid #f3f4f6' }}>
+                      <CheckCircle size={11} style={{ color: '#10b981' }} weight="fill" />
+                      <span className="text-[10px]" style={{ color: '#9ca3af' }}>AI Confidence: <strong style={{ color: '#10b981' }}>{insight.confidence}</strong></span>
                     </div>
                   </div>
                 </div>
