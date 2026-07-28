@@ -15,7 +15,7 @@ import { getPortfolioQuality } from '@/lib/data-sim';
 import { useRealtime } from '@/lib/use-realtime';
 
 const LOB_COLORS: Record<string, string> = {
-  FIFASTRA: '#1e3a5f', SPEKTRA: '#f43f5e', DANASTRA: '#06b6d4', FINATRA: '#f59e0b', AMITRA: '#10b981',
+  FIFASTRA: '#1e3a5f', SPEKTRA: '#dc2626', DANASTRA: '#06b6d4', FINATRA: '#f59e0b', AMITRA: '#10b981',
 };
 
 export default function PortfolioQualityPage() {

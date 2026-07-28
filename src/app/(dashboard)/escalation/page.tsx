@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import {
-  PaperPlaneTilt, Envelope, Chats, ShareNetwork,
+  PaperPlaneTilt, Envelope,
   CheckCircle, Warning, Clock, ArrowRight,
   CaretDown, CaretUp, Plus, Funnel,
 } from '@phosphor-icons/react';
@@ -11,10 +11,21 @@ import {
   type EscalationTicket, type EscalationChannel,
 } from '@/lib/data-sim';
 
+const WHATSAPP_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/whatsapp.svg';
+const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/microsoftoutlook.svg';
+
+function WhatsAppIcon({ size = 18, color = '#10b981' }: { size?: number; color?: string }) {
+  return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} style={{ filter: `brightness(0) saturate(100%) sepia(0) saturate(7500%) hue-rotate(150deg) brightness(90%)` }} />;
+}
+
+function TeamsIcon({ size = 18, color = '#6366f1' }: { size?: number; color?: string }) {
+  return <img src={TEAMS_SVG} alt="MS Teams" width={size} height={size} style={{ filter: `brightness(0) saturate(100%) sepia(0) saturate(6500%) hue-rotate(230deg) brightness(90%)` }} />;
+}
+
 const CHANNEL_META: Record<EscalationChannel, { label: string; icon: React.ElementType; color: string; placeholder: string }> = {
   email:    { label: 'Email',    icon: Envelope,          color: '#4f8ef7', placeholder: 'ops-director@group.fif.co.id' },
-  whatsapp: { label: 'WhatsApp', icon: Chats,      color: '#10b981', placeholder: '+62-812-XXXX-XXXX' },
-  teams:    { label: 'MS Teams', icon: ShareNetwork, color: '#6366f1', placeholder: 'fifgroup-operations' },
+  whatsapp: { label: 'WhatsApp', icon: WhatsAppIcon,     color: '#10b981', placeholder: '+62-812-XXXX-XXXX' },
+  teams:    { label: 'MS Teams', icon: TeamsIcon,         color: '#6366f1', placeholder: 'fifgroup-operations' },
 };
 
 const SEV_META = {

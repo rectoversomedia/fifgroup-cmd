@@ -4,12 +4,22 @@ import * as React from 'react';
 import {
   PaperPlaneTilt, ChatCircle, MegaphoneSimple,
   CheckCircle, Warning, Clock, ArrowRight,
-  CaretDown, CaretUp, Envelope, Chats, ShareNetwork,
+  CaretDown, CaretUp, Envelope,
 } from '@phosphor-icons/react';
 import {
   getEscalationTickets, createEscalationTicket,
   type EscalationTicket, type EscalationChannel,
 } from '@/lib/data-sim';
+
+const WHATSAPP_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/whatsapp.svg';
+const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/microsoftoutlook.svg';
+
+function WhatsAppIcon({ size = 18 }: { size?: number }) {
+  return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} style={{ filter: `brightness(0) saturate(100%) sepia(0) saturate(7500%) hue-rotate(150deg) brightness(90%)` }} />;
+}
+function TeamsIcon({ size = 18 }: { size?: number }) {
+  return <img src={TEAMS_SVG} alt="MS Teams" width={size} height={size} style={{ filter: `brightness(0) saturate(100%) sepia(0) saturate(6500%) hue-rotate(230deg) brightness(90%)` }} />;
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -98,9 +108,9 @@ const SEV = {
 } as const;
 
 const CHANNEL_META: Record<EscalationChannel, { label: string; icon: React.ElementType; color: string }> = {
-  email:    { label: 'Email',    icon: Envelope,          color: '#4f8ef7' },
-  whatsapp: { label: 'WhatsApp', icon: Chats,      color: '#10b981' },
-  teams:    { label: 'MS Teams', icon: ShareNetwork, color: '#6366f1' },
+  email:    { label: 'Email',    icon: Envelope,       color: '#4f8ef7' },
+  whatsapp: { label: 'WhatsApp', icon: WhatsAppIcon, color: '#10b981' },
+  teams:    { label: 'MS Teams', icon: TeamsIcon,     color: '#6366f1' },
 };
 
 const DEFAULT_CURRENTS: Record<number, string> = {
