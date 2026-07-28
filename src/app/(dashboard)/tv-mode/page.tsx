@@ -16,7 +16,7 @@ const SLIDES = [
   { id: 'fifada',     label: 'FIFADA App',          href: '/fifada' },
   { id: 'push',       label: 'Push Notification',  href: '/push-notification' },
   { id: 'journey',    label: 'Journey',             href: '/journey' },
-  { id: 'appanalytics', label: 'App Analytics',    href: '/app-analytics' },
+  { id: 'appanalytics', label: 'App Analytics',    href: '/fifgo' },
   { id: 'errors',     label: 'Error Tracking',      href: '/error-tracking' },
   { id: 'competitors',label: 'Competitors',         href: '/competitors' },
   { id: 'portfolioq', label: 'Portfolio Quality',   href: '/portfolio-quality' },

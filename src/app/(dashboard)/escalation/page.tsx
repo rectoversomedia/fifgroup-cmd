@@ -12,7 +12,7 @@ import {
 } from '@/lib/data-sim';
 
 const WHATSAPP_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/whatsapp.svg';
-const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/microsoftoutlook.svg';
+const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/microsoftteams.svg';
 
 function WhatsAppIcon({ size = 18, color = '#10b981' }: { size?: number; color?: string }) {
   return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} style={{ filter: `brightness(0) saturate(100%) sepia(0) saturate(7500%) hue-rotate(150deg) brightness(90%)` }} />;

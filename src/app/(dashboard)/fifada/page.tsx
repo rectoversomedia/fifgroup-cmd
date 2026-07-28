@@ -31,7 +31,7 @@ export default function FIFADAPage() {
     { label: 'API Response', value: '310ms', target: '< 500ms', good: true },
     { label: 'Error Rate', value: '1.4%', target: '< 0.5%', good: false },
     { label: 'Crash Rate', value: '1.4%', target: '< 0.5%', good: false },
-    { label: 'Push Delivery', value: '89%', target: '> 95%', good: false },
+    { label: 'Push Delivery', value: '94.2%', target: '> 95%', good: false },
     { label: 'Session Duration', value: '4.1m', target: '> 3m', good: true },
   ];
 
@@ -44,7 +44,7 @@ export default function FIFADAPage() {
   const issues = [
     { severity: 'high', text: 'FIFADA crash rate 1.4% — threshold 0.5%. Investigating ANR in Android 13.', date: '23 Jul 2026' },
     { severity: 'high', text: 'FIFADA error rate 1.4% — above 0.5% threshold. Root cause: payment gateway timeout.', date: '22 Jul 2026' },
-    { severity: 'medium', text: 'Push delivery 89% — below 95% target. Check FCM configuration.', date: '20 Jul 2026' },
+    { severity: 'medium', text: 'Push delivery 94.2% — below 95% target. Check FCM configuration.', date: '20 Jul 2026' },
   ];
 
 
@@ -212,7 +212,7 @@ export default function FIFADAPage() {
             <Warning size={20} style={{ color: '#dc2626' }} weight="fill" className="mt-0.5 shrink-0" />
             <div>
               <p className="text-sm font-bold" style={{ color: '#dc2626' }}>Multiple Health Issues Detected</p>
-              <p className="text-xs mt-0.5" style={{ color: '#374151' }}>Crash rate (1.4%) and error rate (1.4%) exceed thresholds. Push delivery (89%) below target.</p>
+              <p className="text-xs mt-0.5" style={{ color: '#374151' }}>Crash rate (1.4%) and error rate (1.4%) exceed thresholds. Push delivery (94.2%) below target.</p>
             </div>
           </div>
 

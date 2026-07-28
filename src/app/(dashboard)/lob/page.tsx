@@ -32,7 +32,7 @@ const LOBS = [
   { id: 'finatra',  name: 'FINATRA',  fullName: 'Investment Finance', color: '#f59e0b',
     active: 105300, pct: 45, change: 2, viewed: 234000, applied: 41700, submitted: 23100, disbursed: 10400, time: 4.1,
     cohort: [100, 74, 65, 55] },
-  { id: 'amitra',   name: 'AMITRA',   fullName: 'Micro Insurance',     color: '#10b981',
+  { id: 'amitra',   name: 'AMITRA',   fullName: 'Micro Lending',      color: '#10b981',
     active: 121680, pct: 52, change: 6, viewed: 234000, applied: 46800, submitted: 27300, disbursed: 12800, time: 3.5,
     cohort: [100, 65, 50, 39] },
 ];

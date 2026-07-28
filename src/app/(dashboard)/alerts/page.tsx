@@ -12,7 +12,7 @@ import {
 } from '@/lib/data-sim';
 
 const WHATSAPP_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/whatsapp.svg';
-const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/microsoftoutlook.svg';
+const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/microsoftteams.svg';
 
 function WhatsAppIcon({ size = 18 }: { size?: number }) {
   return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} style={{ filter: `brightness(0) saturate(100%) sepia(0) saturate(7500%) hue-rotate(150deg) brightness(90%)` }} />;
@@ -82,7 +82,7 @@ const ALERT_SEEDS: Omit<Alert, 'current'>[] = [
     metric: 'NPF Rate', threshold: '> 4%', status: 'triggered',
     lastTriggered: '20 Jul 2026, 09:30 WIB',
     message: 'SPEKTRA NPF at 4.2% — approaching 5% limit. Escalate to ops director.',
-    actions: ['Escalate to ops-director@group.fif.co.id', 'Review recovery rate by branch', 'Prepare restructuring方案'],
+    actions: ['Escalate to ops-director@group.fif.co.id', 'Review recovery rate by branch', 'Prepare restructuring plan'],
   },
   {
     id: 7, title: 'Bill Reminder Success', app: 'FIFGO', severity: 'low',
