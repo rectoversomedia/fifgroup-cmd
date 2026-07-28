@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Lightning, Users, ChartBar, Gear, Database, Brain, Warning, TrendUp, TrendDown, CheckCircle, MagnifyingGlass } from '@phosphor-icons/react';
+import { Lightning, Users, ChartBar, Gear, Database, Brain, Warning, TrendUp, TrendDown, CheckCircle, MagnifyingGlass, ChatCircle, Bell, Envelope, DeviceMobile, PaperPlaneTilt } from '@phosphor-icons/react';
 
 const JOURNEYS = [
   {
@@ -507,18 +507,33 @@ export default function CDPPage() {
 }
 
 type IdentityMatch = {
-  id: string; name: string;
-  identifiers: { phone: string; email: string; ip?: string; deviceId?: string };
+  id: string; name: string; birthDate?: string; occupation?: string; city?: string;
+  identifiers: { phone: string; email: string; ip?: string; deviceId?: string; ktp?: string };
   devices: { id: string; type: 'mobile' | 'desktop'; os: string; lastSeen?: string }[];
   events: { id: string; type: string; timestamp: string; channel: string; location: string; source: string; detail: string; color: string; metadata?: Record<string, unknown> }[];
   lobs: { name: string; color: string; since: string; loans: number; totalDisbursed: number }[];
   totalDisbursed: number; riskLevel: string; matchType: string; confidence: number;
+  // Extended: loan & application history
+  loans: {
+    id: string; lob: string; lobColor: string; status: 'active' | 'completed' | 'rejected' | 'pending' | 'dormant';
+    product: string; amount: number; tenor: number; interestRate: number;
+    disbursedAt: string; completedAt?: string; monthlyInstallment: number;
+    repaymentRate: number; outstanding: number; purpose: string;
+    history: { date: string; type: 'payment' | 'inquiry' | 'late' | 'escalation'; amount: number; note: string }[];
+  }[];
+  nextPayment?: { dueDate: string; amount: number; status: 'ontime' | 'upcoming' | 'overdue' };
+  churnRisk: 'low' | 'medium' | 'high';
+  lastDisbursedAt?: string;
+  gapDays?: number; // days since last disbursement
+  availableProducts: { name: string; reason: string; color: string; score: number }[];
+  communicationPrefs: { whatsapp: boolean; sms: boolean; email: boolean; push: boolean };
 };
 
 const SAMPLE_PROFILES: IdentityMatch[] = [
   {
     id: 'uid-001-72cd', name: 'Budi Santoso',
-    identifiers: { phone: '0812-3456-7890', email: 'budi.santoso@gmail.com', ip: '36.72.192.14', deviceId: 'android:a1b2c3d4e5f6' },
+    birthDate: '1988-04-15', occupation: 'Wiraswasta', city: 'Jakarta Selatan',
+    identifiers: { phone: '0812-3456-7890', email: 'budi.santoso@gmail.com', ip: '36.72.192.14', deviceId: 'android:a1b2c3d4e5f6', ktp: '3174-880415-0001' },
     devices: [
       { id: 'android:a1b2c3d4e5f6', type: 'mobile', os: 'Android 13', lastSeen: '2h ago' },
       { id: 'ios:9f8e7d6c5b4a', type: 'mobile', os: 'iOS 17', lastSeen: '3d ago' },
@@ -536,9 +551,34 @@ const SAMPLE_PROFILES: IdentityMatch[] = [
       { name: 'SPEKTRA', color: '#8b5cf6', since: 'Jul 2026', loans: 0, totalDisbursed: 0 },
     ],
     totalDisbursed: 12000000, riskLevel: 'Low Risk', matchType: 'phone + device_fingerprint', confidence: 0.98,
+    lastDisbursedAt: '2026-03-10', gapDays: 139,
+    churnRisk: 'medium',
+    nextPayment: { dueDate: '2026-08-10', amount: 618000, status: 'upcoming' },
+    loans: [
+      {
+        id: 'FIF-LN-001234', lob: 'FIFASTRA', lobColor: '#dc2626', status: 'active',
+        product: 'FIFASTRA Motor', amount: 12000000, tenor: 24, interestRate: 18,
+        disbursedAt: '2026-03-10', monthlyInstallment: 618000, repaymentRate: 100, outstanding: 9900000,
+        purpose: 'Pembelian motor bekas',
+        history: [
+          { date: '2026-03-10', type: 'payment', amount: 0, note: 'Disbursement' },
+          { date: '2026-04-10', type: 'payment', amount: 618000, note: 'Angsuran bulan 1 — on time' },
+          { date: '2026-05-10', type: 'payment', amount: 618000, note: 'Angsuran bulan 2 — on time' },
+          { date: '2026-06-10', type: 'payment', amount: 618000, note: 'Angsuran bulan 3 — on time' },
+          { date: '2026-07-10', type: 'payment', amount: 618000, note: 'Angsuran bulan 4 — on time' },
+        ],
+      },
+    ],
+    availableProducts: [
+      { name: 'DANASTRA', reason: 'Motor lama miliknya sudah 7 tahun — cocok refinance atau upgrade', color: '#f59e0b', score: 88 },
+      { name: 'FINATRA', reason: 'Wiraswasta — eligible untuk modal usaha mikro', color: '#059669', score: 72 },
+      { name: 'AMITRA', reason: 'Tabungan pendidikan anak — eligible, ada program khusus', color: '#ec4899', score: 65 },
+    ],
+    communicationPrefs: { whatsapp: true, sms: true, email: true, push: true },
   },
   {
     id: 'uid-002-93ab', name: 'Siti Rahayu',
+    birthDate: '1995-11-22', occupation: 'Karyawan Swasta', city: 'Bandung',
     identifiers: { phone: '0857-8765-4321', email: 'siti.rahayu@yahoo.com', ip: '114.4.78.201', deviceId: 'ios:9z8y7x6w5v4u' },
     devices: [{ id: 'ios:9z8y7x6w5v4u', type: 'mobile', os: 'iOS 16', lastSeen: '1d ago' }],
     events: [
@@ -548,9 +588,17 @@ const SAMPLE_PROFILES: IdentityMatch[] = [
     ],
     lobs: [],
     totalDisbursed: 0, riskLevel: 'New User', matchType: 'email_domain', confidence: 0.72,
+    churnRisk: 'low',
+    loans: [],
+    availableProducts: [
+      { name: 'SPEKTRA', reason: 'Baru pertama kali — produk mikro tanpa agunan, proses 100% digital', color: '#8b5cf6', score: 94 },
+      { name: 'FIFASTRA', reason: 'Karyawan swasta dengan slip gaji — eligible untuk FIFASTRA Gaji', color: '#dc2626', score: 81 },
+    ],
+    communicationPrefs: { whatsapp: true, sms: false, email: true, push: true },
   },
   {
     id: 'uid-003-41ef', name: 'Ahmad Wijaya',
+    birthDate: '1982-07-08', occupation: 'Pengusaha Toko Elektronik', city: 'Surabaya',
     identifiers: { phone: '0813-9876-1234', email: 'ahmad.wijaya@ptmniatama.co.id', ip: '202.62.16.88', deviceId: 'android:q1r2s3t4u5v' },
     devices: [
       { id: 'android:q1r2s3t4u5v', type: 'mobile', os: 'Android 12', lastSeen: '30m ago' },
@@ -567,6 +615,24 @@ const SAMPLE_PROFILES: IdentityMatch[] = [
       { name: 'FINATRA', color: '#059669', since: '—', loans: 0, totalDisbursed: 0 },
     ],
     totalDisbursed: 0, riskLevel: 'Lead', matchType: 'ip + email_domain', confidence: 0.85,
+    churnRisk: 'low',
+    loans: [
+      {
+        id: 'FIN-INQ-001', lob: 'FINATRA', lobColor: '#059669', status: 'pending',
+        product: 'FINATRA Modal Usaha', amount: 50000000, tenor: 36, interestRate: 24,
+        disbursedAt: '', monthlyInstallment: 0, repaymentRate: 0, outstanding: 0,
+        purpose: 'Modal toko elektronik',
+        history: [
+          { date: '2026-07-27 08:15', type: 'inquiry', amount: 50000000, note: 'Form submitted via website' },
+          { date: '2026-07-27 08:20', type: 'inquiry', amount: 0, note: 'Phone call initiated — interested in 36-month tenor' },
+        ],
+      },
+    ],
+    availableProducts: [
+      { name: 'FINATRA', reason: 'Pengusaha dengan omzet toko — eligible untuk modal kerja Rp 25-200 juta', color: '#059669', score: 97 },
+      { name: 'DANASTRA', reason: 'Pemilik aset — eligible refinance kendaraan untuk tambahan working capital', color: '#f59e0b', score: 74 },
+    ],
+    communicationPrefs: { whatsapp: true, sms: true, email: true, push: false },
   },
 ];
 
@@ -697,11 +763,59 @@ function IdentityResolutionTab() {
 
 function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
   const [activeEvent, setActiveEvent] = React.useState<string | null>(null);
+  const [activeLoan, setActiveLoan] = React.useState<string | null>(null);
+  const [actionLog, setActionLog] = React.useState<{ ch: string; msg: string; time: string }[]>([]);
+  const [pendingActions, setPendingActions] = React.useState<string[]>([]);
   const fmtIDR = (v: number) => `Rp ${v.toLocaleString('id-ID')}`;
+
+  const sendAction = (channel: string, label: string) => {
+    setPendingActions(prev => prev.filter(a => a !== label));
+    setActionLog(prev => [
+      { ch: channel, msg: label, time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) },
+      ...prev,
+    ]);
+  };
+
+  const STATUS_COLORS: Record<string, string> = {
+    active: '#10b981', completed: '#6366f1', rejected: '#dc2626', pending: '#f59e0b', dormant: '#6b7280',
+  };
+  const TYPE_ICONS: Record<string, string> = {
+    payment: 'P', inquiry: 'I', late: '!', escalation: 'X',
+  };
+  const TYPE_COLORS: Record<string, string> = {
+    payment: '#10b981', inquiry: '#4f8ef7', late: '#f59e0b', escalation: '#dc2626',
+  };
+
+  const nextActions: Record<string, { channel: string; icon: React.ElementType; label: string; msg: string; color: string; priority: 'high' | 'medium' | 'low' }[]> = {
+    BudiSantoso: [
+      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp Cross-Sell', msg: 'Budi, motor lama mau di-refinance? Dana tambahan Rp 15jt cair dalam 3 hari. Klik 👉 fifgroup.id/refi', color: '#10b981', priority: 'high' },
+      { channel: 'Push', icon: Bell, label: 'Push — DANASTRA Offer', msg: 'Tukar motor lama dapat dana tambahan! Promo refinance 0.5%/bulan. ☝️', color: '#f59e0b', priority: 'high' },
+      { channel: 'Email', icon: Envelope, label: 'Email — AMITRA Education', msg: 'Siapkan masa depan anak Anda dengan tabungan pendidikan AMITRA. Mulai Rp 200rb/bulan.', color: '#ec4899', priority: 'medium' },
+      { channel: 'SMS', icon: DeviceMobile, label: 'SMS Reminder', msg: 'Budi, angsuran FIFASTRA Rp 618rb jatuh tgl 10 Agust. Pastikan saldo cukup ya.', color: '#6b7280', priority: 'low' },
+    ],
+    SitiRahayu: [
+      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp — SPEKTRA Offer', msg: 'Siti! Pinjaman mikro tanpa agunan Rp 5jt, bunga 0% untuk 30 hari pertama. Proses 100% di HP 👉 fifgroup.id/spektra', color: '#8b5cf6', priority: 'high' },
+      { channel: 'Push', icon: Bell, label: 'Push — Greeting', msg: 'Selamat datang Siti! Ajukan pinjaman pertama Anda di FIFGO — proses cepat, bunga ringan.', color: '#4f8ef7', priority: 'medium' },
+    ],
+    AhmadWijaya: [
+      { channel: 'WhatsApp', icon: ChatCircle, label: 'WhatsApp — FINATRA Follow-up', msg: 'Pak Ahmad, pengajuan FINATRA Rp 50jt sedang diproses. Tim kami akan menghubungi besok. ☎️', color: '#059669', priority: 'high' },
+      { channel: 'Call', icon: DeviceMobile, label: 'Schedule Call', msg: 'Outbound call: follow-up FINATRA Rp 50jt — pengusaha toko elektronik Surabaya. Slot: besok 09:00-11:00 WIB.', color: '#1e3a5f', priority: 'high' },
+      { channel: 'Email', icon: Envelope, label: 'Email — FINATRA Docs', msg: 'Persiapkan dokumen FINATRA: NIB, Rekening 6 bln, Surat keterangan usaha dari Kelurahan.', color: '#6366f1', priority: 'medium' },
+    ],
+  };
+
+  const profileKey = profile.name.replace(/\s+/g, '');
+  const actions = nextActions[profileKey] || [];
+
+  const getActionState = (label: string) => {
+    if (actionLog.some(a => a.msg === label)) return 'sent';
+    if (pendingActions.includes(label)) return 'pending';
+    return 'ready';
+  };
 
   return (
     <div className="space-y-5">
-      {/* Profile Header */}
+      {/* ── Profile Header ── */}
       <div className="bg-gradient-to-br from-[#1e3a5f] to-[#2d4a8f] rounded-2xl p-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
@@ -711,26 +825,45 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
               </span>
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-white">{profile.name}</h2>
-              <p className="text-white/60 text-xs mt-0.5">UID: <span className="font-mono">{profile.id}</span></p>
-              <div className="flex gap-2 mt-2 flex-wrap">
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white/80">{profile.identifiers.email}</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white/80">{profile.identifiers.phone}</span>
-                {profile.identifiers.ip && <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white/80">IP: {profile.identifiers.ip}</span>}
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-extrabold text-white">{profile.name}</h2>
+                {profile.birthDate && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/60">Lahir {new Date(profile.birthDate).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                )}
+              </div>
+              <p className="text-white/50 text-xs">UID: <span className="font-mono text-white/70">{profile.id}</span></p>
+              <div className="flex gap-2 mt-1.5 flex-wrap">
+                {profile.city && <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/60">📍 {profile.city}</span>}
+                {profile.occupation && <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/60">💼 {profile.occupation}</span>}
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="inline-block text-[10px] px-3 py-1 rounded-full bg-white/20 text-white/80 mb-2">{profile.riskLevel}</div>
-            <p className="text-white text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>Matched via {profile.matchType}</p>
+            <div className="flex gap-2 mb-2 flex-wrap justify-end">
+              <span className="text-[10px] px-3 py-1 rounded-full bg-white/20 text-white/80">{profile.riskLevel}</span>
+              {profile.churnRisk && (
+                <span className="text-[10px] px-3 py-1 rounded-full font-bold" style={{
+                  background: profile.churnRisk === 'high' ? '#dc262640' : profile.churnRisk === 'medium' ? '#f59e0b40' : '#10b98140',
+                  color: profile.churnRisk === 'high' ? '#fca5a5' : profile.churnRisk === 'medium' ? '#fde68a' : '#a7f3d0',
+                }}>
+                  Churn Risk: {profile.churnRisk.toUpperCase()}
+                </span>
+              )}
+            </div>
+            {profile.gapDays !== undefined && (
+              <p className="text-white/50 text-[10px]">Last disbursement: {profile.gapDays} days ago</p>
+            )}
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-4 mt-5">
-          {[
+
+        {/* Summary KPIs */}
+        <div className="grid grid-cols-4 gap-3 mt-5">
+          {([
             { label: 'Total Disbursed', value: fmtIDR(profile.totalDisbursed) },
-            { label: 'Active LoBs', value: `${profile.lobs.length}` },
-            { label: 'Known Devices', value: `${profile.devices.length}` },
-          ].map(s => (
+            { label: 'Active Loans', value: `${profile.loans.filter(l => l.status === 'active').length}` },
+            ...(profile.loans.some(l => l.status === 'active') ? [{ label: 'Monthly Angsuran', value: fmtIDR(profile.loans.find(l => l.status === 'active')!.monthlyInstallment) }] : []),
+            { label: 'Available Products', value: `${profile.availableProducts.length}` },
+          ] as { label: string; value: string }[]).map(s => (
             <div key={s.label} className="text-center p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.1)' }}>
               <p className="text-white font-extrabold text-sm">{s.value}</p>
               <p className="text-white/60 text-[10px] mt-0.5">{s.label}</p>
@@ -739,7 +872,7 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
         </div>
       </div>
 
-      {/* Identifiers & Devices */}
+      {/* ── Identifiers & Devices ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="bg-white rounded-2xl border border-gray-200 p-5">
           <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Known Identifiers</h3>
@@ -748,6 +881,7 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
               { label: 'Full Name', value: profile.name },
               { label: 'Phone', value: profile.identifiers.phone },
               { label: 'Email', value: profile.identifiers.email },
+              ...(profile.identifiers.ktp ? [{ label: 'KTP', value: profile.identifiers.ktp }] : []),
               ...(profile.identifiers.ip ? [{ label: 'IP Address', value: profile.identifiers.ip }] : []),
               ...(profile.identifiers.deviceId ? [{ label: 'Device ID', value: profile.identifiers.deviceId }] : []),
             ].map((id: any) => (
@@ -760,8 +894,27 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
               <span className="text-xs" style={{ color: '#9ca3af' }}>Confidence</span>
               <span className="text-xs font-bold px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700">{(profile.confidence * 100).toFixed(0)}%</span>
             </div>
+            <div className="pt-1">
+              <p className="text-[10px] font-semibold mb-2" style={{ color: '#9ca3af' }}>Communication Preferences</p>
+              <div className="flex gap-2 flex-wrap">
+                {Object.entries(profile.communicationPrefs).map(([ch, enabled]) => {
+                  const iconMap: Record<string, React.ReactNode> = {
+                    whatsapp: <svg width="12" height="12" viewBox="0 0 24 24" fill={enabled ? '#25D366' : '#d1d5db'}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 6.987L.789 23.789l4.35-1.678A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm5.894 17.803c-.386 1.082-1.978 1.99-3.166 2.147-.51.07-1.175.098-1.94.042a12.44 12.44 0 01-3.22-.77c-.24-.085-.416-.13-.594-.13s-.316.03-.463.055c-.147.025-.342-.035-.542-.185-1.78-1.34-2.96-3.47-3.056-3.67-.095-.2-1.01-1.31-1.01-2.5 0-1.19.64-1.78.868-2.02.23-.24.5-.3.666-.3.167 0 .333 0 .48.008.146.008.343-.055.523.4.182.455.618 1.575.672 1.69.054.115.09.248.03.395-.06.147-.09.26-.18.373-.09.115-.19.252-.27.337-.09.086-.18.18-.077.352.103.173.46.73.99 1.185.43.37.8.485 1.09.537.29.05.56.063.77-.09.21-.154.35-.39.45-.62.1-.23.21-.2.58-.07.37.13 2.36.96 2.77 1.79.41.83.41 1.54.29 1.69-.12.15-.43.24-.9.43z"/></svg>,
+                    sms: <DeviceMobile size={11} style={{ color: enabled ? '#4f8ef7' : '#d1d5db' }} />,
+                    email: <Envelope size={11} style={{ color: enabled ? '#f59e0b' : '#d1d5db' }} />,
+                    push: <Bell size={11} style={{ color: enabled ? '#10b981' : '#d1d5db' }} />,
+                  };
+                  return (
+                    <span key={ch} className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full" style={{ background: enabled ? '#f0fdf4' : '#f9fafb', color: enabled ? '#374151' : '#d1d5db' }}>
+                      {iconMap[ch]} {ch}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
+
         <div className="bg-white rounded-2xl border border-gray-200 p-5">
           <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Known Devices</h3>
           <div className="space-y-3">
@@ -783,7 +936,238 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
         </div>
       </div>
 
-      {/* Activity Timeline */}
+      {/* ── Loan & Application History ── */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-5">
+        <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Loan &amp; Application History</h3>
+        {profile.loans.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-sm font-medium" style={{ color: '#9ca3af' }}>No loan history yet</p>
+            <p className="text-xs mt-1" style={{ color: '#d1d5db' }}>This customer has not applied for any products</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {profile.loans.map(loan => {
+              const isOpen = activeLoan === loan.id;
+              const statusColor = STATUS_COLORS[loan.status] || '#6b7280';
+              return (
+                <div key={loan.id} className="rounded-xl border" style={{ borderColor: `${statusColor}30`, background: `${statusColor}05` }}>
+                  <button
+                    className="w-full flex items-center gap-4 p-4 text-left"
+                    onClick={() => setActiveLoan(isOpen ? null : loan.id)}
+                  >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${loan.lobColor}20` }}>
+                      <span className="text-sm font-black" style={{ color: loan.lobColor }}>{loan.lob[0]}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-bold" style={{ color: '#111827' }}>{loan.product}</span>
+                        <span className="text-[9px] px-2 py-0.5 rounded-full font-bold" style={{ background: `${statusColor}20`, color: statusColor }}>
+                          {loan.status.toUpperCase()}
+                        </span>
+                        {loan.status === 'active' && (
+                          <span className="text-[9px] px-2 py-0.5 rounded-full font-bold" style={{ background: '#10b98120', color: '#10b981' }}>
+                            {loan.repaymentRate}% repayment rate
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex gap-3 mt-1 flex-wrap">
+                        <span className="text-[11px]" style={{ color: '#9ca3af' }}>{loan.purpose}</span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0 hidden sm:block">
+                      <p className="text-sm font-bold" style={{ color: '#111827' }}>{fmtIDR(loan.amount)}</p>
+                      <p className="text-[10px]" style={{ color: '#9ca3af' }}>{loan.tenor}x · {loan.interestRate}%/yr</p>
+                    </div>
+                    <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor"
+                      style={{ color: '#d1d5db', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>
+                      <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,172.69l74.34-82.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-4 pb-4 border-t" style={{ borderColor: `${statusColor}20` }}>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4">
+                        {[
+                          { label: 'Loan ID', value: loan.id },
+                          { label: 'Amount', value: fmtIDR(loan.amount) },
+                          { label: 'Tenor', value: `${loan.tenor} months` },
+                          { label: 'Interest', value: `${loan.interestRate}%/year` },
+                          { label: 'Monthly Installment', value: fmtIDR(loan.monthlyInstallment) },
+                          { label: 'Outstanding', value: loan.outstanding > 0 ? fmtIDR(loan.outstanding) : '—' },
+                          { label: 'Disbursed', value: loan.disbursedAt ? new Date(loan.disbursedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '—' },
+                          { label: 'Purpose', value: loan.purpose },
+                        ].map(s => (
+                          <div key={s.label}>
+                            <p className="text-[10px]" style={{ color: '#9ca3af' }}>{s.label}</p>
+                            <p className="text-xs font-semibold mt-0.5" style={{ color: '#374151' }}>{s.value}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Repayment timeline */}
+                      {loan.history.length > 0 && (
+                        <div>
+                          <p className="text-[11px] font-semibold mb-3" style={{ color: '#6b7280' }}>Repayment History</p>
+                          <div className="flex gap-1 overflow-x-auto pb-2">
+                            {loan.history.map((h, idx) => {
+                              const clr = TYPE_COLORS[h.type] || '#6b7280';
+                              return (
+                                <div key={idx} className="shrink-0 w-32 p-2 rounded-lg text-center" style={{ background: `${clr}10`, border: `1px solid ${clr}20` }}>
+                                  <div className="w-6 h-6 rounded-full mx-auto mb-1 flex items-center justify-center" style={{ background: `${clr}20` }}>
+                                    <span className="text-[10px] font-black" style={{ color: clr }}>{TYPE_ICONS[h.type] || '?'}</span>
+                                  </div>
+                                  <p className="text-[9px] font-semibold" style={{ color: clr }}>{h.type.toUpperCase()}</p>
+                                  <p className="text-[10px] font-bold mt-0.5" style={{ color: '#374151' }}>{h.amount > 0 ? fmtIDR(h.amount) : '—'}</p>
+                                  <p className="text-[9px] mt-0.5 truncate" style={{ color: '#9ca3af' }}>{new Date(h.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
+                                  <p className="text-[9px] mt-0.5" style={{ color: '#9ca3af' }}>{h.note}</p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Next payment alert */}
+                      {loan.status === 'active' && profile.nextPayment && (
+                        <div className="mt-3 p-3 rounded-xl" style={{ background: profile.nextPayment.status === 'overdue' ? '#fef2f2' : '#fffbeb', border: `1px solid ${profile.nextPayment.status === 'overdue' ? '#dc2626' : '#f59e0b'}30` }}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: profile.nextPayment.status === 'overdue' ? '#dc2626' : '#f59e0b' }} />
+                            <span className="text-xs font-semibold" style={{ color: profile.nextPayment.status === 'overdue' ? '#dc2626' : '#d97706' }}>
+                              Next Payment: {new Date(profile.nextPayment.dueDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            </span>
+                            <span className="text-xs font-bold" style={{ color: '#374151' }}>{fmtIDR(profile.nextPayment.amount)}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Available Products ── */}
+      {profile.availableProducts.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Recommended Products <span className="font-normal text-[11px]" style={{ color: '#9ca3af' }}>— next best offer for this customer</span></h3>
+          <div className="space-y-3">
+            {profile.availableProducts.map(p => (
+              <div key={p.name} className="flex items-center gap-3 p-4 rounded-xl" style={{ background: '#f9fafb', borderLeft: `3px solid ${p.color}` }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${p.color}15` }}>
+                  <span className="text-sm font-black" style={{ color: p.color }}>{p.name[0]}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold" style={{ color: '#111827' }}>{p.name}</span>
+                    <div className="h-1.5 flex-1 max-w-16 rounded-full overflow-hidden" style={{ background: '#e5e7eb' }}>
+                      <div className="h-full rounded-full" style={{ width: `${p.score}%`, background: p.score >= 80 ? '#10b981' : p.score >= 60 ? '#f59e0b' : '#6b7280' }} />
+                    </div>
+                    <span className="text-[10px] font-bold" style={{ color: p.score >= 80 ? '#10b981' : '#6b7280' }}>{p.score}%</span>
+                  </div>
+                  <p className="text-[11px] mt-1" style={{ color: '#6b7280' }}>{p.reason}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const { icon: Icon, label, msg, color } = actions.find(a => a.label.includes(p.name)) || { icon: PaperPlaneTilt, label: `Offer ${p.name}`, msg: `Halo ${profile.name}, promo ${p.name} untuk Anda!`, color: p.color };
+                    sendAction(label.split(' — ')[0], label);
+                  }}
+                  className="shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white transition-opacity"
+                  style={{ background: p.color, opacity: 0.85 }}
+                >
+                  Send Offer
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Action Automation Panel ── */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-5">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <PaperPlaneTilt size={16} style={{ color: '#6366f1' }} weight="fill" />
+            <h3 className="text-sm font-bold" style={{ color: '#111827' }}>Action Automation</h3>
+            <span className="text-[9px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 font-bold">CDP TRIGGER</span>
+          </div>
+          {profile.gapDays !== undefined && profile.gapDays > 90 && (
+            <span className="text-[9px] px-2.5 py-1 rounded-full font-bold" style={{ background: '#fef3c7', color: '#d97706' }}>
+              ⚠ {profile.gapDays} days inactive — high re-engagement priority
+            </span>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          {actions.map((action, i) => {
+            const Icon = action.icon;
+            const state = getActionState(action.label);
+            const sent = state === 'sent';
+            return (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl transition-all" style={{
+                background: sent ? '#f0fdf4' : action.priority === 'high' ? '#fffbeb' : '#f9fafb',
+                border: `1px solid ${sent ? '#10b98130' : action.priority === 'high' ? '#f59e0b30' : '#f3f4f6'}`,
+                opacity: sent ? 0.7 : 1,
+              }}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${action.color}15` }}>
+                  <Icon size={16} style={{ color: action.color }} weight="fill" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold" style={{ color: '#374151' }}>{action.label}</span>
+                    {action.priority === 'high' && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: '#fef3c7', color: '#d97706' }}>PRIORITY</span>
+                    )}
+                    {sent && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700">✓ SENT</span>
+                    )}
+                  </div>
+                  <p className="text-[10px] mt-0.5 truncate" style={{ color: '#9ca3af' }}>{action.msg}</p>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  {Object.entries(profile.communicationPrefs).map(([ch, enabled]) => {
+                    if (!action.label.toLowerCase().includes(ch) && !action.label.toLowerCase().includes('call') && ch !== 'push') return null;
+                    return enabled ? (
+                      <span key={ch} className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600">✓ {ch}</span>
+                    ) : (
+                      <span key={ch} className="text-[9px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-400">✗ {ch}</span>
+                    );
+                  })}
+                  {!sent && (
+                    <button
+                      onClick={() => sendAction(action.channel, action.label)}
+                      className="text-[10px] px-3 py-1.5 rounded-lg font-bold text-white transition-all hover:opacity-90"
+                      style={{ background: action.color }}
+                    >
+                      Execute
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Sent log */}
+        {actionLog.length > 0 && (
+          <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f3f4f6' }}>
+            <p className="text-[11px] font-semibold mb-2" style={{ color: '#9ca3af' }}>Action Log</p>
+            <div className="space-y-1.5">
+              {actionLog.map((log, i) => (
+                <div key={i} className="flex items-center gap-3 text-[11px]" style={{ color: '#6b7280' }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="font-semibold" style={{ color: '#10b981' }}>{log.ch}</span>
+                  <span>{log.msg}</span>
+                  <span className="ml-auto text-[10px]" style={{ color: '#9ca3af' }}>{log.time} WIB</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Activity Timeline ── */}
       <div className="bg-white rounded-2xl border border-gray-200 p-5">
         <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Activity Timeline</h3>
         <div>
@@ -831,27 +1215,6 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
           })}
         </div>
       </div>
-
-      {/* LoB History */}
-      {profile.lobs.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-5">
-          <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>LoB Product History</h3>
-          <div className="space-y-3">
-            {profile.lobs.map(lob => (
-              <div key={lob.name} className="flex items-center justify-between p-4 rounded-xl" style={{ background: '#f9fafb', borderLeft: `3px solid ${lob.color}` }}>
-                <div>
-                  <p className="text-sm font-bold" style={{ color: '#111827' }}>{lob.name}</p>
-                  <p className="text-[11px]" style={{ color: '#9ca3af' }}>Since {lob.since} · {lob.loans} loans</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold" style={{ color: '#111827' }}>{fmtIDR(lob.totalDisbursed)}</p>
-                  <p className="text-[11px]" style={{ color: '#9ca3af' }}>Total disbursed</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
