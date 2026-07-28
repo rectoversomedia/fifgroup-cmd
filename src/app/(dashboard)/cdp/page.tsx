@@ -3,6 +3,16 @@
 import * as React from 'react';
 import { Lightning, Users, ChartBar, Gear, Database, Brain, Warning, TrendUp, TrendDown, CheckCircle, MagnifyingGlass, ChatCircle, Bell, Envelope, DeviceMobile, PaperPlaneTilt } from '@phosphor-icons/react';
 
+const LOB_LOGOS: Record<string, string> = {
+  FIFASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FIFASTRA-1780538519035.png',
+  SPEKTRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20SPEKTRA-1780538544863.png',
+  DANASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20DANASTRA-1780538584771.png',
+  FINATRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FINATRA-1780538626287.png',
+  AMITRA:   'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20AMITRA-1780538604037.png',
+};
+
+type ActionStep = { step: number; status: 'pending' | 'sending' | 'done' | 'error'; label: string; detail: string; time?: string };
+
 const JOURNEYS = [
   {
     id: 'new-user', name: 'New User Nurture',
@@ -515,7 +525,7 @@ type IdentityMatch = {
   totalDisbursed: number; riskLevel: string; matchType: string; confidence: number;
   // Extended: loan & application history
   loans: {
-    id: string; lob: string; lobColor: string; status: 'active' | 'completed' | 'rejected' | 'pending' | 'dormant';
+    id: string; lob: string; lobColor: string; logo: string; status: 'active' | 'completed' | 'rejected' | 'pending' | 'dormant';
     product: string; amount: number; tenor: number; interestRate: number;
     disbursedAt: string; completedAt?: string; monthlyInstallment: number;
     repaymentRate: number; outstanding: number; purpose: string;
@@ -556,8 +566,10 @@ const SAMPLE_PROFILES: IdentityMatch[] = [
     nextPayment: { dueDate: '2026-08-10', amount: 618000, status: 'upcoming' },
     loans: [
       {
-        id: 'FIF-LN-001234', lob: 'FIFASTRA', lobColor: '#dc2626', status: 'active',
-        product: 'FIFASTRA Motor', amount: 12000000, tenor: 24, interestRate: 18,
+        id: 'FIF-LN-001234', lob: 'FIFASTRA', lobColor: '#dc2626',
+        logo: LOB_LOGOS['FIFASTRA'],
+        status: 'active',
+        product: 'FIFASTRA', amount: 12000000, tenor: 24, interestRate: 18,
         disbursedAt: '2026-03-10', monthlyInstallment: 618000, repaymentRate: 100, outstanding: 9900000,
         purpose: 'Pembelian motor bekas',
         history: [
@@ -618,8 +630,10 @@ const SAMPLE_PROFILES: IdentityMatch[] = [
     churnRisk: 'low',
     loans: [
       {
-        id: 'FIN-INQ-001', lob: 'FINATRA', lobColor: '#059669', status: 'pending',
-        product: 'FINATRA Modal Usaha', amount: 50000000, tenor: 36, interestRate: 24,
+        id: 'FIN-INQ-001', lob: 'FINATRA', lobColor: '#059669',
+        logo: LOB_LOGOS['FINATRA'],
+        status: 'pending',
+        product: 'FINATRA', amount: 50000000, tenor: 36, interestRate: 24,
         disbursedAt: '', monthlyInstallment: 0, repaymentRate: 0, outstanding: 0,
         purpose: 'Modal toko elektronik',
         history: [
@@ -764,16 +778,43 @@ function IdentityResolutionTab() {
 function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
   const [activeEvent, setActiveEvent] = React.useState<string | null>(null);
   const [activeLoan, setActiveLoan] = React.useState<string | null>(null);
-  const [actionLog, setActionLog] = React.useState<{ ch: string; msg: string; time: string }[]>([]);
-  const [pendingActions, setPendingActions] = React.useState<string[]>([]);
+  const [actionLog, setActionLog] = React.useState<{ ch: string; msg: string; time: string; status: 'sent' | 'pending' | 'error' }[]>([]);
+  const [activeAction, setActiveAction] = React.useState<{ label: string; channel: string; steps: ActionStep[] } | null>(null);
   const fmtIDR = (v: number) => `Rp ${v.toLocaleString('id-ID')}`;
 
-  const sendAction = (channel: string, label: string) => {
-    setPendingActions(prev => prev.filter(a => a !== label));
-    setActionLog(prev => [
-      { ch: channel, msg: label, time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) },
-      ...prev,
-    ]);
+  const executeAction = (channel: string, label: string, msg: string) => {
+    const steps: ActionStep[] = [
+      { step: 1, status: 'pending', label: 'Validate contact', detail: `Check ${channel} — ${profile.identifiers.phone}` },
+      { step: 2, status: 'pending', label: 'Build message', detail: `Personalized content for ${profile.name}` },
+      { step: 3, status: 'pending', label: 'Send via ' + channel, detail: msg.slice(0, 60) + '...' },
+      { step: 4, status: 'pending', label: 'Confirm delivery', detail: `Wait for delivery receipt...` },
+    ];
+    setActiveAction({ label, channel, steps });
+
+    steps.forEach((s, i) => {
+      setTimeout(() => {
+        setActiveAction(prev => {
+          if (!prev) return prev;
+          const updated = { ...prev, steps: prev.steps.map((st, j) => j === i ? { ...st, status: 'done' as const } : st) };
+          if (i < steps.length - 1) {
+            setTimeout(() => {
+              setActiveAction(p => {
+                if (!p) return p;
+                return { ...p, steps: p.steps.map((st, j) => j === i + 1 ? { ...st, status: 'sending' as const } : st) };
+              });
+            }, 600);
+          }
+          if (i === steps.length - 1) {
+            setActionLog(prev => [
+              { ch: channel, msg: label, time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }), status: 'sent' },
+              ...prev,
+            ]);
+            setTimeout(() => setActiveAction(null), 800);
+          }
+          return updated;
+        });
+      }, (i * 1200) + 400);
+    });
   };
 
   const STATUS_COLORS: Record<string, string> = {
@@ -809,7 +850,7 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
 
   const getActionState = (label: string) => {
     if (actionLog.some(a => a.msg === label)) return 'sent';
-    if (pendingActions.includes(label)) return 'pending';
+    if (activeAction?.label === label) return 'active';
     return 'ready';
   };
 
@@ -955,8 +996,8 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
                     className="w-full flex items-center gap-4 p-4 text-left"
                     onClick={() => setActiveLoan(isOpen ? null : loan.id)}
                   >
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${loan.lobColor}20` }}>
-                      <span className="text-sm font-black" style={{ color: loan.lobColor }}>{loan.lob[0]}</span>
+                    <div className="w-12 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden" style={{ background: '#f9fafb' }}>
+                      <img src={loan.logo} alt={loan.lob} className="object-contain" style={{ height: 28, width: 'auto', maxWidth: 48 }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -1053,10 +1094,13 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
         <div className="bg-white rounded-2xl border border-gray-200 p-5">
           <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Recommended Products <span className="font-normal text-[11px]" style={{ color: '#9ca3af' }}>— next best offer for this customer</span></h3>
           <div className="space-y-3">
-            {profile.availableProducts.map(p => (
+            {profile.availableProducts.map(p => {
+              const logo = LOB_LOGOS[p.name];
+              return (
               <div key={p.name} className="flex items-center gap-3 p-4 rounded-xl" style={{ background: '#f9fafb', borderLeft: `3px solid ${p.color}` }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${p.color}15` }}>
-                  <span className="text-sm font-black" style={{ color: p.color }}>{p.name[0]}</span>
+                <div className="w-12 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden" style={{ background: '#fff' }}>
+                  {logo && <img src={logo} alt={p.name} className="object-contain" style={{ height: 28, width: 'auto', maxWidth: 52 }} />}
+                  {!logo && <span className="text-sm font-black" style={{ color: p.color }}>{p.name[0]}</span>}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -1070,16 +1114,17 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
                 </div>
                 <button
                   onClick={() => {
-                    const { icon: Icon, label, msg, color } = actions.find(a => a.label.includes(p.name)) || { icon: PaperPlaneTilt, label: `Offer ${p.name}`, msg: `Halo ${profile.name}, promo ${p.name} untuk Anda!`, color: p.color };
-                    sendAction(label.split(' — ')[0], label);
+                    const act = actions.find(a => a.label.includes(p.name));
+                    if (act) executeAction(act.channel, act.label, act.msg);
                   }}
-                  className="shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white transition-opacity"
+                  className="shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white transition-opacity hover:opacity-90"
                   style={{ background: p.color, opacity: 0.85 }}
                 >
                   Send Offer
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -1136,7 +1181,7 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
                   })}
                   {!sent && (
                     <button
-                      onClick={() => sendAction(action.channel, action.label)}
+                      onClick={() => executeAction(action.channel, action.label, action.msg)}
                       className="text-[10px] px-3 py-1.5 rounded-lg font-bold text-white transition-all hover:opacity-90"
                       style={{ background: action.color }}
                     >
@@ -1148,6 +1193,43 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
             );
           })}
         </div>
+
+        {/* Step Execution Panel */}
+        {activeAction && (
+          <div className="rounded-xl border-2 p-5" style={{ borderColor: '#6366f1', background: '#f0f0ff' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-5 h-5 rounded-full border-2 border-indigo-600 flex items-center justify-center animate-spin" style={{ borderTopColor: 'transparent' }}>
+              </div>
+              <h4 className="text-sm font-bold" style={{ color: '#6366f1' }}>Executing: {activeAction.label}</h4>
+              <span className="text-[10px] px-2 py-0.5 rounded-full ml-auto" style={{ background: '#e0e7ff', color: '#6366f1' }}>{activeAction.channel}</span>
+            </div>
+            <div className="space-y-2.5">
+              {activeAction.steps.map((step, i) => (
+                <div key={step.step} className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-black"
+                    style={{
+                      background: step.status === 'done' ? '#10b981' : step.status === 'sending' ? '#6366f1' : '#e5e7eb',
+                      color: step.status === 'done' ? 'white' : step.status === 'sending' ? 'white' : '#9ca3af',
+                    }}>
+                    {step.status === 'done' ? '✓' : step.status === 'sending' ? '...' : step.step}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold" style={{ color: step.status === 'done' ? '#10b981' : step.status === 'sending' ? '#6366f1' : '#9ca3af' }}>{step.label}</span>
+                      {step.status === 'sending' && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full animate-pulse" style={{ background: '#e0e7ff', color: '#6366f1' }}>running</span>
+                      )}
+                      {step.status === 'done' && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: '#f0fdf4', color: '#10b981' }}>done</span>
+                      )}
+                    </div>
+                    <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>{step.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Sent log */}
         {actionLog.length > 0 && (
