@@ -151,11 +151,6 @@ export default function AlertsPage() {
   const [ackedIds, setAckedIds] = React.useState<Set<number>>(new Set());
   const { data: fifadaMetrics } = useRealtime(() => getAppHealthMetrics('fifada'), 30_000);
 
-  // Derive live values from data-sim (with sensible fallbacks)
-  const crashRate = fifadaMetrics?.metrics.find(m => m.label === 'Crash Rate')?.value ?? '0.8%';
-  const errorRate = fifadaMetrics?.metrics.find(m => m.label === 'Error Rate')?.value ?? '1.4%';
-  const pushDel   = fifadaMetrics?.metrics.find(m => m.label === 'Push Delivery')?.value ?? '94.2%';
-
   const handleAck = React.useCallback((id: number) => {
     setAckedIds(prev => {
       const next = new Set(prev);
@@ -168,107 +163,114 @@ export default function AlertsPage() {
     setFilter(f);
   }, []);
 
-  const ALERTS_DYNAMIC: Alert[] = [
-    {
-      id: 1,
-      name: 'FIFADA Crash Rate',
-      metric: 'Crash Rate',
-      app: 'FIFADA',
-      current: crashRate,
-      threshold: '> 0.5%',
-      severity: 'HIGH',
-      status: 'triggered',
-      lastTriggered: '22 Jul 2026, 14:32 WIB',
-      message: `FIFADA crash rate detected at ${crashRate} — above 0.5% threshold. Root cause: memory leak in document scanner module. Engineering team notified.`,
-      actions: [
-        'Deploy memory leak patch (ETA: 24 Jul)',
-        'Enable crash reporting for scanner v2',
-        'QA regression test before release',
-      ],
-    },
-    {
-      id: 2,
-      name: 'FIFADA Error Rate',
-      metric: 'Error Rate',
-      app: 'FIFADA',
-      current: errorRate,
-      threshold: '> 1%',
-      severity: 'HIGH',
-      status: 'triggered',
-      lastTriggered: '22 Jul 2026, 14:28 WIB',
-      message: `FIFADA error rate detected at ${errorRate} — above 1% threshold. Monitoring for escalation. Consider hotfix if rate increases.`,
-      actions: [
-        'Enable error alerting in Datadog',
-        'Review recent deploy changes',
-        'Prepare hotfix if > 2% threshold breached',
-      ],
-    },
-    {
-      id: 3,
-      name: 'SPEKTRA Document Drop-off',
-      metric: 'Upload Drop-off',
-      app: 'SPEKTRA',
-      current: '62%',
-      threshold: '> 60%',
-      severity: 'HIGH',
-      status: 'triggered',
-      lastTriggered: '21 Jul 2026, 09:15 WIB',
-      message: 'SPEKTRA document upload drop-off at 62%. UX team reviewing upload flow. Hypothesis: file size limit (5MB) too small for scanned documents.',
-      actions: [
-        'A/B test 10MB vs 25MB file limit',
-        'Implement auto-compression pipeline',
-        'Add supported formats in-app guide',
-      ],
-    },
-    {
-      id: 4,
-      name: 'Push Delivery Rate',
-      metric: 'Push Delivery',
-      app: 'FIFADA',
-      current: pushDel,
-      threshold: '< 95%',
-      severity: 'MEDIUM',
-      status: 'triggered',
-      lastTriggered: '21 Jul 2026, 16:45 WIB',
-      message: `Push delivery rate at ${pushDel} — below 95% target. Device token validity review recommended. Affects users with stale tokens.`,
-      actions: [
-        'Audit device token validity',
-        'Implement token refresh flow',
-        'Review Firebase Cloud Messaging config',
-      ],
-    },
-    {
-      id: 5,
-      name: 'Bill Reminder Success',
-      metric: 'Reminder Success',
-      app: 'FIFGO',
-      current: '94%',
-      threshold: '< 90%',
-      severity: 'HEALTHY',
-      status: 'resolved',
-      lastTriggered: '18 Jul 2026, 10:00 WIB',
-      message: 'Bill Reminder journey performing above threshold at 94% success rate. No action required.',
-      actions: [],
-    },
-    {
-      id: 6,
-      name: 'Avg Days to Disburse',
-      metric: 'Disbursement Speed',
-      app: 'All LoBs',
-      current: '3.8 days',
-      threshold: '> 5 days',
-      severity: 'HEALTHY',
-      status: 'resolved',
-      lastTriggered: '15 Jul 2026, 08:00 WIB',
-      message: 'Average disbursement speed at 3.8 days — well within 5-day target. Continue monitoring AMITRA which is at 4.8 days.',
-      actions: [],
-    },
-  ];
+  // Stable reference — useMemo prevents new object refs on every render
+  const ALERTS_DYNAMIC: Alert[] = React.useMemo(() => {
+    const crashRate = fifadaMetrics?.metrics.find(m => m.label === 'Crash Rate')?.value ?? '0.8%';
+    const errorRate = fifadaMetrics?.metrics.find(m => m.label === 'Error Rate')?.value ?? '1.4%';
+    const pushDel   = fifadaMetrics?.metrics.find(m => m.label === 'Push Delivery')?.value ?? '94.2%';
 
-  const triggered   = ALERTS_DYNAMIC.filter(a => a.status === 'triggered');
-  const resolved    = ALERTS_DYNAMIC.filter(a => a.status === 'resolved');
-  const highCount   = triggered.filter(a => a.severity === 'HIGH').length;
-  const mediumCount = triggered.filter(a => a.severity === 'MEDIUM').length;
+    return [
+      {
+        id: 1,
+        name: 'FIFADA Crash Rate',
+        metric: 'Crash Rate',
+        app: 'FIFADA',
+        current: crashRate,
+        threshold: '> 0.5%',
+        severity: 'HIGH',
+        status: 'triggered',
+        lastTriggered: '22 Jul 2026, 14:32 WIB',
+        message: `FIFADA crash rate detected at ${crashRate} — above 0.5% threshold. Root cause: memory leak in document scanner module. Engineering team notified.`,
+        actions: [
+          'Deploy memory leak patch (ETA: 24 Jul)',
+          'Enable crash reporting for scanner v2',
+          'QA regression test before release',
+        ],
+      },
+      {
+        id: 2,
+        name: 'FIFADA Error Rate',
+        metric: 'Error Rate',
+        app: 'FIFADA',
+        current: errorRate,
+        threshold: '> 1%',
+        severity: 'HIGH',
+        status: 'triggered',
+        lastTriggered: '22 Jul 2026, 14:28 WIB',
+        message: `FIFADA error rate detected at ${errorRate} — above 1% threshold. Monitoring for escalation. Consider hotfix if rate increases.`,
+        actions: [
+          'Enable error alerting in Datadog',
+          'Review recent deploy changes',
+          'Prepare hotfix if > 2% threshold breached',
+        ],
+      },
+      {
+        id: 3,
+        name: 'SPEKTRA Document Drop-off',
+        metric: 'Upload Drop-off',
+        app: 'SPEKTRA',
+        current: '62%',
+        threshold: '> 60%',
+        severity: 'HIGH',
+        status: 'triggered',
+        lastTriggered: '21 Jul 2026, 09:15 WIB',
+        message: 'SPEKTRA document upload drop-off at 62%. UX team reviewing upload flow. Hypothesis: file size limit (5MB) too small for scanned documents.',
+        actions: [
+          'A/B test 10MB vs 25MB limit',
+          'Implement auto-compression pipeline',
+          'Add supported formats in-app guide',
+        ],
+      },
+      {
+        id: 4,
+        name: 'Push Delivery Rate',
+        metric: 'Push Delivery',
+        app: 'FIFADA',
+        current: pushDel,
+        threshold: '< 95%',
+        severity: 'MEDIUM',
+        status: 'triggered',
+        lastTriggered: '21 Jul 2026, 16:45 WIB',
+        message: `Push delivery rate at ${pushDel} — below 95% target. Device token validity review recommended.`,
+        actions: [
+          'Audit device token validity',
+          'Implement token refresh flow',
+          'Review Firebase Cloud Messaging config',
+        ],
+      },
+      {
+        id: 5,
+        name: 'Bill Reminder Success',
+        metric: 'Reminder Success',
+        app: 'FIFGO',
+        current: '94%',
+        threshold: '< 90%',
+        severity: 'HEALTHY',
+        status: 'resolved',
+        lastTriggered: '18 Jul 2026, 10:00 WIB',
+        message: 'Bill Reminder journey performing above threshold at 94% success rate.',
+        actions: [],
+      },
+      {
+        id: 6,
+        name: 'Avg Days to Disburse',
+        metric: 'Disbursement Speed',
+        app: 'All LoBs',
+        current: '3.8 days',
+        threshold: '> 5 days',
+        severity: 'HEALTHY',
+        status: 'resolved',
+        lastTriggered: '15 Jul 2026, 08:00 WIB',
+        message: 'Average disbursement speed at 3.8 days — well within 5-day target.',
+        actions: [],
+      },
+    ];
+  }, [fifadaMetrics]);
+
+  const triggered   = React.useMemo(() => ALERTS_DYNAMIC.filter(a => a.status === 'triggered'), [ALERTS_DYNAMIC]);
+  const resolved    = React.useMemo(() => ALERTS_DYNAMIC.filter(a => a.status === 'resolved'), [ALERTS_DYNAMIC]);
+  const highCount   = React.useMemo(() => triggered.filter(a => a.severity === 'HIGH').length, [triggered]);
+  const mediumCount = React.useMemo(() => triggered.filter(a => a.severity === 'MEDIUM').length, [triggered]);
 
   const displayed = filter === 'all'
     ? ALERTS_DYNAMIC
