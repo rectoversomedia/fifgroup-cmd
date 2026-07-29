@@ -11,11 +11,11 @@ const LOB_LOGOS: Record<string, string> = {
   AMITRA:   'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20AMITRA-1780538604037.png',
 };
 
-const WA_SVG = 'https://upload.wikimedia.org/wikipedia/commons/6/65/WhatsApp.svg';
-const EMAIL_SVG = 'https://ssl.gstatic.com/images/branding/product/1x/gmail_2020q4_512dp.png';
-const TEAMS_SVG = 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg';
-const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/messagebird.svg';
-const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/googlecloudnotifications.svg';
+const WA_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
+const EMAIL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/gmail.svg';
+const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/microsoftteams.svg';
+const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/messagebird.svg';
+const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googlecloudnotifications.svg';
 
 function WaIcon({ size = 16 }: { size?: number }) {
   return <img src={WA_SVG} alt="WhatsApp" width={size} height={size} />;

@@ -3,10 +3,10 @@
 import * as React from 'react';
 import { Lightning, Users, CheckCircle, TrendUp, Bell, Rocket, ChartBar, CurrencyCircleDollar, Calendar } from '@phosphor-icons/react';
 
-const WA_SVG = 'https://upload.wikimedia.org/wikipedia/commons/6/65/WhatsApp.svg';
-const EMAIL_SVG = 'https://ssl.gstatic.com/images/branding/product/1x/gmail_2020q4_512dp.png';
-const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/messagebird.svg';
-const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/googlecloudnotifications.svg';
+const WA_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
+const EMAIL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/gmail.svg';
+const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/messagebird.svg';
+const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googlecloudnotifications.svg';
 
 function MktIcon({ channel, size = 16 }: { channel: string; size?: number }) {
   switch (channel) {

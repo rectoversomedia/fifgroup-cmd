@@ -11,9 +11,9 @@ import {
   type EscalationTicket, type EscalationChannel,
 } from '@/lib/data-sim';
 
-const WHATSAPP_SVG = 'https://upload.wikimedia.org/wikipedia/commons/6/65/WhatsApp.svg';
-const TEAMS_SVG = 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg';
-const EMAIL_SVG = 'https://ssl.gstatic.com/images/branding/product/1x/gmail_2020q4_512dp.png';
+const WHATSAPP_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
+const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/microsoftteams.svg';
+const EMAIL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/gmail.svg';
 
 function WhatsAppIcon({ size = 18, color = '#10b981' }: { size?: number; color?: string }) {
   return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} />;
