@@ -1,19 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { Lightning, Users, CheckCircle, TrendUp, Bell, Rocket, ChartBar, CurrencyCircleDollar, Calendar } from '@phosphor-icons/react';
-
-const WA_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
-const EMAIL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/gmail.svg';
-const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/messagebird.svg';
-const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googlecloudnotifications.svg';
+import { Lightning, Users, CheckCircle, TrendUp, Bell, Rocket, ChartBar, CurrencyCircleDollar, Calendar, ChatCircle, Envelope, ChatTeardropDots } from '@phosphor-icons/react';
 
 function MktIcon({ channel, size = 16 }: { channel: string; size?: number }) {
   switch (channel) {
-    case 'WhatsApp': return <img src={WA_SVG} alt="WhatsApp" width={size} height={size} />;
-    case 'Email': return <img src={EMAIL_SVG} alt="Email" width={size} height={size} />;
-    case 'SMS': return <img src={SMS_SVG} alt="SMS" width={size} height={size} style={{ filter: 'brightness(0) saturate(100%)' }} />;
-    case 'Push Notification': case 'In-App Message': return <img src={PUSH_SVG} alt="Push" width={size} height={size} style={{ filter: 'brightness(0) saturate(100%)' }} />;
+    case 'WhatsApp': return <ChatCircle size={size} weight="fill" style={{ color: '#25D366' }} />;
+    case 'Email': return <Envelope size={size} weight="fill" style={{ color: '#EA4335' }} />;
+    case 'SMS': return <ChatTeardropDots size={size} weight="fill" style={{ color: '#64748b' }} />;
+    case 'Push Notification': case 'In-App Message': return <Bell size={size} weight="fill" style={{ color: '#f97316' }} />;
     default: return <Bell size={size} />;
   }
 }

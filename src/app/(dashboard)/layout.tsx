@@ -5,31 +5,27 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   List, User, SignOut,
-  ChartBar, Star, Stack,
+  ChartBar, Star,
   CurrencyCircleDollar, Globe,
   Megaphone, Database, Pulse,
   Trophy, MapPin, Bell, DeviceMobile,
-  ChartLine, ShieldCheck, Gear, PushPin,
-  TrendUp, TrendDown, LockSimple,
+  ChartLine, ShieldCheck, Gear,
+  TrendUp, LockSimple,
 } from '@phosphor-icons/react';
 import { useAuth } from '@/components/auth-provider';
 import { isPageLocked } from '@/components/page-lock';
 import PageGate from '@/components/page-gate';
 
 const FIFGROUP_LOGO = '/images/fifgroup-logo.png';
-
-const WA_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
-const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/microsoftteams.svg';
-const EMAIL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/gmail.svg';
-const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/messagebird.svg';
-const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googlecloudnotifications.svg';
+const FIFGO_LOGO_NAV = '/images/fifgo-logo.png';
+const FIFADA_LOGO_NAV = '/images/fifada-logo.jpg';
 
 type NavItem = {
   href: string;
   label: string;
   icon: React.ElementType;
   color: string;
-  badge?: number;
+  logo?: string;
 };
 
 type NavGroup = {
@@ -41,24 +37,24 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Executive',
     items: [
-      { href: '/',                  label: 'Portfolio Overview', icon: ChartLine,        color: '#1e3a5f' },
-      { href: '/portfolio-quality', label: 'Portfolio Quality', icon: Trophy,          color: '#10b981' },
-      { href: '/geographic',       label: 'Geographic',        icon: MapPin,           color: '#8b5cf6' },
+      { href: '/',                     label: 'Portfolio Overview', icon: ChartLine,           color: '#1e3a5f' },
+      { href: '/portfolio-quality',    label: 'Portfolio Quality',   icon: Trophy,             color: '#10b981' },
+      { href: '/geographic',          label: 'Geographic',         icon: MapPin,             color: '#8b5cf6' },
     ],
   },
   {
     label: 'Digital Products',
     items: [
-      { href: '/fifgo',  label: 'FIFGO App',   icon: DeviceMobile, color: '#06b6d4' },
-      { href: '/fifada', label: 'FIFADA App',  icon: Star,        color: '#f59e0b' },
+      { href: '/fifgo',  label: 'FIFGO App',  icon: DeviceMobile, color: '#06b6d4', logo: FIFGO_LOGO_NAV },
+      { href: '/fifada', label: 'FIFADA App', icon: Star,        color: '#f59e0b', logo: FIFADA_LOGO_NAV },
     ],
   },
   {
     label: 'Marketing',
     items: [
       { href: '/push-notification', label: 'Push Notification', icon: Megaphone, color: '#f97316' },
-      { href: '/marketing',         label: 'Marketing',         icon: TrendUp,   color: '#f59e0b' },
-      { href: '/campaign',          label: 'Campaign Hub',       icon: Megaphone, color: '#dc2626' },
+      { href: '/marketing',         label: 'Marketing',         icon: TrendUp,    color: '#f59e0b' },
+      { href: '/campaign',          label: 'Campaign Hub',      icon: Megaphone,  color: '#dc2626' },
     ],
   },
   {
@@ -72,27 +68,27 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Performance',
     items: [
       { href: '/lob',   label: 'LoB Performance', icon: ChartBar,             color: '#8b5cf6' },
-      { href: '/sales', label: 'Sales',            icon: CurrencyCircleDollar,  color: '#10b981' },
+      { href: '/sales', label: 'Sales',           icon: CurrencyCircleDollar, color: '#10b981' },
     ],
   },
   {
     label: 'Operations',
     items: [
       { href: '/error-tracking', label: 'Error Tracking', icon: ShieldCheck, color: '#64748b' },
-      { href: '/competitors',    label: 'Competitors',     icon: Globe,        color: '#64748b' },
+      { href: '/competitors',    label: 'Competitors',     icon: Globe,       color: '#64748b' },
     ],
   },
   {
     label: 'Tools',
     items: [
-      { href: '/alerts',      label: 'Alerts',      icon: Bell, color: '#dc2626' },
-      { href: '/escalation',  label: 'Escalation',  icon: Bell, color: '#dc2626' },
+      { href: '/alerts',     label: 'Alerts',     icon: Bell, color: '#dc2626' },
+      { href: '/escalation', label: 'Escalation', icon: Bell, color: '#dc2626' },
     ],
   },
   {
     label: 'Admin',
     items: [
-      { href: '/cdp-admin', label: 'CDP Admin', icon: Gear,  color: '#1e3a5f' },
+      { href: '/cdp-admin', label: 'CDP Admin', icon: Gear,        color: '#1e3a5f' },
       { href: '/settings',  label: 'Settings',   icon: ShieldCheck, color: '#1e3a5f' },
     ],
   },
@@ -135,7 +131,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Logo */}
       <div className="h-[60px] flex items-center justify-center shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
         {collapsed ? (
-          <img src="https://www.fifgroup.co.id/favicon.ico" alt="FIFGROUP" className="object-contain" style={{ height: 30, width: 30 }} />
+          <img src={FIFGROUP_LOGO} alt="FIFGROUP" className="object-contain" style={{ height: 30, width: 30 }} />
         ) : (
           <img src={FIFGROUP_LOGO} alt="FIFGROUP" className="object-contain" style={{ height: 34, width: 'auto' }} />
         )}
@@ -174,7 +170,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     }}
                     className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg transition-all"
                     style={{
-                      background: isActive ? `${item.color}12` : isLocked ? 'transparent' : 'transparent',
+                      background: isActive ? `${item.color}12` : 'transparent',
                       color: isActive ? item.color : isLocked ? '#cbd5e1' : '#64748b',
                       fontWeight: isActive ? 700 : isLocked ? 400 : 500,
                       fontSize: 13,
@@ -183,12 +179,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     }}
                     title={collapsed ? item.label : undefined}
                   >
-                    <div className="relative">
-                      <Icon
-                        size={20}
-                        weight={isActive ? 'fill' : isLocked ? 'regular' : 'regular'}
-                        style={{ color: isActive ? item.color : isLocked ? '#cbd5e1' : '#94a3b8', flexShrink: 0 }}
-                      />
+                    <div className="relative shrink-0">
+                      {item.logo && !collapsed ? (
+                        <img
+                          src={item.logo}
+                          alt={item.label}
+                          className="object-contain rounded"
+                          style={{ height: 18, width: 18 }}
+                        />
+                      ) : (
+                        <Icon
+                          size={20}
+                          weight={isActive ? 'fill' : isLocked ? 'regular' : 'regular'}
+                          style={{ color: isActive ? item.color : isLocked ? '#cbd5e1' : '#94a3b8' }}
+                        />
+                      )}
                       {isLocked && (
                         <div className="absolute -bottom-0.5 -right-0.5">
                           <LockSimple size={10} weight="fill" style={{ color: '#94a3b8' }} />

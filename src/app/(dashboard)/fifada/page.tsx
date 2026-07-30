@@ -8,8 +8,8 @@ import {
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const FIFADA_LOGO = '/images/fifada-logo.jpg';
-const APPSTORE_ICON = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/apple.svg';
-const PLAYSTORE_ICON = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googleplay.svg';
+const APPSTORE_ICON = '';
+const PLAYSTORE_ICON = '';
 
 type FifadaStoreData = {
   rating: number;
@@ -172,8 +172,8 @@ export default function FIFADAPage() {
       {/* Store Toggle */}
       <div className="flex items-center gap-2 bg-white rounded-xl p-1.5 border border-gray-200 w-fit">
         {([
-          { id: 'playstore' as const, label: 'Google Play Store', icon: PLAYSTORE_ICON },
-          { id: 'appstore' as const, label: 'Apple App Store', icon: APPSTORE_ICON },
+          { id: 'playstore' as const, label: 'Google Play Store' },
+          { id: 'appstore' as const, label: 'Apple App Store' },
         ]).map(s_ => (
           <button
             key={s_.id}
@@ -181,7 +181,13 @@ export default function FIFADAPage() {
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all"
             style={store === s_.id ? { background: '#1f2937', color: '#fff' } : { background: 'transparent', color: '#9ca3af' }}
           >
-            <img src={s_.icon} alt={s_.label} className="w-4 h-4 object-contain" style={store !== s_.id ? { filter: 'grayscale(1) opacity(0.45)' } : {}} />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={store === s_.id ? '#fff' : '#9ca3af'}>
+              {s_.id === 'playstore' ? (
+                <path d="M3 18h18v-18H3zm16.5-15c.83 0 1.5.67 1.5 1.5v12c0 .83-.67 1.5-1.5 1.5H6c-.83 0-1.5-.67-1.5-1.5V6c0-.83.67-1.5 1.5-1.5h13.5z" />
+              ) : (
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+              )}
+            </svg>
             {s_.label}
           </button>
         ))}

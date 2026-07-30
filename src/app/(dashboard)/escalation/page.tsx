@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import {
-  PaperPlaneTilt, Envelope,
+  PaperPlaneTilt, Envelope, ChatCircle,
   CheckCircle, Warning, Clock, ArrowRight,
   CaretDown, CaretUp, Plus, Funnel,
 } from '@phosphor-icons/react';
@@ -11,20 +11,18 @@ import {
   type EscalationTicket, type EscalationChannel,
 } from '@/lib/data-sim';
 
-const WHATSAPP_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
-const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/microsoftteams.svg';
-const EMAIL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/gmail.svg';
+const WHATSAPP_SVG = ''; const TEAMS_SVG = ''; const EMAIL_SVG = '';
 
 function WhatsAppIcon({ size = 18, color = '#10b981' }: { size?: number; color?: string }) {
-  return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} />;
+  return <ChatCircle size={size} weight="fill" style={{ color: '#25D366' }} />;
 }
 
 function TeamsIcon({ size = 18, color = '#6366f1' }: { size?: number; color?: string }) {
-  return <img src={TEAMS_SVG} alt="MS Teams" width={size} height={size} />;
+  return <PaperPlaneTilt size={size} weight="fill" style={{ color: '#6264A7' }} />;
 }
 
 function EmailIcon({ size = 18, color = '#4f8ef7' }: { size?: number; color?: string }) {
-  return <img src={EMAIL_SVG} alt="Email" width={size} height={size} />;
+  return <Envelope size={size} weight="fill" style={{ color: '#EA4335' }} />;
 }
 
 const CHANNEL_META: Record<EscalationChannel, { label: string; icon: React.ElementType; color: string; placeholder: string }> = {

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Lightning, Users, ChartBar, Gear, Database, Brain, Warning, TrendUp, TrendDown, CheckCircle, MagnifyingGlass, Bell, DeviceMobile, PaperPlaneTilt } from '@phosphor-icons/react';
+import { Lightning, Users, ChartBar, Gear, Database, Brain, Warning, TrendUp, TrendDown, CheckCircle, MagnifyingGlass, Bell, DeviceMobile, PaperPlaneTilt, ChatCircle, Envelope, ChatTeardropDots } from '@phosphor-icons/react';
 import { loadCDPData, saveCDPData, getDefaultCDP } from '@/components/cdp-admin';
 import type { Journey, Segment, HybridChannel, AIInsight } from '@/components/cdp-admin';
 
@@ -13,26 +13,20 @@ const LOB_LOGOS: Record<string, string> = {
   AMITRA:   '/images/amitra-logo.png',
 };
 
-const WA_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
-const EMAIL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/gmail.svg';
-const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/microsoftteams.svg';
-const SMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/messagebird.svg';
-const PUSH_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googlecloudnotifications.svg';
-
 function WaIcon({ size = 16 }: { size?: number }) {
-  return <img src={WA_SVG} alt="WhatsApp" width={size} height={size} />;
+  return <ChatCircle size={size} weight="fill" style={{ color: '#25D366' }} />;
 }
 function EmailIcon({ size = 16 }: { size?: number }) {
-  return <img src={EMAIL_SVG} alt="Email" width={size} height={size} />;
+  return <Envelope size={size} weight="fill" style={{ color: '#EA4335' }} />;
 }
 function TeamsIcon({ size = 16 }: { size?: number }) {
-  return <img src={TEAMS_SVG} alt="MS Teams" width={size} height={size} />;
+  return <PaperPlaneTilt size={size} weight="fill" style={{ color: '#6264A7' }} />;
 }
 function SmsIcon({ size = 16 }: { size?: number }) {
-  return <img src={SMS_SVG} alt="SMS" width={size} height={size} style={{ filter: 'brightness(0) saturate(100%)' }} />;
+  return <ChatTeardropDots size={size} weight="fill" style={{ color: '#64748b' }} />;
 }
 function PushIcon({ size = 16 }: { size?: number }) {
-  return <img src={PUSH_SVG} alt="Push" width={size} height={size} style={{ filter: 'brightness(0) saturate(100%)' }} />;
+  return <Bell size={size} weight="fill" style={{ color: '#f97316' }} />;
 }
 function ChannelIcon({ channel, size = 16 }: { channel: string; size?: number }) {
   switch (channel) {
@@ -981,9 +975,9 @@ function UnifiedProfileView({ profile }: { profile: IdentityMatch }) {
                 {Object.entries(profile.communicationPrefs).map(([ch, enabled]) => {
                   const iconEl = (() => {
                     switch (ch) {
-                      case 'whatsapp': return <img src={WA_SVG} alt="WhatsApp" width={12} height={12} />;
+                      case 'whatsapp': return <WaIcon size={11} />;
                       case 'sms': return <SmsIcon size={11} />;
-                      case 'email': return <img src={EMAIL_SVG} alt="Email" width={11} height={11} />;
+                      case 'email': return <EmailIcon size={11} />;
                       case 'push': return <PushIcon size={11} />;
                       default: return null;
                     }
@@ -1371,7 +1365,7 @@ function OfferModal({ profile, product, onClose, onExecute }: OfferModalProps) {
     { id: 'SMS', label: 'SMS', color: '#4f8ef7',
       icon: <DeviceMobile size={16} style={{ color: 'white' }} /> },
     { id: 'Email', label: 'Email', color: '#f59e0b',
-      icon: <img src={EMAIL_SVG} alt="Email" width={16} height={16} /> },
+      icon: <EmailIcon size={16} /> },
     { id: 'Push', label: 'Push Notif', color: '#10b981',
       icon: <Bell size={16} style={{ color: 'white' }} /> },
   ];

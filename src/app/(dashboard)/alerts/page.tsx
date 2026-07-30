@@ -11,18 +11,16 @@ import {
   type EscalationTicket, type EscalationChannel,
 } from '@/lib/data-sim';
 
-const WHATSAPP_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
-const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/microsoftteams.svg';
-const EMAIL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/gmail.svg';
+const WHATSAPP_SVG = ''; const TEAMS_SVG = ''; const EMAIL_SVG = '';
 
 function WhatsAppIcon({ size = 18 }: { size?: number }) {
-  return <img src={WHATSAPP_SVG} alt="WhatsApp" width={size} height={size} />;
+  return <ChatCircle size={size} weight="fill" style={{ color: '#25D366' }} />;
 }
 function TeamsIcon({ size = 18 }: { size?: number }) {
-  return <img src={TEAMS_SVG} alt="MS Teams" width={size} height={size} />;
+  return <PaperPlaneTilt size={size} weight="fill" style={{ color: '#6264A7' }} />;
 }
 function EmailIcon({ size = 18 }: { size?: number }) {
-  return <img src={EMAIL_SVG} alt="Email" width={size} height={size} />;
+  return <_Envelope size={size} weight="fill" style={{ color: '#EA4335' }} />;
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────

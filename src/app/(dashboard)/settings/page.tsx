@@ -6,7 +6,7 @@ import { PageLockAdmin } from '@/components/page-lock';
 import { useAuth } from '@/components/auth-provider';
 
 const FIFGROUP_LOGO = '/images/fifgroup-logo.png';
-const CHANNEL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googleads.svg';
+const CHANNEL_SVG = '';
 
 export default function SettingsPage() {
   const { isAdmin } = useAuth();
