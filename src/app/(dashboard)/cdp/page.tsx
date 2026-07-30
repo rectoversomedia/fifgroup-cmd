@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import { Lightning, Users, ChartBar, Gear, Database, Brain, Warning, TrendUp, TrendDown, CheckCircle, MagnifyingGlass, Bell, DeviceMobile, PaperPlaneTilt } from '@phosphor-icons/react';
+import { loadCDPData, saveCDPData, getDefaultCDP } from '@/components/cdp-admin';
+import type { Journey, Segment, HybridChannel, AIInsight } from '@/components/cdp-admin';
 
 const LOB_LOGOS: Record<string, string> = {
   FIFASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FIFASTRA-1780538519035.png',
@@ -126,9 +128,13 @@ const CDP_FEATURES = [
   { icon: Brain, name: 'Predictive Scoring', status: 'beta', desc: 'NPL risk scoring, churn prediction, LTV scoring (beta)', color: '#f59e0b' },
 ];
 
-const AI_INSIGHTS = [
+const AI_INSIGHTS_ICON_MAP: Record<string, any> = {
+  TrendDown, TrendUp, Warning, Lightning,
+};
+
+const AI_INSIGHTS_DEFAULT = [
   {
-    id: 'ins-1', icon: TrendDown, color: '#dc2626',
+    id: 'ins-1', iconType: 'TrendDown', color: '#dc2626',
     priority: 'high', type: 'funnel',
     title: 'SPEKTRA: 62% Drop-off at Document Upload Stage',
     finding: 'Of 31,200 users who started SPEKTRA application, 19,400 (62%) dropped off during document upload. Top rejected document: selfie with ID.',
@@ -137,7 +143,7 @@ const AI_INSIGHTS = [
     apps: null, lobs: ['SPEKTRA'],
   },
   {
-    id: 'ins-2', icon: TrendUp, color: '#10b981',
+    id: 'ins-2', iconType: 'TrendUp', color: '#10b981',
     priority: 'high', type: 'engagement',
     title: 'Cross-Sell Opportunity: 34K Single-LoB Users',
     finding: '34,821 FIFGO users have only 1 LoB product active. Best cross-sell pair: FIFASTRA → DANASTRA (42% natural fit based on loan purpose overlap).',
@@ -146,7 +152,7 @@ const AI_INSIGHTS = [
     apps: ['FIFGO'], lobs: ['FIFASTRA', 'DANASTRA'],
   },
   {
-    id: 'ins-3', icon: Warning, color: '#d97706',
+    id: 'ins-3', iconType: 'Warning', color: '#d97706',
     priority: 'medium', type: 'retention',
     title: 'SPEKTRA Month-2 Retention 52% — Below 60% Benchmark',
     finding: 'SPEKTRA cohort Month-2 retention is 52%, 8 points below the 60% benchmark. 71% of churned users had disbursement delay >5 days.',
@@ -155,7 +161,7 @@ const AI_INSIGHTS = [
     apps: null, lobs: ['SPEKTRA'],
   },
   {
-    id: 'ins-4', icon: Lightning, color: '#4f8ef7',
+    id: 'ins-4', iconType: 'Lightning', color: '#4f8ef7',
     priority: 'medium', type: 'hybrid',
     title: 'KYC Document Rejection Causing 18% of Branch Visits',
     finding: '18% of users who visited branch after app start were rejected for KYC documents — primarily due to selfie quality issues. Add in-app validation could eliminate 60% of these visits.',
@@ -164,7 +170,7 @@ const AI_INSIGHTS = [
     apps: ['FIFGO'], lobs: null,
   },
   {
-    id: 'ins-5', icon: TrendUp, color: '#10b981',
+    id: 'ins-5', iconType: 'TrendUp', color: '#10b981',
     priority: 'info', type: 'aso',
     title: 'FIFGO ASO Momentum: +23% Downloads, #1 Category Rank',
     finding: 'FIFGO downloads up 23% WoW driven by improved Finance category ranking. Moved from #2 to #1 position. Screenshot update from Q2 was effective.',
@@ -193,9 +199,17 @@ export default function CDPPage() {
   const [tab, setTab] = React.useState<Tab>('overview');
   const [selectedJourney, setSelectedJourney] = React.useState('new-user');
   const [timeStr, setTimeStr] = React.useState('--:--');
-  const journey = JOURNEYS.find(j => j.id === selectedJourney)!;
-  const totalUsers = SEGMENTS.reduce((s, seg) => s + seg.count, 0);
-  const totalActive = JOURNEYS.filter(j => j.status === 'active').length;
+
+  const [cdpData, setCDPData] = React.useState(() => {
+    const saved = loadCDPData();
+    return saved || getDefaultCDP();
+  });
+
+  React.useEffect(() => { saveCDPData(cdpData); }, [cdpData]);
+
+  const journey = cdpData.journeys.find((j: any) => j.id === selectedJourney) || cdpData.journeys[0];
+  const totalUsers = cdpData.segments.reduce((s: number, seg: any) => s + seg.count, 0);
+  const totalActive = cdpData.journeys.filter((j: any) => j.status === 'active').length;
 
   React.useEffect(() => {
     setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }));
@@ -318,7 +332,7 @@ export default function CDPPage() {
         <div className="space-y-3">
           {/* Journey Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-            {JOURNEYS.map(j => {
+            {cdpData.journeys.map((j: Journey) => {
               const JIcon = ICON_MAP[j.icon] || Users;
               const isSelected = selectedJourney === j.id;
               return (
@@ -361,10 +375,7 @@ export default function CDPPage() {
           <div className="bg-white rounded-xl border overflow-hidden" style={{ borderColor: `${journey.color}40` }}>
             <div className="p-3 flex items-start gap-3 flex-wrap" style={{ background: `${journey.color}08`, borderBottom: `1px solid ${journey.color}20` }}>
               <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${journey.color}15` }}>
-                {(ICON_MAP[journey.icon] || Users).render
-                  ? React.createElement(ICON_MAP[journey.icon] || Users, { size: 18, style: { color: journey.color }, weight: 'fill' })
-                  : <Users size={18} style={{ color: journey.color }} weight="fill" />
-                }
+                {(() => { const Ic = ICON_MAP[journey.icon] || Users; return React.createElement(Ic, { size: 18, style: { color: journey.color }, weight: 'fill' }); })()}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -394,7 +405,7 @@ export default function CDPPage() {
                 Trigger: {journey.trigger}
               </div>
               <div className="space-y-2">
-                {journey.steps.map((step, i) => (
+                {journey.steps.map((step: Journey['steps'][number], i: number) => (
                   <div key={i} className="flex items-start gap-3">
                     <div className="flex flex-col items-center shrink-0">
                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: journey.color }}>{i + 1}</div>
@@ -434,7 +445,7 @@ export default function CDPPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-3">
           <h3 className="text-xs font-bold mb-3" style={{ color: '#111827' }}>User Segments</h3>
           <div className="grid grid-cols-3 gap-2">
-            {SEGMENTS.map(seg => (
+            {cdpData.segments.map((seg: Segment) => (
               <div key={seg.id} className="bg-gray-50 rounded-xl p-3 border border-gray-100 flex flex-col items-center text-center">
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2" style={{ background: `${seg.color}15` }}>
                   <Users size={14} style={{ color: seg.color }} weight="fill" />
@@ -456,14 +467,7 @@ export default function CDPPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-3">
           <h3 className="text-xs font-bold mb-3" style={{ color: '#111827' }}>Omnichannel Integration Map</h3>
           <div className="space-y-2">
-            {[
-              { segment: 'New Users (0-30d)', count: 28400, channels: ['Push', 'In-App', 'Email'], priority: 'high', color: '#4f8ef7' },
-              { segment: 'Active Borrowers', count: 168000, channels: ['Push', 'SMS', 'In-App'], priority: 'high', color: '#10b981' },
-              { segment: 'Repeat Borrowers', count: 23400, channels: ['Push', 'In-App', 'Branch'], priority: 'medium', color: '#8b5cf6' },
-              { segment: 'Cross-Sell Target', count: 34821, channels: ['In-App', 'Push', 'SMS'], priority: 'high', color: '#06b6d4' },
-              { segment: 'Dormant Users', count: 14200, channels: ['SMS', 'Email', 'Push'], priority: 'medium', color: '#f97316' },
-              { segment: 'High Value Users', count: 12400, channels: ['In-App', 'Push', 'Branch'], priority: 'low', color: '#f59e0b' },
-            ].map(seg => (
+            {cdpData.hybrid.map((seg: HybridChannel) => (
               <div key={seg.segment} className="flex items-center gap-3 p-3 rounded-lg" style={{ background: '#f9fafb', border: '1px solid #f3f4f6' }}>
                 <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: seg.color }} />
                 <div className="w-36 shrink-0">
@@ -471,7 +475,7 @@ export default function CDPPage() {
                   <p className="text-[9px]" style={{ color: '#9ca3af' }}>{seg.count.toLocaleString()} users</p>
                 </div>
                 <div className="flex-1 flex gap-1.5 flex-wrap">
-                  {seg.channels.map(ch => (
+                  {seg.channels.map((ch: string) => (
                     <span key={ch} className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: `${seg.color}15`, color: seg.color }}>{ch}</span>
                   ))}
                 </div>
@@ -497,8 +501,8 @@ export default function CDPPage() {
             </p>
           </div>
 
-          {AI_INSIGHTS.map(insight => {
-            const Icon = insight.icon;
+          {cdpData.insights.map((insight: AIInsight) => {
+            const Icon = AI_INSIGHTS_ICON_MAP[insight.iconType] || Warning;
             return (
               <div key={insight.id} className="bg-white rounded-xl p-3 border border-gray-200">
                 <div className="flex items-start gap-3">
@@ -512,10 +516,10 @@ export default function CDPPage() {
                         {insight.priority}
                       </span>
                       <span className="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">{insight.type}</span>
-                      {insight.apps?.map(a => (
+                      {insight.apps?.map((a: string) => (
                         <span key={a} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: '#eff6ff', color: '#4f8ef7' }}>{a.toUpperCase()}</span>
                       ))}
-                      {insight.lobs?.map(l => (
+                      {insight.lobs?.map((l: string) => (
                         <span key={l} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: '#f5f3ff', color: '#8b5cf6' }}>{l}</span>
                       ))}
                     </div>

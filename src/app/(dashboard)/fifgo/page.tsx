@@ -7,12 +7,24 @@ import {
   CheckCircle, Warning, Gear,
 } from '@phosphor-icons/react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
-import { FifgoAdminPanel, loadFifgoData, saveFifgoData, FifgoData } from '@/components/fifgo-admin';
+import { FifgoAdminPanel, DEFAULT_FIFGO, loadFifgoData, saveFifgoData, FifgoData } from '@/components/fifgo-admin';
 
 const FIFGO_LOGO = 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/FIFGO_APP_LOGO-1780892650611.png';
 
+const LOB_LOGOS: Record<string, string> = {
+  FIFASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FIFASTRA-1780538519035.png',
+  SPEKTRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20SPEKTRA-1780538544863.png',
+  DANASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20DANASTRA-1780538584771.png',
+  FINATRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FINATRA-1780538626287.png',
+  AMITRA:   'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20AMITRA-1780538604037.png',
+};
+
+const APPSTORE_ICON = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/apple.svg';
+const PLAYSTORE_ICON = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googleplay.svg';
+
 export default function FIFGOPage() {
   const [tab, setTab] = React.useState<'overview' | 'aso' | 'reviews' | 'health'>('overview');
+  const [store, setStore] = React.useState<'playstore' | 'appstore'>('playstore');
   const [timeStr, setTimeStr] = React.useState('--:--');
   const [showAdmin, setShowAdmin] = React.useState(false);
   const [data, setData] = React.useState<FifgoData>(loadFifgoData);
@@ -29,6 +41,8 @@ export default function FIFGOPage() {
   };
 
   const isHealthy = data.appHealthMetrics.every(m => m.good);
+  const s = data[store]; // current store data
+  const asoScore = data.ascoreBreakdown.reduce((acc, item) => acc + item.score * item.weight / 100, 0);
 
   return (
     <div className="p-4 sm:p-6 space-y-5 bg-gray-50 min-h-screen">
@@ -45,7 +59,7 @@ export default function FIFGOPage() {
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: isHealthy ? '#d1fae5' : '#fef3c7', color: isHealthy ? '#065f46' : '#92400e' }}>
                 {isHealthy ? 'HEALTHY' : 'REVIEW'}
               </span>
-              <span className="text-xs" style={{ color: '#9ca3af' }}>Android · v3.2.1</span>
+              <span className="text-xs" style={{ color: '#9ca3af' }}>{store === 'playstore' ? 'Android' : 'iOS'} · v3.2.1</span>
             </div>
           </div>
         </div>
@@ -67,6 +81,24 @@ export default function FIFGOPage() {
         </div>
       </div>
 
+      {/* Store Toggle */}
+      <div className="flex items-center gap-2 bg-white rounded-xl p-1.5 border border-gray-200 w-fit">
+        {([
+          { id: 'playstore' as const, label: 'Google Play Store', icon: PLAYSTORE_ICON },
+          { id: 'appstore' as const, label: 'App Store', icon: APPSTORE_ICON },
+        ]).map(s_ => (
+          <button
+            key={s_.id}
+            onClick={() => setStore(s_.id)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all"
+            style={store === s_.id ? { background: '#1f2937', color: '#fff' } : { background: 'transparent', color: '#9ca3af' }}
+          >
+            <img src={s_.icon} alt={s_.label} className="w-4 h-4 object-contain" style={store !== s_.id ? { filter: 'grayscale(1) opacity(0.45)' } : {}} />
+            {s_.label}
+          </button>
+        ))}
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-1 bg-white rounded-xl p-1 border border-gray-200 overflow-x-auto">
         {[
@@ -74,17 +106,17 @@ export default function FIFGOPage() {
           { id: 'aso', label: 'ASO' },
           { id: 'reviews', label: 'Reviews' },
           { id: 'health', label: 'App Health' },
-        ].map(t => (
+        ].map(t_ => (
           <button
-            key={t.id}
-            onClick={() => setTab(t.id as typeof tab)}
+            key={t_.id}
+            onClick={() => setTab(t_.id as typeof tab)}
             className="px-4 py-2 rounded-lg text-xs font-semibold transition-all shrink-0"
-            style={tab === t.id
+            style={tab === t_.id
               ? { background: '#06b6d4', color: '#fff' }
               : { background: 'transparent', color: '#6b7280' }
             }
           >
-            {t.label}
+            {t_.label}
           </button>
         ))}
       </div>
@@ -95,10 +127,10 @@ export default function FIFGOPage() {
           {/* Key Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {[
-              { icon: Star, color: '#f59e0b', label: 'Rating', value: `${data.rating}★`, change: `+${data.rating - 4.0}` },
-              { icon: Download, color: '#06b6d4', label: 'Downloads', value: data.downloads, change: data.downloadsChange },
-              { icon: ShieldCheck, color: '#10b981', label: 'ASO Score', value: `${data.asoScore}/100`, change: `+${data.asoScore - 74}` },
-              { icon: AppWindow, color: '#8b5cf6', label: 'Active Users', value: data.activeUsers, change: data.activeUsersChange },
+              { icon: Star, color: '#f59e0b', label: 'Rating', value: `${s.rating}★`, change: store === 'playstore' ? `+${(s.rating - 4.0).toFixed(1)}` : `+${(s.rating - 4.3).toFixed(1)}` },
+              { icon: Download, color: '#06b6d4', label: 'Downloads', value: s.downloads, change: s.downloadsChange },
+              { icon: ShieldCheck, color: '#10b981', label: 'ASO Score', value: `${Math.round(asoScore)}/100`, change: `+${Math.round(asoScore - 74)}` },
+              { icon: AppWindow, color: '#8b5cf6', label: 'Active Users', value: s.activeUsers, change: s.activeUsersChange },
             ].map(stat => (
               <div key={stat.label} className="bg-white rounded-2xl p-5 border border-gray-200 flex flex-col items-center text-center">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: `${stat.color}15` }}>
@@ -113,9 +145,14 @@ export default function FIFGOPage() {
 
           {/* Rating Distribution */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Rating Distribution</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold" style={{ color: '#111827' }}>Rating Distribution</h3>
+              <span className="text-[10px] px-2 py-1 rounded-full font-bold" style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                {store === 'playstore' ? 'Play Store' : 'App Store'}
+              </span>
+            </div>
             <div className="space-y-2">
-              {data.ratingDistribution.map(r => (
+              {s.ratingDistribution.map(r => (
                 <div key={r.stars} className="flex items-center gap-3">
                   <span className="text-xs w-6 text-right" style={{ color: '#9ca3af' }}>{r.stars}★</span>
                   <div className="flex-1 h-2 rounded-full" style={{ background: '#f3f4f6' }}>
@@ -127,9 +164,9 @@ export default function FIFGOPage() {
             </div>
             <div className="mt-4 pt-3 grid grid-cols-3 gap-4" style={{ borderTop: '1px solid #f3f4f6' }}>
               {[
-                { label: 'Total Reviews', value: data.totalReviews },
-                { label: 'Positive (5★)', value: `${data.ratingDistribution.find(r => r.stars === 5)?.pct ?? 0}%`, color: '#10b981' },
-                { label: 'Negative (1-2★)', value: `${(data.ratingDistribution.find(r => r.stars === 1)?.pct ?? 0) + (data.ratingDistribution.find(r => r.stars === 2)?.pct ?? 0)}%`, color: '#dc2626' },
+                { label: 'Total Reviews', value: s.totalReviews },
+                { label: 'Positive (5★)', value: `${s.ratingDistribution.find(r => r.stars === 5)?.pct ?? 0}%`, color: '#10b981' },
+                { label: 'Negative (1-2★)', value: `${(s.ratingDistribution.find(r => r.stars === 1)?.pct ?? 0) + (s.ratingDistribution.find(r => r.stars === 2)?.pct ?? 0)}%`, color: '#dc2626' },
               ].map(m => (
                 <div key={m.label} className="text-center">
                   <p className="text-lg font-extrabold" style={{ color: m.color ?? '#111827' }}>{m.value}</p>
@@ -143,10 +180,10 @@ export default function FIFGOPage() {
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>LoBs Inside FIFGO</h3>
             <div className="grid grid-cols-5 gap-3">
-              {data.lobs.map(lob => (
+              {s.lobs.map(lob => (
                 <div key={lob.name} className="bg-gray-50 rounded-2xl p-3 text-center border border-gray-100">
-                  <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center text-xs font-bold text-white" style={{ background: lob.color }}>
-                    {lob.name[0]}
+                  <div className="w-10 h-10 rounded-xl mx-auto mb-2 overflow-hidden flex items-center justify-center bg-white border border-gray-100">
+                    <img src={LOB_LOGOS[lob.name] ?? ''} alt={lob.name} className="w-8 h-8 object-contain" />
                   </div>
                   <p className="text-[11px] font-bold" style={{ color: '#374151' }}>{lob.name}</p>
                   <p className="text-lg font-extrabold mt-1" style={{ color: '#111827' }}>{lob.pct}%</p>
@@ -169,7 +206,7 @@ export default function FIFGOPage() {
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-sm font-bold" style={{ color: '#111827' }}>ASO Score Breakdown</h3>
-              <span className="text-sm font-bold" style={{ color: '#10b981' }}>{data.asoScore} / 100</span>
+              <span className="text-sm font-bold" style={{ color: '#10b981' }}>{Math.round(asoScore)} / 100</span>
             </div>
             <div className="space-y-4">
               {data.ascoreBreakdown.map(item => (
@@ -197,7 +234,7 @@ export default function FIFGOPage() {
               {data.keywords.map(kw => (
                 <div key={kw.keyword} className="flex items-center gap-4 py-2" style={{ borderBottom: '1px solid #f9fafb' }}>
                   <span className="flex-1 text-sm font-medium" style={{ color: '#374151' }}>{kw.keyword}</span>
-                  <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white`}
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white"
                     style={{ background: kw.position <= 3 ? '#10b981' : kw.position <= 10 ? '#f59e0b' : '#9ca3af' }}>
                     #{kw.position}
                   </span>
