@@ -4,26 +4,17 @@ import * as React from 'react';
 import {
   Star, Download, TrendUp, TrendDown, Minus,
   ChartBar, ShieldCheck, Eye, AppWindow,
-  CheckCircle, Warning, Gear,
+  CheckCircle, Warning, Gear, Lightning,
 } from '@phosphor-icons/react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, Cell, PieChart, Pie, Legend } from 'recharts';
 import { FifgoAdminPanel, DEFAULT_FIFGO, loadFifgoData, saveFifgoData, FifgoData } from '@/components/fifgo-admin';
 
 const FIFGO_LOGO = 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/FIFGO_APP_LOGO-1780892650611.png';
-
-const LOB_LOGOS: Record<string, string> = {
-  FIFASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FIFASTRA-1780538519035.png',
-  SPEKTRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20SPEKTRA-1780538544863.png',
-  DANASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20DANASTRA-1780538584771.png',
-  FINATRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FINATRA-1780538626287.png',
-  AMITRA:   'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20AMITRA-1780538604037.png',
-};
-
 const APPSTORE_ICON = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/apple.svg';
 const PLAYSTORE_ICON = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googleplay.svg';
 
 export default function FIFGOPage() {
-  const [tab, setTab] = React.useState<'overview' | 'aso' | 'reviews' | 'health'>('overview');
+  const [tab, setTab] = React.useState<'overview' | 'aso' | 'reviews' | 'rec'>('overview');
   const [store, setStore] = React.useState<'playstore' | 'appstore'>('playstore');
   const [timeStr, setTimeStr] = React.useState('--:--');
   const [showAdmin, setShowAdmin] = React.useState(false);
@@ -41,7 +32,7 @@ export default function FIFGOPage() {
   };
 
   const isHealthy = data.appHealthMetrics.every(m => m.good);
-  const s = data[store]; // current store data
+  const s = data[store];
   const asoScore = data.ascoreBreakdown.reduce((acc, item) => acc + item.score * item.weight / 100, 0);
 
   return (
@@ -105,7 +96,7 @@ export default function FIFGOPage() {
           { id: 'overview', label: 'Overview' },
           { id: 'aso', label: 'ASO' },
           { id: 'reviews', label: 'Reviews' },
-          { id: 'health', label: 'App Health' },
+          { id: 'rec', label: 'Recommendation' },
         ].map(t_ => (
           <button
             key={t_.id}
@@ -176,77 +167,47 @@ export default function FIFGOPage() {
             </div>
           </div>
 
-          {/* LoBs */}
+          {/* Rating Trend — Monthly */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>LoBs Inside FIFGO</h3>
-            <div className="grid grid-cols-5 gap-3">
-              {s.lobs.map(lob => (
-                <div key={lob.name} className="bg-gray-50 rounded-2xl p-3 text-center border border-gray-100">
-                  <div className="w-10 h-10 rounded-xl mx-auto mb-2 overflow-hidden flex items-center justify-center bg-white border border-gray-100">
-                    <img src={LOB_LOGOS[lob.name] ?? ''} alt={lob.name} className="w-8 h-8 object-contain" />
-                  </div>
-                  <p className="text-[11px] font-bold" style={{ color: '#374151' }}>{lob.name}</p>
-                  <p className="text-lg font-extrabold mt-1" style={{ color: '#111827' }}>{lob.pct}%</p>
-                  <p className="text-[10px]" style={{ color: '#9ca3af' }}>{lob.users}</p>
-                  <span className="text-[10px] mt-1 inline-block px-1.5 py-0.5 rounded-full font-bold"
-                    style={{ background: lob.status === 'Below Target' ? '#fef3c7' : '#d1fae5', color: lob.status === 'Below Target' ? '#92400e' : '#065f46' }}>
-                    {lob.status}
-                  </span>
-                </div>
-              ))}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold" style={{ color: '#111827' }}>Rating Trend — Monthly</h3>
+              <span className="text-[10px] px-2 py-1 rounded-full font-bold" style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                Last 12 Months
+              </span>
             </div>
+            <ResponsiveContainer width="100%" height={180}>
+              <LineChart data={data.ratingTrend} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="fifgoRatingGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                <XAxis dataKey="period" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+                <YAxis domain={[3, 5]} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} ticks={[3, 3.5, 4, 4.5, 5]} />
+                <Tooltip
+                  contentStyle={{ background: 'white', border: '1px solid #f3f4f6', borderRadius: 12, fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                  formatter={(v: any) => [`${Number(v).toFixed(2)}★`, 'Rating']}
+                  cursor={{ stroke: '#06b6d4', strokeWidth: 1, strokeDasharray: '4 4' }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="rating"
+                  stroke="#06b6d4"
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: '#06b6d4', strokeWidth: 0 }}
+                  activeDot={{ r: 6, fill: '#06b6d4', strokeWidth: 0 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       )}
 
-      {/* ─── ASO TAB ─── */}
+      {/* ─── ASO TAB — AppTweak Style ─── */}
       {tab === 'aso' && (
-        <div className="space-y-5">
-          {/* ASO Score Breakdown */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-sm font-bold" style={{ color: '#111827' }}>ASO Score Breakdown</h3>
-              <span className="text-sm font-bold" style={{ color: '#10b981' }}>{Math.round(asoScore)} / 100</span>
-            </div>
-            <div className="space-y-4">
-              {data.ascoreBreakdown.map(item => (
-                <div key={item.label}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold" style={{ color: '#374151' }}>{item.label}</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#f3f4f6', color: '#9ca3af' }}>{item.weight}%</span>
-                    </div>
-                    <span className="text-xs font-bold" style={{ color: '#111827' }}>{item.score}</span>
-                  </div>
-                  <div className="h-2 rounded-full" style={{ background: '#f3f4f6' }}>
-                    <div className="h-full rounded-full transition-all" style={{ width: `${item.score}%`, background: item.score >= 80 ? '#10b981' : item.score >= 60 ? '#f59e0b' : '#dc2626' }} />
-                  </div>
-                  <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>{item.detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Keywords */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Keyword Rankings</h3>
-            <div className="space-y-2">
-              {data.keywords.map(kw => (
-                <div key={kw.keyword} className="flex items-center gap-4 py-2" style={{ borderBottom: '1px solid #f9fafb' }}>
-                  <span className="flex-1 text-sm font-medium" style={{ color: '#374151' }}>{kw.keyword}</span>
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                    style={{ background: kw.position <= 3 ? '#10b981' : kw.position <= 10 ? '#f59e0b' : '#9ca3af' }}>
-                    #{kw.position}
-                  </span>
-                  <span className="w-12 text-center text-xs" style={{ color: '#9ca3af' }}>{kw.volume}</span>
-                  <span className="w-10 text-right text-xs font-bold" style={{ color: kw.change > 0 ? '#10b981' : kw.change < 0 ? '#dc2626' : '#9ca3af' }}>
-                    {kw.change > 0 ? '+' : ''}{kw.change}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ASOTab appName="FIFGO: Pembiayaan Mudah" appDev="FIFGROUP DEV. TEAM" appCat="Finance · Loans & Credits" store={store} asoScore={asoScore} data={data} />
       )}
 
       {/* ─── REVIEWS TAB ─── */}
@@ -279,25 +240,83 @@ export default function FIFGOPage() {
         </div>
       )}
 
-      {/* ─── APP HEALTH TAB ─── */}
-      {tab === 'health' && (
+      {/* ─── RECOMMENDATION TAB ─── */}
+      {tab === 'rec' && (
         <div className="space-y-5">
+          {/* Recommendation Header Card */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <div className="flex items-center gap-4 mb-5">
               <div className="w-14 h-14 rounded-2xl overflow-hidden flex items-center justify-center bg-gray-50 border border-gray-200">
                 <img src={FIFGO_LOGO} alt="FIFGO" className="w-12 h-12 object-contain" />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-extrabold" style={{ color: '#111827' }}>FIFGO — App Health</h2>
-                <p className="text-xs" style={{ color: '#9ca3af' }}>Last updated: {timeStr} WIB · v3.2.1</p>
+                <h2 className="text-lg font-extrabold" style={{ color: '#111827' }}>FIFGO — Recommendations</h2>
+                <p className="text-xs" style={{ color: '#9ca3af' }}>AI-powered ASO & performance improvement suggestions</p>
               </div>
-              <span className="px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: isHealthy ? '#d1fae5' : '#fef3c7', color: isHealthy ? '#065f46' : '#92400e' }}>
-                {isHealthy ? 'HEALTHY' : 'REVIEW'}
+              <span className="px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
+                {data.recommendations.length} suggestions
               </span>
             </div>
 
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
+            {/* Priority Cards */}
+            <div className="grid grid-cols-3 gap-3 mb-5">
+              {[
+                { label: 'High Priority', count: data.recommendations.filter(r => r.priority === 'high').length, color: '#dc2626', bg: '#fef2f2' },
+                { label: 'Medium Priority', count: data.recommendations.filter(r => r.priority === 'medium').length, color: '#d97706', bg: '#fffbeb' },
+                { label: 'Low Priority', count: data.recommendations.filter(r => r.priority === 'low').length, color: '#10b981', bg: '#f0fdf4' },
+              ].map(p => (
+                <div key={p.label} className="rounded-xl p-3 text-center" style={{ background: p.bg }}>
+                  <p className="text-2xl font-extrabold" style={{ color: p.color }}>{p.count}</p>
+                  <p className="text-[11px] font-medium" style={{ color: p.color }}>{p.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Recommendation List */}
+            <div className="space-y-3">
+              {data.recommendations.map((rec, i) => (
+                <div key={i} className="p-4 rounded-xl border"
+                  style={{
+                    background: rec.priority === 'high' ? '#fef2f2' : rec.priority === 'medium' ? '#fffbeb' : '#f0fdf4',
+                    borderColor: rec.priority === 'high' ? '#fecaca' : rec.priority === 'medium' ? '#fde68a' : '#bbf7d0',
+                  }}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: rec.priority === 'high' ? '#fee2e2' : rec.priority === 'medium' ? '#fef3c7' : '#d1fae5' }}>
+                      {rec.priority === 'high' ? (
+                        <Warning size={16} style={{ color: '#dc2626' }} weight="fill" />
+                      ) : rec.priority === 'medium' ? (
+                        <Lightning size={16} style={{ color: '#d97706' }} weight="fill" />
+                      ) : (
+                        <CheckCircle size={16} style={{ color: '#10b981' }} weight="fill" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-xs font-bold" style={{ color: '#374151' }}>{rec.title}</p>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold capitalize"
+                          style={{
+                            background: rec.priority === 'high' ? '#fee2e2' : rec.priority === 'medium' ? '#fef3c7' : '#d1fae5',
+                            color: rec.priority === 'high' ? '#dc2626' : rec.priority === 'medium' ? '#d97706' : '#10b981',
+                          }}>
+                          {rec.priority}
+                        </span>
+                      </div>
+                      <p className="text-[11px] leading-relaxed" style={{ color: '#6b7280' }}>{rec.description}</p>
+                      {rec.impact && (
+                        <p className="text-[10px] mt-1 font-medium" style={{ color: '#10b981' }}>💡 Expected impact: {rec.impact}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* App Health Summary */}
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>App Health Snapshot</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {data.appHealthMetrics.map(m => (
                 <div key={m.label} className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center text-center">
                   <div className="flex items-center gap-1.5 mb-2">
@@ -312,40 +331,6 @@ export default function FIFGOPage() {
                 </div>
               ))}
             </div>
-
-            {/* Issues */}
-            {data.issues.length > 0 && (
-              <div className="space-y-2 mb-5">
-                <h3 className="text-sm font-bold" style={{ color: '#111827' }}>Active Issues</h3>
-                {data.issues.map((issue, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: issue.severity === 'high' ? '#fef2f2' : '#fffbeb', border: `1px solid ${issue.severity === 'high' ? '#fecaca' : '#fde68a'}` }}>
-                    <Warning size={14} style={{ color: issue.severity === 'high' ? '#dc2626' : '#d97706' }} weight="fill" className="mt-0.5 shrink-0" />
-                    <div className="flex-1">
-                      <p className="text-xs font-medium" style={{ color: '#374151' }}>{issue.text}</p>
-                      <p className="text-[10px]" style={{ color: '#9ca3af' }}>{issue.date}</p>
-                    </div>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0"
-                      style={{ background: issue.severity === 'high' ? '#fee2e2' : '#fef3c7', color: issue.severity === 'high' ? '#dc2626' : '#d97706' }}>
-                      {issue.severity}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Rating Trend */}
-            <div>
-              <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Rating Trend ({data.ratingTrend.length} months)</h3>
-              <ResponsiveContainer width="100%" height={160}>
-                <LineChart data={data.ratingTrend} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                  <XAxis dataKey="period" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                  <YAxis domain={[3, 4.5]} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} ticks={[3, 3.5, 4, 4.5]} />
-                  <Tooltip contentStyle={{ background: 'white', border: '1px solid #f3f4f6', borderRadius: 12, fontSize: 12 }} formatter={(v) => [`${v}★`, 'Rating']} />
-                  <Line type="monotone" dataKey="rating" stroke="#06b6d4" strokeWidth={3} dot={{ r: 5, fill: '#06b6d4' }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
           </div>
         </div>
       )}
@@ -358,6 +343,253 @@ export default function FIFGOPage() {
           onClose={() => setShowAdmin(false)}
         />
       )}
+    </div>
+  );
+}
+
+// ─── Shared ASO Tab Component (AppTweak style) ───
+function ASOTab({
+  appName, appDev, appCat, store, asoScore, data
+}: {
+  appName: string; appDev: string; appCat: string;
+  store: 'playstore' | 'appstore'; asoScore: number; data: FifgoData;
+}) {
+  const s = data[store];
+  const competitors = [
+    { name: 'FIFGO', score: Math.round(asoScore) },
+    { name: 'Adiraku', score: 95 },
+    { name: 'BFI Mobile', score: 88 },
+    { name: 'BAF Mobile', score: 91 },
+  ];
+  const asoSections = [
+    { id: 'name', label: 'Name' },
+    { id: 'short-desc', label: 'Short Description' },
+    { id: 'long-desc', label: 'Long Description' },
+    { id: 'icon', label: 'Icon' },
+    { id: 'screenshots', label: 'Screenshots' },
+    { id: 'videos', label: 'Promotional Video' },
+    { id: 'app-details', label: 'App Details' },
+    { id: 'reviews', label: 'Reviews & Ratings' },
+    { id: 'category', label: 'Category Ranking' },
+  ];
+  const [activeSection, setActiveSection] = React.useState('name');
+
+  const sectionData: Record<string, { label: string; score: number; color: string; detail: string; chars?: string; note: string }> = {
+    name: {
+      label: 'App Name',
+      score: data.ascoreBreakdown.find(b => b.label === 'App Title')?.score ?? 0,
+      color: (data.ascoreBreakdown.find(b => b.label === 'App Title')?.score ?? 0) >= 80 ? '#10b981' : (data.ascoreBreakdown.find(b => b.label === 'App Title')?.score ?? 0) >= 60 ? '#f59e0b' : '#dc2626',
+      detail: `${appName}`,
+      chars: `${appName.length} characters`,
+      note: 'You still have room to add some keywords to your App Name.',
+    },
+    'short-desc': {
+      label: 'Short Description',
+      score: 62,
+      color: '#f59e0b',
+      detail: 'Pinjaman mudah, cepat, dan transparan untuk seluruh rakyat Indonesia.',
+      chars: '62 characters',
+      note: 'Consider adding 1–2 more high-volume keywords.',
+    },
+    'long-desc': {
+      label: 'Long Description',
+      score: 65,
+      color: '#f59e0b',
+      detail: 'FIFGO adalah aplikasi pembiayaan digital dari FIFGROUP yang menghadirkan layanan...',
+      chars: '2,800 characters',
+      note: 'Outdated screenshots detected. Review content structure.',
+    },
+    icon: {
+      label: 'Icon',
+      score: 80,
+      color: '#10b981',
+      detail: 'Current icon is acceptable. Consider A/B testing with brighter variants.',
+      note: 'Icon is clear at small sizes.',
+    },
+    screenshots: {
+      label: 'Screenshots',
+      score: 72,
+      color: '#f59e0b',
+      detail: '6 screenshots uploaded. Portrait + landscape recommended.',
+      note: 'Missing video screenshot coverage.',
+    },
+    videos: {
+      label: 'Promotional Video',
+      score: 0,
+      color: '#dc2626',
+      detail: 'No promotional video uploaded.',
+      note: 'Adding a promo video can increase conversion by up to 25%.',
+    },
+    'app-details': {
+      label: 'App Details',
+      score: 78,
+      color: '#10b981',
+      detail: 'Privacy policy, contact email, and app category properly configured.',
+      note: 'Consider updating screenshots for Android 14 UI.',
+    },
+    reviews: {
+      label: 'Reviews & Ratings',
+      score: s.ratingDistribution.find(r => r.stars === 5)?.pct ?? 0 > 60 ? 80 : 65,
+      color: s.ratingDistribution.find(r => r.stars === 5)?.pct ?? 0 > 60 ? '#10b981' : '#f59e0b',
+      detail: `${s.rating}★ from ${s.totalReviews} reviews`,
+      note: 'Response rate to reviews: 45%. Target: 80%.',
+    },
+    category: {
+      label: 'Category Ranking',
+      score: 70,
+      color: '#f59e0b',
+      detail: '#3 in Finance · #8 in Loans & Credits',
+      note: 'Competing for top 3 in Loans & Credits.',
+    },
+  };
+
+  const active = sectionData[activeSection];
+
+  return (
+    <div className="space-y-5">
+      {/* App Info Header */}
+      <div className="bg-white rounded-2xl p-5 border border-gray-200">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-14 h-14 rounded-2xl overflow-hidden flex items-center justify-center bg-white border border-gray-200">
+            <img src={FIFGO_LOGO} alt={appName} className="w-12 h-12 object-contain" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-base font-extrabold" style={{ color: '#111827' }}>{appName}</h2>
+            <p className="text-xs" style={{ color: '#9ca3af' }}>{appDev}</p>
+            <p className="text-[10px]" style={{ color: '#9ca3af' }}>{appCat}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-3xl font-extrabold" style={{ color: '#10b981' }}>{Math.round(asoScore)}</p>
+            <p className="text-[10px]" style={{ color: '#9ca3af' }}>ASO Score</p>
+          </div>
+        </div>
+
+        {/* Competitor Comparison */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: '#9ca3af' }}>ASO Score vs Competitors</p>
+          <div className="flex items-end gap-2 h-16">
+            {competitors.map(c => (
+              <div key={c.name} className="flex flex-col items-center gap-1 flex-1">
+                <div
+                  className="w-full rounded-t-lg flex items-end justify-center pb-1"
+                  style={{ height: `${c.score}%`, minHeight: 4, background: c.name === 'FIFGO' ? '#06b6d4' : '#e5e7eb' }}
+                >
+                  <span className="text-[9px] font-extrabold" style={{ color: c.name === 'FIFGO' ? '#fff' : '#9ca3af' }}>{c.score}</span>
+                </div>
+                <span className="text-[9px] font-medium" style={{ color: '#374151' }}>{c.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ASO Section Nav + Detail */}
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        {/* Section Tabs */}
+        <div className="flex gap-0 p-1 bg-gray-50 border-b border-gray-200 overflow-x-auto">
+          {asoSections.map(sec => {
+            const sd = sectionData[sec.id];
+            return (
+              <button
+                key={sec.id}
+                onClick={() => setActiveSection(sec.id)}
+                className="px-3 py-1.5 rounded-lg text-[10px] font-semibold shrink-0 transition-all whitespace-nowrap"
+                style={activeSection === sec.id
+                  ? { background: '#1e3a5f', color: '#fff' }
+                  : { background: 'transparent', color: '#6b7280' }
+                }
+              >
+                {sec.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Section Detail */}
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-extrabold text-white"
+              style={{ background: active.color }}
+            >
+              {active.score}
+            </div>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#111827' }}>{active.label}</p>
+              <p className="text-[11px]" style={{ color: '#9ca3af' }}>{active.chars ?? ''} {active.chars ? '·' : ''} Score {active.score}/100</p>
+            </div>
+            <div className="ml-auto">
+              <span className="text-xs px-2 py-1 rounded-lg font-semibold text-white" style={{ background: active.score >= 80 ? '#10b981' : active.score >= 60 ? '#f59e0b' : '#dc2626' }}>
+                {active.score >= 80 ? 'Good' : active.score >= 60 ? 'Needs Work' : 'Poor'}
+              </span>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="h-3 rounded-full mb-4" style={{ background: '#f3f4f6' }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${active.score}%`, background: active.color }} />
+          </div>
+
+          {/* Current Content */}
+          {active.detail && (
+            <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 mb-3">
+              <p className="text-[10px] font-bold mb-1" style={{ color: '#9ca3af' }}>CURRENT</p>
+              <p className="text-xs font-medium leading-relaxed" style={{ color: '#374151' }}>{active.detail}</p>
+            </div>
+          )}
+
+          {/* Recommendation Note */}
+          <div className="p-3 rounded-xl" style={{ background: '#eff6ff', border: '1px solid #bfdbfe' }}>
+            <p className="text-[11px] font-medium" style={{ color: '#1e3a5f' }}>
+              💡 {active.note}
+            </p>
+          </div>
+
+          {/* Keywords Input */}
+          {(activeSection === 'name' || activeSection === 'short-desc') && (
+            <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f3f4f6' }}>
+              <p className="text-[10px] font-bold mb-2" style={{ color: '#9ca3af' }}>TEST A NEW VERSION</p>
+              <textarea
+                className="w-full text-xs p-3 rounded-xl border border-gray-200 bg-gray-50 resize-none"
+                rows={2}
+                placeholder="Type to test new name or description..."
+                style={{ color: '#374151', outline: 'none' }}
+              />
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-[9px]" style={{ color: '#9ca3af' }}>0 characters</span>
+                <span className="text-[9px] px-2 py-0.5 rounded-full font-bold" style={{ background: '#f3f4f6', color: '#9ca3af' }}>
+                  Keyword Impact: —
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Keyword Rankings */}
+      <div className="bg-white rounded-2xl p-6 border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-bold" style={{ color: '#111827' }}>Keyword Rankings</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: '#f3f4f6', color: '#9ca3af' }}>Highlight Repeated</span>
+          </div>
+        </div>
+        <div className="space-y-2">
+          {data.keywords.map(kw => (
+            <div key={kw.keyword} className="flex items-center gap-4 py-2" style={{ borderBottom: '1px solid #f9fafb' }}>
+              <span className="flex-1 text-sm font-medium" style={{ color: '#374151' }}>{kw.keyword}</span>
+              <span className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                style={{ background: kw.position <= 3 ? '#10b981' : kw.position <= 10 ? '#f59e0b' : '#9ca3af' }}>
+                #{kw.position}
+              </span>
+              <span className="w-12 text-center text-xs" style={{ color: '#9ca3af' }}>{kw.volume}</span>
+              <span className="w-10 text-right text-xs font-bold" style={{ color: kw.change > 0 ? '#10b981' : kw.change < 0 ? '#dc2626' : '#9ca3af' }}>
+                {kw.change > 0 ? '+' : ''}{kw.change}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -24,6 +24,7 @@ export type FifgoData = {
   appHealthMetrics: { label: string; value: string; target: string; good: boolean }[];
   issues: { severity: string; text: string; date: string }[];
   ratingTrend: { period: string; rating: number }[];
+  recommendations: { priority: 'high' | 'medium' | 'low'; title: string; description: string; impact?: string }[];
 };
 
 // ─── Default data ───────────────────────────────────────────────────────────────
@@ -96,6 +97,13 @@ export const DEFAULT_FIFGO: FifgoData = {
     { period: 'Mar', rating: 4.0 }, { period: 'Apr', rating: 4.1 },
     { period: 'May', rating: 4.1 }, { period: 'Jun', rating: 4.2 },
     { period: 'Jul', rating: 4.2 },
+  ],
+  recommendations: [
+    { priority: 'high', title: 'Add Promotional Video', description: 'No promotional video is currently uploaded. Adding a 15–30s promo video can boost install conversion by up to 25%.', impact: '+15–25% conversion rate' },
+    { priority: 'high', title: 'Update Screenshots for Android 14', description: 'Current screenshots do not reflect the latest Android 14 UI. Users may feel the app looks outdated compared to competitors.', impact: '+5% rating perception' },
+    { priority: 'medium', title: 'Short Description Keyword Gap', description: 'Short description is missing 2 high-volume keywords: "pinjol" and "kredit tanpa agunan". Add these to improve search visibility.', impact: '+8% keyword reach' },
+    { priority: 'medium', title: 'Review Response Rate Low', description: 'Only 45% of user reviews are being responded to. Target should be 80%+. Fast responses correlate with higher ratings.', impact: '+0.1–0.2★ rating lift' },
+    { priority: 'low', title: 'Screenshots Landscape Orientation', description: 'Currently only portrait screenshots. Adding landscape/tablet screenshots can improve visibility on larger screens.', impact: '+3% install rate on tablets' },
   ],
 };
 
@@ -444,23 +452,43 @@ export function FifgoAdminPanel({ data, onChange, onClose }: Props) {
             </div>
           </section>
 
-          {/* Rating Trend */}
+          {/* Recommendations */}
           <section>
-            <SectionTitle icon="📈" label="Rating Trend" />
-            <div className="grid grid-cols-2 gap-3">
-              {data.ratingTrend.map((t, i) => (
+            <SectionTitle icon="💡" label="Recommendations" />
+            <div className="space-y-3">
+              {data.recommendations.map((rec, i) => (
                 <div key={i} className="rounded-2xl p-4" style={{ background: '#f9fafb', border: '1px solid #e5e7eb' }}>
-                  <F label="Month">
-                    <input value={t.period} onChange={e => onChange({ ...data, ratingTrend: mut(data.ratingTrend, i, 'period', e.target.value) })}
-                      className="w-full px-3 py-2 rounded-xl border text-xs" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }} />
+                  <div className="grid grid-cols-3 gap-3 mb-2">
+                    <F label="Priority">
+                      <select value={rec.priority}
+                        onChange={e => onChange({ ...data, recommendations: mut(data.recommendations, i, 'priority', e.target.value as 'high' | 'medium' | 'low') })}
+                        className="w-full px-3 py-2 rounded-xl border text-xs" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }}>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                      </select>
+                    </F>
+                    <F label="Impact">
+                      <input value={rec.impact ?? ''}
+                        onChange={e => onChange({ ...data, recommendations: mut(data.recommendations, i, 'impact', e.target.value) })}
+                        placeholder="e.g. +15% conversion"
+                        className="w-full px-3 py-2 rounded-xl border text-xs" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }} />
+                    </F>
+                  </div>
+                  <F label="Title">
+                    <input value={rec.title}
+                      onChange={e => onChange({ ...data, recommendations: mut(data.recommendations, i, 'title', e.target.value) })}
+                      className="w-full px-3 py-2 rounded-xl border text-xs font-semibold" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }} />
                   </F>
-                  <F label="Rating">
-                    <input type="number" step="0.1" min="0" max="5" value={t.rating}
-                      onChange={e => onChange({ ...data, ratingTrend: mut(data.ratingTrend, i, 'rating', num(e.target.value)) })}
-                      className="w-full px-3 py-2 rounded-xl border text-xs font-bold" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }} />
-                  </F>
+                  <textarea value={rec.description} rows={2}
+                    onChange={e => onChange({ ...data, recommendations: mut(data.recommendations, i, 'description', e.target.value) })}
+                    className="w-full px-3 py-2 rounded-xl border text-xs resize-y" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }} />
                 </div>
               ))}
+              <button onClick={() => onChange({ ...data, recommendations: [...data.recommendations, { priority: 'medium', title: '', description: '', impact: '' }] })}
+                className="w-full py-2 rounded-xl text-[11px] font-semibold" style={{ background: '#f0fdf4', color: '#10b981', border: '1px dashed #bbf7d0' }}>
+                + Tambah Recommendation
+              </button>
             </div>
           </section>
 
