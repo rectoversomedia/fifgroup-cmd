@@ -172,7 +172,7 @@ export default function FIFADAPage() {
             <img src={FIFADA_LOGO} alt="FIFADA" className="w-14 h-14 object-contain" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold" style={{ color: '#111827' }}>FIFADA</h1>
+            <h1 className="text-base font-bold" style={{ color: '#111827' }}>FIFADA</h1>
             <p className="text-sm" style={{ color: '#6b7280' }}>Multi Finance · Indonesia</p>
             <div className="flex items-center gap-2 mt-1">
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: isHealthy ? '#d1fae5' : '#fef3c7', color: isHealthy ? '#065f46' : '#92400e' }}>
@@ -446,7 +446,7 @@ export default function FIFADAPage() {
                 { label: 'Low Priority', count: RECOMMENDATIONS.filter(r => r.priority === 'low').length, color: '#10b981', bg: '#f0fdf4' },
               ].map(p => (
                 <div key={p.label} className="rounded-xl p-3 text-center" style={{ background: p.bg }}>
-                  <p className="text-2xl font-extrabold" style={{ color: p.color }}>{p.count}</p>
+                  <p className="text-base font-bold" style={{ color: p.color }}>{p.count}</p>
                   <p className="text-[11px] font-medium" style={{ color: p.color }}>{p.label}</p>
                 </div>
               ))}
@@ -629,7 +629,7 @@ function ASOTab({
             <p className="text-[10px]" style={{ color: '#9ca3af' }}>{appCat}</p>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-extrabold" style={{ color: '#10b981' }}>{Math.round(asoScore)}</p>
+            <p className="text-base font-bold" style={{ color: '#10b981' }}>{Math.round(asoScore)}</p>
             <p className="text-[10px]" style={{ color: '#9ca3af' }}>ASO Score</p>
           </div>
         </div>

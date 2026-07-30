@@ -44,7 +44,7 @@ export default function EventsPage() {
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: `${m.color}15` }}>
               <m.icon size={22} style={{ color: m.color }} weight="fill" />
             </div>
-            <p className="text-2xl font-extrabold mb-1" style={{ color: '#111827' }}>{m.value}</p>
+            <p className="text-base font-bold mb-1" style={{ color: '#111827' }}>{m.value}</p>
             <p className="text-xs" style={{ color: '#9ca3af' }}>{m.label}</p>
           </div>
         ))}

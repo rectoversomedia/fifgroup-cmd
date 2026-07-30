@@ -130,7 +130,7 @@ export default function PortfolioQualityPage() {
               </div>
               <span className="text-[11px] font-medium" style={{ color: '#9ca3af' }}>{m.label}</span>
             </div>
-            <p className={`font-extrabold mb-1 ${m.label === 'Total Outstanding' ? 'text-base' : 'text-2xl'}`} style={{ color: '#111827' }}>{m.value}</p>
+            <p className="text-base font-bold mb-1" style={{ color: '#111827' }}>{m.value}</p>
             <div className="flex items-center justify-between mt-auto">
               <span className="text-[11px]" style={{ color: '#9ca3af' }}>{m.sub}</span>
               <span className="text-[11px] font-bold" style={{ color: m.color }}>{m.trend}</span>

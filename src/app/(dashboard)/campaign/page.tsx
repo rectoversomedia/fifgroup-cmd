@@ -521,7 +521,7 @@ export default function CampaignHubPage() {
                   <div className="w-2 h-2 rounded-full" style={{ background: campaign.color }} />
                   <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: campaign.color }}>{campaign.type}</span>
                 </div>
-                <h2 className="text-xl font-extrabold" style={{ color: '#111827' }}>{campaign.name}</h2>
+                <h2 className="text-base font-bold" style={{ color: '#111827' }}>{campaign.name}</h2>
                 <p className="text-sm italic" style={{ color: '#6b7280' }}>"{campaign.tagline}"</p>
                 <div className="flex items-center gap-3 mt-2 flex-wrap">
                   <div className="flex items-center gap-1 text-[11px]" style={{ color: '#9ca3af' }}>
