@@ -76,7 +76,7 @@ export default function JourneyPage() {
             <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: `${m.color}15` }}>
               <m.icon size={18} style={{ color: m.color }} weight="fill" />
             </div>
-            <p className="text-2xl font-extrabold mb-1" style={{ color: '#111827' }}>{m.value}</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>{m.value}</p>
             <p className="text-xs font-medium" style={{ color: '#374151' }}>{m.label}</p>
             <p className="text-[11px] mt-1" style={{ color: '#9ca3af' }}>{m.sub}</p>
           </div>
@@ -97,7 +97,7 @@ export default function JourneyPage() {
             <div key={s.step} className="text-center">
               <div className="rounded-xl p-3 mb-1" style={{ background: `${s.color}10`, border: `1px solid ${s.color}25` }}>
                 <p className="text-[10px] font-semibold mb-1" style={{ color: s.color }}>{s.step}</p>
-                <p className="text-lg font-black" style={{ color: s.color }}>{s.val.toLocaleString('id-ID')}</p>
+                <p className="text-base font-bold" style={{ color: s.color }}>{s.val.toLocaleString('id-ID')}</p>
               </div>
               {i < 4 && <div className="h-2 bg-gray-100 rounded mx-2 my-1" />}
             </div>

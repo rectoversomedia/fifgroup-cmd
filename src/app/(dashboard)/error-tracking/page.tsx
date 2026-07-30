@@ -94,7 +94,7 @@ export default function ErrorTrackingPage() {
             <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: `${m.color}15` }}>
               <m.icon size={18} style={{ color: m.color }} weight="fill" />
             </div>
-            <p className="text-3xl font-extrabold" style={{ color: m.color }}>{m.value}</p>
+            <p className="text-base font-bold" style={{ color: m.color }}>{m.value}</p>
             <p className="text-xs font-medium mt-1" style={{ color: '#9ca3af' }}>{m.label}</p>
           </div>
         ))}

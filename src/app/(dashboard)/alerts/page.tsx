@@ -490,7 +490,7 @@ export default function AlertsPage() {
         ].map(m => (
           <div key={m.label} className="bg-white rounded-2xl p-5 border border-gray-200 flex flex-col items-center text-center">
             <p className="text-xs font-medium mb-2" style={{ color: '#6b7280' }}>{m.label}</p>
-            <p className="text-3xl font-extrabold mb-1" style={{ color: m.color }}>{m.value}</p>
+            <p className="text-base font-bold" style={{ color: m.color }}>{m.value}</p>
             <p className="text-[11px]" style={{ color: '#9ca3af' }}>{m.sub}</p>
           </div>
         ))}
@@ -525,7 +525,7 @@ export default function AlertsPage() {
             {displayed.length === 0 ? (
               <div className="bg-white rounded-2xl p-12 flex flex-col items-center text-center border border-gray-200">
                 <CheckCircle size={48} style={{ color: '#10b981' }} weight="fill" />
-                <p className="text-lg font-bold mt-4" style={{ color: '#111827' }}>All Clear</p>
+                <p className="text-base font-bold" style={{ color: '#111827' }}>All Clear</p>
                 <p className="text-sm mt-1" style={{ color: '#9ca3af' }}>No alerts in this category</p>
               </div>
             ) : (

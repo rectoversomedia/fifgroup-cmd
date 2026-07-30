@@ -262,7 +262,7 @@ export default function EscalationPage() {
           { label: 'Failed', value: stats.failed, color: '#dc2626' },
         ].map(m => (
           <div key={m.label} className="bg-white rounded-2xl p-5 border border-gray-200 flex flex-col items-center text-center">
-            <p className="text-3xl font-extrabold" style={{ color: m.color }}>{m.value}</p>
+            <p className="text-base font-bold" style={{ color: m.color }}>{m.value}</p>
             <p className="text-xs font-medium mt-1" style={{ color: '#9ca3af' }}>{m.label}</p>
           </div>
         ))}

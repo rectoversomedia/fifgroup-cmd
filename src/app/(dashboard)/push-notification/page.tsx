@@ -61,7 +61,7 @@ export default function PushNotificationPage() {
             <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: `${m.color}15` }}>
               <m.icon size={18} style={{ color: m.color }} weight="fill" />
             </div>
-            <p className="text-2xl font-extrabold mb-1" style={{ color: '#111827' }}>{m.value}</p>
+            <p className="text-base font-bold mb-1" style={{ color: '#111827' }}>{m.value}</p>
             <p className="text-xs font-medium" style={{ color: '#374151' }}>{m.label}</p>
             <p className="text-[11px] mt-1" style={{ color: '#9ca3af' }}>{m.sub}</p>
           </div>
@@ -140,7 +140,7 @@ export default function PushNotificationPage() {
             { label: 'Open Rate', value: '48%', color: '#f59e0b' },
           ].map(m => (
             <div key={m.label} className="text-center rounded-xl p-4" style={{ background: `${m.color}08`, border: `1px solid ${m.color}20` }}>
-              <p className="text-2xl font-black mb-1" style={{ color: m.color }}>{m.value}</p>
+              <p className="text-base font-bold" style={{ color: m.color }}>{m.value}</p>
               <p className="text-xs font-semibold" style={{ color: '#6b7280' }}>{m.label}</p>
             </div>
           ))}

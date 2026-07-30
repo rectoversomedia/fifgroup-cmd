@@ -180,7 +180,7 @@ function DrillDownModal({ stage, onClose }: { stage: string; onClose: () => void
               <div className="grid grid-cols-2 gap-2">
                 {data.timeBreakdown.map(t => (
                   <div key={t.name} className="bg-gray-50 rounded-xl p-3 text-center">
-                    <p className="text-lg font-extrabold" style={{ color: '#374151' }}>{t.pct}%</p>
+                    <p className="text-base font-bold" style={{ color: '#374151' }}>{t.pct}%</p>
                     <p className="text-[10px]" style={{ color: '#9ca3af' }}>{t.name}</p>
                   </div>
                 ))}
@@ -254,7 +254,7 @@ export default function SalesPage() {
               <k.icon size={18} style={{ color: k.color }} weight="fill" />
             </div>
             <p className="text-xs font-medium mb-1" style={{ color: '#6b7280' }}>{k.label}</p>
-            <p className="text-2xl font-extrabold mb-1" style={{ color: '#111827' }}>{k.value}</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>{k.value}</p>
             <p className="text-[11px] mb-2" style={{ color: '#9ca3af' }}>{k.sub}</p>
             <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#ecfdf5', color: '#059669' }}>{k.change}</span>
           </div>

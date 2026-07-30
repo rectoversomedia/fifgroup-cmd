@@ -173,7 +173,7 @@ export default function MarketingPage() {
           </div>
           <div>
             <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Total Reach</p>
-            <p className="text-lg font-extrabold" style={{ color: '#111827' }}>{Math.round(totalSent / 1000)}K</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>{Math.round(totalSent / 1000)}K</p>
           </div>
         </div>
         <div className="bg-white rounded-2xl p-4 border border-gray-200 flex items-center gap-3">
@@ -182,7 +182,7 @@ export default function MarketingPage() {
           </div>
           <div>
             <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Conversions</p>
-            <p className="text-lg font-extrabold" style={{ color: '#111827' }}>{totalConverted.toLocaleString()}</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>{totalConverted.toLocaleString()}</p>
           </div>
         </div>
         <div className="bg-white rounded-2xl p-4 border border-gray-200 flex items-center gap-3">
@@ -191,7 +191,7 @@ export default function MarketingPage() {
           </div>
           <div>
             <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Live Campaigns</p>
-            <p className="text-lg font-extrabold" style={{ color: '#111827' }}>{totalLive}/6</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>{totalLive}/6</p>
           </div>
         </div>
         <div className="bg-white rounded-2xl p-4 border border-gray-200 flex items-center gap-3">
@@ -200,7 +200,7 @@ export default function MarketingPage() {
           </div>
           <div>
             <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Est. Revenue</p>
-            <p className="text-lg font-extrabold" style={{ color: '#111827' }}>Rp 108B</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>Rp 108B</p>
           </div>
         </div>
       </div>
@@ -356,7 +356,7 @@ export default function MarketingPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                  <h2 className="text-lg font-extrabold" style={{ color: '#111827' }}>{campaign.name}</h2>
+                  <h2 className="text-base font-bold" style={{ color: '#111827' }}>{campaign.name}</h2>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
                     campaign.status === 'live' ? 'bg-emerald-100 text-emerald-700' :
                     campaign.status === 'draft' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
@@ -372,7 +372,7 @@ export default function MarketingPage() {
                   { label: 'ROAS', value: campaign.roas },
                 ].map(m => (
                   <div key={m.label} className="text-center">
-                    <p className="text-lg font-extrabold" style={{ color: '#111827' }}>{m.value}</p>
+                    <p className="text-base font-bold" style={{ color: '#111827' }}>{m.value}</p>
                     <p className="text-[10px]" style={{ color: '#9ca3af' }}>{m.label}</p>
                   </div>
                 ))}
@@ -393,11 +393,11 @@ export default function MarketingPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-gray-50 rounded-xl p-3 text-center">
-                      <p className="text-lg font-extrabold" style={{ color: '#111827' }}>{campaign.budget}</p>
+                      <p className="text-base font-bold" style={{ color: '#111827' }}>{campaign.budget}</p>
                       <p className="text-[10px]" style={{ color: '#9ca3af' }}>Total Budget</p>
                     </div>
                     <div className="bg-gray-50 rounded-xl p-3 text-center">
-                      <p className="text-lg font-extrabold" style={{ color: '#059669' }}>{campaign.spent}</p>
+                      <p className="text-base font-bold" style={{ color: '#059669' }}>{campaign.spent}</p>
                       <p className="text-[10px]" style={{ color: '#9ca3af' }}>Spent</p>
                     </div>
                   </div>

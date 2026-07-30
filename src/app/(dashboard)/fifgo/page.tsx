@@ -127,7 +127,7 @@ export default function FIFGOPage() {
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: `${stat.color}15` }}>
                   <stat.icon size={22} style={{ color: stat.color }} weight="fill" />
                 </div>
-                <p className="text-2xl font-extrabold mb-1" style={{ color: '#111827' }}>{stat.value}</p>
+                <p className="text-base font-bold" style={{ color: '#111827' }}>{stat.value}</p>
                 <p className="text-xs mb-1" style={{ color: '#9ca3af' }}>{stat.label}</p>
                 <span className="text-[11px] font-bold" style={{ color: '#10b981' }}>{stat.change}</span>
               </div>
@@ -160,7 +160,7 @@ export default function FIFGOPage() {
                 { label: 'Negative (1-2★)', value: `${(s.ratingDistribution.find(r => r.stars === 1)?.pct ?? 0) + (s.ratingDistribution.find(r => r.stars === 2)?.pct ?? 0)}%`, color: '#dc2626' },
               ].map(m => (
                 <div key={m.label} className="text-center">
-                  <p className="text-lg font-extrabold" style={{ color: m.color ?? '#111827' }}>{m.value}</p>
+                  <p className="text-base font-bold" style={{ color: m.color ?? '#111827' }}>{m.value}</p>
                   <p className="text-[11px]" style={{ color: '#9ca3af' }}>{m.label}</p>
                 </div>
               ))}
@@ -250,7 +250,7 @@ export default function FIFGOPage() {
                 <img src={FIFGO_LOGO} alt="FIFGO" className="w-12 h-12 object-contain" />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-extrabold" style={{ color: '#111827' }}>FIFGO — Recommendations</h2>
+                <h2 className="text-base font-bold" style={{ color: '#111827' }}>FIFGO — Recommendations</h2>
                 <p className="text-xs" style={{ color: '#9ca3af' }}>AI-powered ASO & performance improvement suggestions</p>
               </div>
               <span className="px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
@@ -326,7 +326,7 @@ export default function FIFGOPage() {
                     }
                     <span className="text-xs font-medium" style={{ color: '#6b7280' }}>{m.label}</span>
                   </div>
-                  <p className="text-2xl font-extrabold mb-1" style={{ color: m.good ? '#111827' : '#dc2626' }}>{m.value}</p>
+                  <p className="text-base font-bold" style={{ color: m.good ? '#111827' : '#dc2626' }}>{m.value}</p>
                   <p className="text-[10px]" style={{ color: '#9ca3af' }}>Target: {m.target}</p>
                 </div>
               ))}

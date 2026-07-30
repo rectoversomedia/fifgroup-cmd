@@ -51,7 +51,7 @@ function KPICard({ label, value, sub, change, color, loading }: {
       {loading ? (
         <Skeleton className="w-24 h-8 mb-2" />
       ) : (
-        <p className="text-3xl font-extrabold mb-1" style={{ color: '#111827' }}>{value}</p>
+        <p className="text-base font-bold" style={{ color: '#111827' }}>{value}</p>
       )}
       <p className="text-[11px] mb-2" style={{ color: '#9ca3af' }}>{sub}</p>
       {loading ? (
@@ -192,11 +192,11 @@ export default function PortfolioPage() {
           <span className="text-xs font-bold px-3 py-1 rounded-full mb-3" style={{ background: '#d1fae5', color: '#065f46' }}>HEALTHY</span>
           <div className="grid grid-cols-2 gap-3 w-full">
             <div className="bg-gray-50 rounded-xl p-3 text-center">
-              <p className="text-lg font-extrabold" style={{ color: '#111827' }}>234K</p>
+              <p className="text-base font-bold" style={{ color: '#111827' }}>234K</p>
               <p className="text-[10px]" style={{ color: '#9ca3af' }}>MAU</p>
             </div>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
-              <p className="text-lg font-extrabold" style={{ color: '#111827' }}>4.2★</p>
+              <p className="text-base font-bold" style={{ color: '#111827' }}>4.2★</p>
               <p className="text-[10px]" style={{ color: '#9ca3af' }}>Rating</p>
             </div>
           </div>
@@ -211,11 +211,11 @@ export default function PortfolioPage() {
           <span className="text-xs font-bold px-3 py-1 rounded-full mb-3" style={{ background: '#fef3c7', color: '#92400e' }}>WATCH</span>
           <div className="grid grid-cols-2 gap-3 w-full">
             <div className="bg-gray-50 rounded-xl p-3 text-center">
-              <p className="text-lg font-extrabold" style={{ color: '#111827' }}>62K</p>
+              <p className="text-base font-bold" style={{ color: '#111827' }}>62K</p>
               <p className="text-[10px]" style={{ color: '#9ca3af' }}>MAU</p>
             </div>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
-              <p className="text-lg font-extrabold" style={{ color: '#111827' }}>3.8★</p>
+              <p className="text-base font-bold" style={{ color: '#111827' }}>3.8★</p>
               <p className="text-[10px]" style={{ color: '#9ca3af' }}>Rating</p>
             </div>
           </div>
@@ -234,7 +234,7 @@ export default function PortfolioPage() {
             ))}
           </div>
           <div className="w-full bg-gray-50 rounded-xl p-3 text-center">
-            <p className="text-lg font-extrabold" style={{ color: '#1e3a5f' }}>296K</p>
+            <p className="text-base font-bold" style={{ color: '#1e3a5f' }}>296K</p>
             <p className="text-[10px]" style={{ color: '#9ca3af' }}>Total Users</p>
           </div>
         </div>
@@ -252,7 +252,7 @@ export default function PortfolioPage() {
               { label: 'Avg Disburse', value: '3.8d', color: '#f59e0b' },
             ].map(s => (
               <div key={s.label} className="bg-gray-50 rounded-2xl p-4 flex flex-col items-center text-center">
-                <p className="text-2xl font-extrabold mb-1" style={{ color: s.color }}>{s.value}</p>
+                <p className="text-base font-bold" style={{ color: s.color }}>{s.value}</p>
                 <p className="text-[11px]" style={{ color: '#9ca3af' }}>{s.label}</p>
               </div>
             ))}

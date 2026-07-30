@@ -79,7 +79,7 @@ function LoBDrillPanel({ lob, onClose }: { lob: typeof LOBS[0]; onClose: () => v
               { label: 'MoM Change', value: `${lob.change > 0 ? '+' : ''}${lob.change}%` },
             ].map(m => (
               <div key={m.label} className="bg-gray-50 rounded-xl p-3 text-center">
-                <p className="text-lg font-extrabold" style={{ color: '#111827' }}>{m.value}</p>
+                <p className="text-base font-bold" style={{ color: '#111827' }}>{m.value}</p>
                 <p className="text-[10px]" style={{ color: '#9ca3af' }}>{m.label}</p>
               </div>
             ))}
@@ -200,7 +200,7 @@ export default function LoBPage() {
         ].map(m => (
           <div key={m.label} className="bg-white rounded-2xl p-5 border border-gray-200 flex flex-col items-center text-center">
             <p className="text-xs font-medium mb-2" style={{ color: '#6b7280' }}>{m.label}</p>
-            <p className="text-3xl font-extrabold mb-2" style={{ color: '#111827' }}>{m.value}</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>{m.value}</p>
             <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#ecfdf5', color: '#059669' }}>
               {m.change > 0 ? '+' : ''}{m.change}%
             </span>
