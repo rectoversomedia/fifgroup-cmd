@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 
-const FIFGROUP_LOGO = 'https://www.fifgroup.co.id/assets/images/png/fifgroup-logo-v2-20260423.png';
+const FIFGROUP_LOGO = '/images/fifgroup-logo.png';
 
 export default function LoginPage() {
   const { login } = useAuth();

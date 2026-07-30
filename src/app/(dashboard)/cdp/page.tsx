@@ -6,11 +6,11 @@ import { loadCDPData, saveCDPData, getDefaultCDP } from '@/components/cdp-admin'
 import type { Journey, Segment, HybridChannel, AIInsight } from '@/components/cdp-admin';
 
 const LOB_LOGOS: Record<string, string> = {
-  FIFASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FIFASTRA-1780538519035.png',
-  SPEKTRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20SPEKTRA-1780538544863.png',
-  DANASTRA: 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20DANASTRA-1780538584771.png',
-  FINATRA:  'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20FINATRA-1780538626287.png',
-  AMITRA:   'https://webcorp-api.fifgroup.co.id/api/v1/media/view/LOGO%20BARU%20LOB%20AMITRA-1780538604037.png',
+  FIFASTRA: '/images/fifastra-logo.png',
+  SPEKTRA:  '/images/spektra-logo.png',
+  DANASTRA: '/images/danastra-logo.png',
+  FINATRA:  '/images/finatra-logo.png',
+  AMITRA:   '/images/amitra-logo.png',
 };
 
 const WA_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';

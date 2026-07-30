@@ -8,7 +8,7 @@ import {
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FifgoAdminPanel, loadFifgoData, saveFifgoData, FifgoData } from '@/components/fifgo-admin';
 
-const FIFGO_LOGO = 'https://webcorp-api.fifgroup.co.id/api/v1/media/view/FIFGO_APP_LOGO-1780892650611.png';
+const FIFGO_LOGO = '/images/fifgo-logo.png';
 const APPSTORE_ICON = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/apple.svg';
 const PLAYSTORE_ICON = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googleplay.svg';
 

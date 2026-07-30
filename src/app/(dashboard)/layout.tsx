@@ -16,7 +16,7 @@ import { useAuth } from '@/components/auth-provider';
 import { isPageLocked } from '@/components/page-lock';
 import PageGate from '@/components/page-gate';
 
-const FIFGROUP_LOGO = 'https://www.fifgroup.co.id/assets/images/png/fifgroup-logo-v2-20260423.png';
+const FIFGROUP_LOGO = '/images/fifgroup-logo.png';
 
 const WA_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/whatsapp.svg';
 const TEAMS_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/microsoftteams.svg';

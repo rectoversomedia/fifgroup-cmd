@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { PageLockAdmin } from '@/components/page-lock';
 import { useAuth } from '@/components/auth-provider';
 
-const FIFGROUP_LOGO = 'https://www.fifgroup.co.id/assets/images/png/fifgroup-logo-v2-20260423.png';
+const FIFGROUP_LOGO = '/images/fifgroup-logo.png';
 const CHANNEL_SVG = 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googleads.svg';
 
 export default function SettingsPage() {
