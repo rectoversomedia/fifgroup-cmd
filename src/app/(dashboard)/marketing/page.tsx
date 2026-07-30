@@ -18,12 +18,26 @@ function MktIcon({ channel, size = 16 }: { channel: string; size?: number }) {
   }
 }
 
+function fmt(n: number): string {
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1).replace('.0', '')}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace('.0', '')}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace('.0', '')}K`;
+  return n.toString();
+}
+
+function fmtIDR(n: number): string {
+  if (n >= 1_000_000_000_000) return `Rp ${(n / 1_000_000_000_000).toFixed(1).replace('.0', '')}T`;
+  if (n >= 1_000_000_000) return `Rp ${(n / 1_000_000_000).toFixed(1).replace('.0', '')}B`;
+  if (n >= 1_000_000) return `Rp ${(n / 1_000_000).toFixed(1).replace('.0', '')}M`;
+  return `Rp ${n.toLocaleString('id-ID')}`;
+}
+
 const CHANNELS = [
-  { channel: 'Push Notification', icon: 'Push Notification', sent: 189000, delivered: 182430, opened: 91215, clicked: 13682, converted: 4561, color: '#4f8ef7', cost: 'Rp 12.4M', revenue: 'Rp 8.2B' },
-  { channel: 'In-App Message', icon: 'In-App Message', sent: 234000, delivered: 234000, opened: 117000, clicked: 21060, converted: 7020, color: '#8b5cf6', cost: 'Rp 0', revenue: 'Rp 12.6B' },
-  { channel: 'SMS', icon: 'SMS', sent: 45600, delivered: 43600, opened: 0, clicked: 3928, converted: 1309, color: '#06b6d4', cost: 'Rp 45.6M', revenue: 'Rp 2.4B' },
-  { channel: 'Email', icon: 'Email', sent: 89000, delivered: 80100, opened: 20025, clicked: 4005, converted: 801, color: '#f59e0b', cost: 'Rp 8.9M', revenue: 'Rp 1.4B' },
-  { channel: 'Branch / Walk-in', icon: 'Branch', sent: 2800, delivered: 2800, opened: 2800, clicked: 1400, converted: 840, color: '#10b981', cost: 'Rp 280M', revenue: 'Rp 1.5B' },
+  { channel: 'Push Notification', icon: 'Push Notification', sent: 189000, delivered: 182430, opened: 91215, clicked: 13682, converted: 4561, cost: 12_400_000, revenue: 8_200_000_000, color: '#4f8ef7' },
+  { channel: 'In-App Message', icon: 'In-App Message', sent: 234000, delivered: 234000, opened: 117000, clicked: 21060, converted: 7020, cost: 0, revenue: 12_600_000_000, color: '#8b5cf6' },
+  { channel: 'SMS', icon: 'SMS', sent: 45600, delivered: 43600, opened: 0, clicked: 3928, converted: 1309, cost: 45_600_000, revenue: 2_400_000_000, color: '#06b6d4' },
+  { channel: 'Email', icon: 'Email', sent: 89000, delivered: 80100, opened: 20025, clicked: 4005, converted: 801, cost: 8_900_000, revenue: 1_400_000_000, color: '#f59e0b' },
+  { channel: 'Branch / Walk-in', icon: 'Branch', sent: 2800, delivered: 2800, opened: 2800, clicked: 1400, converted: 840, cost: 280_000_000, revenue: 1_500_000_000, color: '#10b981' },
 ];
 
 const TEMPLATES = [
@@ -38,10 +52,10 @@ const TEMPLATES = [
 const CAMPAIGNS = [
   {
     id: 'ramadan-promo', name: 'Ramadan Promo 0% Tenor 6 Bulan',
-    status: 'live', progress: 72, budget: 'Rp 840M', spent: 'Rp 604.8M',
+    status: 'live', progress: 72, budget: 840_000_000, spent: 604_800_000,
     start: '14 Jun 2026', end: '14 Jul 2026',
-    reach: '234K', impressions: '1.2M', conversions: 8920,
-    revenue: 'Rp 15.8B', roas: '26.2x', channel: 'Push + In-App + SMS',
+    reach: 234_000, impressions: 1_200_000, conversions: 8920,
+    revenue: 15_800_000_000, roas: '26.2x', channel: 'Push + In-App + SMS',
     team: ['Andi (Lead)', 'Dewi (Content)', 'Budi (CDP)'],
     updates: [
       { date: '22 Jul', text: 'Campaign pacing on track — 72% spend, 68% conversions achieved' },
@@ -52,10 +66,10 @@ const CAMPAIGNS = [
   },
   {
     id: 'fifgo-onboarding', name: 'FIFGO Onboarding Flow',
-    status: 'live', progress: 88, budget: 'Rp 320M', spent: 'Rp 281.6M',
+    status: 'live', progress: 88, budget: 320_000_000, spent: 281_600_000,
     start: '1 Jul 2026', end: '31 Jul 2026',
-    reach: '124K', impressions: '412K', conversions: 8920,
-    revenue: 'Rp 8.4B', roas: '29.8x', channel: 'Push + In-App',
+    reach: 124_000, impressions: 412_000, conversions: 8920,
+    revenue: 8_400_000_000, roas: '29.8x', channel: 'Push + In-App',
     team: ['Andi (Lead)', 'Sari (UX)', 'Budi (CDP)'],
     updates: [
       { date: '23 Jul', text: 'Day 23 — 88% spend. 8,920 new user activations. On track.' },
@@ -66,10 +80,10 @@ const CAMPAIGNS = [
   },
   {
     id: 'spektra-dormant', name: 'SPEKTRA Dormant Re-Engage',
-    status: 'live', progress: 45, budget: 'Rp 180M', spent: 'Rp 81M',
+    status: 'live', progress: 45, budget: 180_000_000, spent: 81_000_000,
     start: '7 Jul 2026', end: '31 Jul 2026',
-    reach: '28K', impressions: '89K', conversions: 1340,
-    revenue: 'Rp 2.1B', roas: '25.9x', channel: 'SMS + Push',
+    reach: 28_000, impressions: 89_000, conversions: 1340,
+    revenue: 2_100_000_000, roas: '25.9x', channel: 'SMS + Push',
     team: ['Budi (Lead)', 'Dewi (Content)'],
     updates: [
       { date: '22 Jul', text: 'Day 15 special offer sent — 1,340 conversions from 28K reach' },
@@ -80,10 +94,10 @@ const CAMPAIGNS = [
   },
   {
     id: 'danastra-crosssell', name: 'DANASTRA Cross-Sell FIFASTRA',
-    status: 'live', progress: 58, budget: 'Rp 220M', spent: 'Rp 127.6M',
+    status: 'live', progress: 58, budget: 220_000_000, spent: 127_600_000,
     start: '7 Jul 2026', end: '31 Jul 2026',
-    reach: '45K', impressions: '178K', conversions: 2680,
-    revenue: 'Rp 4.8B', roas: '37.6x', channel: 'In-App + Push',
+    reach: 45_000, impressions: 178_000, conversions: 2680,
+    revenue: 4_800_000_000, roas: '37.6x', channel: 'In-App + Push',
     team: ['Andi (Lead)', 'Sari (Content)', 'Budi (CDP)'],
     updates: [
       { date: '21 Jul', text: 'Day 14 follow-up: 2,680 cross-sell conversions. ROAS 37.6x.' },
@@ -94,10 +108,10 @@ const CAMPAIGNS = [
   },
   {
     id: 'bill-reminder-july', name: 'Smart Bill Reminder July',
-    status: 'live', progress: 100, budget: 'Rp 60M', spent: 'Rp 60M',
+    status: 'live', progress: 100, budget: 60_000_000, spent: 60_000_000,
     start: '1 Jul 2026', end: '23 Jul 2026',
-    reach: '45.6K', impressions: '136.8K', conversions: 42840,
-    revenue: 'Rp 76.8B', roas: '1,280x', channel: 'Push + SMS',
+    reach: 45_600, impressions: 136_800, conversions: 42840,
+    revenue: 76_800_000_000, roas: '1,280x', channel: 'Push + SMS',
     team: ['Budi (Lead)', 'Dewi (Content)'],
     updates: [
       { date: '23 Jul', text: 'Campaign complete — 94.2% collection rate. Target exceeded.' },
@@ -107,10 +121,10 @@ const CAMPAIGNS = [
   },
   {
     id: 'q3-brand', name: 'Q3 FIFGROUP Brand Awareness',
-    status: 'draft', progress: 0, budget: 'Rp 1.2B', spent: 'Rp 0',
+    status: 'draft', progress: 0, budget: 1_200_000_000, spent: 0,
     start: '1 Aug 2026', end: '30 Sep 2026',
-    reach: 'TBD', impressions: 'TBD', conversions: 0,
-    revenue: 'TBD', roas: 'TBD', channel: 'Digital + OOH',
+    reach: 0, impressions: 0, conversions: 0,
+    revenue: 0, roas: '—', channel: 'Digital + OOH',
     team: ['Andi (Lead)', 'Sari (Content)', 'Dewi (Media)'],
     updates: [
       { date: '23 Jul', text: 'Brief submitted — awaiting creative agency pitch deck' },
@@ -141,11 +155,12 @@ export default function MarketingPage() {
   const campaign = CAMPAIGNS.find(c => c.id === selectedCampaign)!;
   const totalSent = CHANNELS.reduce((s, c) => s + c.sent, 0);
   const totalConverted = CHANNELS.reduce((s, c) => s + c.converted, 0);
+  const totalChannelRevenue = CHANNELS.reduce((s, c) => s + c.revenue, 0);
   const totalLive = CAMPAIGNS.filter(c => c.status === 'live').length;
-  const liveCampaigns = CAMPAIGNS.filter(c => c.status === 'live' && c.revenue !== 'TBD');
-  const totalRevenue = liveCampaigns.reduce((s, c) => s + parseFloat(c.revenue.replace(/[Rp.\sB]/g, '')), 0);
-  const totalSpend = liveCampaigns.reduce((s, c) => s + parseFloat(c.spent.replace(/[Rp.\sBM]/g, '')), 0);
-  const avgRoas = totalSpend > 0 ? Math.round(totalRevenue / totalSpend) : 0;
+  const liveCampaigns = CAMPAIGNS.filter(c => c.status === 'live' && c.budget > 0);
+  const totalCampRevenue = liveCampaigns.reduce((s, c) => s + c.revenue, 0);
+  const totalSpend = liveCampaigns.reduce((s, c) => s + c.spent, 0);
+  const avgRoas = totalSpend > 0 ? Math.round(totalCampRevenue / totalSpend) : 0;
   const bestConv = Math.max(...CHANNELS.map(c => c.converted / c.sent * 100));
 
 
@@ -173,7 +188,7 @@ export default function MarketingPage() {
           </div>
           <div>
             <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Total Reach</p>
-            <p className="text-base font-bold" style={{ color: '#111827' }}>{Math.round(totalSent / 1000)}K</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>{fmt(totalSent)}</p>
           </div>
         </div>
         <div className="bg-white rounded-2xl p-4 border border-gray-200 flex items-center gap-3">
@@ -200,7 +215,7 @@ export default function MarketingPage() {
           </div>
           <div>
             <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Est. Revenue</p>
-            <p className="text-base font-bold" style={{ color: '#111827' }}>Rp 108B</p>
+            <p className="text-base font-bold" style={{ color: '#111827' }}>{fmtIDR(totalChannelRevenue)}</p>
           </div>
         </div>
       </div>
@@ -257,18 +272,18 @@ export default function MarketingPage() {
                             <span className="text-sm font-semibold" style={{ color: c.color }}>{c.channel}</span>
                           </div>
                         </td>
-                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#374151' }}>{c.sent.toLocaleString()}</span></td>
-                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#374151' }}>{c.delivered.toLocaleString()}</span></td>
-                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#374151' }}>{c.opened > 0 ? c.opened.toLocaleString() : '—'}</span></td>
-                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#374151' }}>{c.clicked.toLocaleString()}</span></td>
-                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-bold" style={{ color: '#10b981' }}>{c.converted.toLocaleString()}</span></td>
+                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#374151' }}>{fmt(c.sent)}</span></td>
+                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#374151' }}>{fmt(c.delivered)}</span></td>
+                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#374151' }}>{c.opened > 0 ? fmt(c.opened) : '—'}</span></td>
+                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#374151' }}>{fmt(c.clicked)}</span></td>
+                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-bold" style={{ color: '#10b981' }}>{fmt(c.converted)}</span></td>
                         <td className="py-3.5 pr-4 text-right">
                           <span className="text-sm font-bold px-2 py-0.5 rounded-full" style={{ background: isBest ? '#ecfdf5' : '#f3f4f6', color: isBest ? '#059669' : '#374151' }}>
                             {convPct}%
                           </span>
                         </td>
-                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#6b7280' }}>{c.cost}</span></td>
-                        <td className="py-3.5 text-right"><span className="text-sm font-bold" style={{ color: '#059669' }}>{c.revenue}</span></td>
+                        <td className="py-3.5 pr-4 text-right"><span className="text-sm font-medium" style={{ color: '#6b7280' }}>{fmtIDR(c.cost)}</span></td>
+                        <td className="py-3.5 text-right"><span className="text-sm font-bold" style={{ color: '#059669' }}>{fmtIDR(c.revenue)}</span></td>
                       </tr>
                     );
                   })}
@@ -340,7 +355,7 @@ export default function MarketingPage() {
                     <div className="h-full rounded-full transition-all" style={{ width: `${c.progress}%`, background: c.color }} />
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[10px]" style={{ color: '#9ca3af' }}>{c.spent} spent</span>
+                    <span className="text-[10px]" style={{ color: '#9ca3af' }}>{fmtIDR(c.spent)} spent</span>
                     <span className="text-[10px] font-bold" style={{ color: c.color }}>{c.progress}%</span>
                   </div>
                 </div>
@@ -366,9 +381,9 @@ export default function MarketingPage() {
               </div>
               <div className="flex gap-6 flex-wrap">
                 {[
-                  { label: 'Reach', value: campaign.reach },
-                  { label: 'Conversions', value: campaign.conversions > 0 ? campaign.conversions.toLocaleString() : '—' },
-                  { label: 'Revenue', value: campaign.revenue },
+                  { label: 'Reach', value: typeof campaign.reach === 'number' ? fmt(campaign.reach) : campaign.reach },
+                  { label: 'Conversions', value: typeof campaign.conversions === 'number' && campaign.conversions > 0 ? fmt(campaign.conversions) : '—' },
+                  { label: 'Revenue', value: typeof campaign.revenue === 'number' ? fmtIDR(campaign.revenue) : campaign.revenue },
                   { label: 'ROAS', value: campaign.roas },
                 ].map(m => (
                   <div key={m.label} className="text-center">
@@ -385,7 +400,7 @@ export default function MarketingPage() {
                   <div>
                     <div className="flex justify-between mb-1">
                       <span className="text-xs font-medium" style={{ color: '#6b7280' }}>Budget Used</span>
-                      <span className="text-xs font-bold" style={{ color: campaign.color }}>{campaign.spent} / {campaign.budget}</span>
+                      <span className="text-xs font-bold" style={{ color: campaign.color }}>{fmtIDR(campaign.spent)} / {fmtIDR(campaign.budget)}</span>
                     </div>
                     <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
                       <div className="h-full rounded-full transition-all" style={{ width: `${campaign.progress}%`, background: campaign.color }} />
@@ -393,11 +408,11 @@ export default function MarketingPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-gray-50 rounded-xl p-3 text-center">
-                      <p className="text-base font-bold" style={{ color: '#111827' }}>{campaign.budget}</p>
+                      <p className="text-base font-bold" style={{ color: '#111827' }}>{fmtIDR(campaign.budget)}</p>
                       <p className="text-[10px]" style={{ color: '#9ca3af' }}>Total Budget</p>
                     </div>
                     <div className="bg-gray-50 rounded-xl p-3 text-center">
-                      <p className="text-base font-bold" style={{ color: '#059669' }}>{campaign.spent}</p>
+                      <p className="text-base font-bold" style={{ color: '#059669' }}>{fmtIDR(campaign.spent)}</p>
                       <p className="text-[10px]" style={{ color: '#9ca3af' }}>Spent</p>
                     </div>
                   </div>
