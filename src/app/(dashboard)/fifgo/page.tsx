@@ -2,15 +2,12 @@
 
 import * as React from 'react';
 import {
-  Star, Download, ShieldCheck, AppWindow,
-  CheckCircle, Warning, Gear, Lightning,
+  Star, Download, ShieldCheck,
+  CheckCircle, Warning, Lightning,
 } from '@phosphor-icons/react';
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FifgoAdminPanel, loadFifgoData, saveFifgoData, FifgoData } from '@/components/fifgo-admin';
 
 const FIFGO_LOGO = '/images/fifgo-logo.png';
-const APPSTORE_ICON = '';
-const PLAYSTORE_ICON = '';
 
 export default function FIFGOPage() {
   const [store, setStore] = React.useState<'playstore' | 'appstore'>('playstore');
@@ -31,9 +28,7 @@ export default function FIFGOPage() {
 
   const isHealthy = data.appHealthMetrics.every(m => m.good);
   const s = data[store];
-  const asoScore = data.ascoreBreakdown.reduce((acc, item) => acc + item.score * item.weight / 100, 0);
-  const totalPositive = s.ratingDistribution.find(r => r.stars === 5)?.pct ?? 0;
-  const totalNegative = (s.ratingDistribution.find(r => r.stars === 1)?.pct ?? 0) + (s.ratingDistribution.find(r => r.stars === 2)?.pct ?? 0);
+  const asasoScore = data.ascoreBreakdown.reduce((acc, item) => acc + item.score * item.weight / 100, 0);
 
   return (
     <div className="p-4 sm:p-6 space-y-5 bg-gray-50 min-h-screen">
@@ -60,7 +55,6 @@ export default function FIFGOPage() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all"
             style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}
           >
-            <Gear size={13} />
             Edit Data
           </button>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-gray-200">
@@ -96,16 +90,17 @@ export default function FIFGOPage() {
         ))}
       </div>
 
-      {/* ── MAIN CONTENT (no tabs) ── */}
+      {/* ── MAIN CONTENT ── */}
       <div className="space-y-5">
 
-        {/* Key Stats Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 5 Key Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {[
-            { icon: Star, color: '#f59e0b', label: 'Rating', value: `${s.rating}★`, sub: store === 'playstore' ? `+${(s.rating - 4.0).toFixed(1)} dari 4.0` : `+${(s.rating - 4.3).toFixed(1)} dari 4.3` },
+            { icon: Star, color: '#f59e0b', label: 'Rating', value: `${s.rating}★`, sub: `${s.totalReviews} reviews` },
             { icon: Download, color: '#06b6d4', label: 'Downloads', value: s.downloads, sub: s.downloadsChange },
-            { icon: ShieldCheck, color: '#10b981', label: 'ASO Score', value: `${Math.round(asoScore)}/100`, sub: `vs avg kompetitor 91` },
-            { icon: AppWindow, color: '#8b5cf6', label: 'Active Users', value: s.activeUsers, sub: s.activeUsersChange },
+            { icon: Star, color: '#6366f1', label: 'Total Reviews', value: s.totalReviews, sub: 'all time' },
+            { icon: ShieldCheck, color: '#10b981', label: 'ASO Score', value: `${Math.round(asasoScore)}/100`, sub: `+${Math.max(0, Math.round(asasoScore - 74))} from avg` },
+            { icon: Warning, color: '#dc2626', label: 'Issues', value: `${data.recommendations.filter(r => r.priority === 'high').length}`, sub: 'high priority' },
           ].map(m => (
             <div key={m.label} className="bg-white rounded-2xl p-4 border border-gray-200 flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${m.color}15` }}>
@@ -120,110 +115,21 @@ export default function FIFGOPage() {
           ))}
         </div>
 
-        {/* Rating Distribution + Rating Trend */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* Rating Distribution */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-200">
-            <h3 className="text-sm font-bold mb-4" style={{ color: '#111827' }}>Rating Distribution</h3>
-            <div className="space-y-2.5">
-              {s.ratingDistribution.map(r => (
-                <div key={r.stars} className="flex items-center gap-3">
-                  <span className="text-xs w-5 text-right shrink-0" style={{ color: '#9ca3af' }}>{r.stars}★</span>
-                  <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: '#f3f4f6' }}>
-                    <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: `${r.pct}%` }} />
-                  </div>
-                  <span className="text-xs w-8 text-right shrink-0" style={{ color: '#9ca3af' }}>{r.pct}%</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 pt-3 grid grid-cols-3 gap-3" style={{ borderTop: '1px solid #f3f4f6' }}>
-              <div className="text-center">
-                <p className="text-base font-bold" style={{ color: '#111827' }}>{s.totalReviews}</p>
-                <p className="text-[10px]" style={{ color: '#9ca3af' }}>Total Reviews</p>
-              </div>
-              <div className="text-center">
-                <p className="text-base font-bold" style={{ color: '#10b981' }}>{totalPositive}%</p>
-                <p className="text-[10px]" style={{ color: '#9ca3af' }}>Positive (5★)</p>
-              </div>
-              <div className="text-center">
-                <p className="text-base font-bold" style={{ color: '#dc2626' }}>{totalNegative}%</p>
-                <p className="text-[10px]" style={{ color: '#9ca3af' }}>Negative (1-2★)</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Rating Trend */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold" style={{ color: '#111827' }}>Rating Trend — Monthly</h3>
-              <span className="text-[10px] px-2 py-1 rounded-full font-bold" style={{ background: '#f3f4f6', color: '#6b7280' }}>Last 12 Months</span>
-            </div>
-            <ResponsiveContainer width="100%" height={160}>
-              <LineChart data={data.ratingTrend} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                <XAxis dataKey="period" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <YAxis domain={[3, 5]} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} ticks={[3, 3.5, 4, 4.5, 5]} />
-                <Tooltip
-                  contentStyle={{ background: 'white', border: '1px solid #f3f4f6', borderRadius: 12, fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
-                  formatter={(v: any) => [`${Number(v).toFixed(2)}★`, 'Rating']}
-                  cursor={{ stroke: '#06b6d4', strokeWidth: 1, strokeDasharray: '4 4' }}
-                />
-                <Line type="monotone" dataKey="rating" stroke="#06b6d4" strokeWidth={2.5}
-                  dot={{ r: 4, fill: '#06b6d4', strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: '#06b6d4', strokeWidth: 0 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* ASO Score Breakdown */}
+        {/* Recommendations (ASO Detail) */}
         <div className="bg-white rounded-2xl p-5 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold" style={{ color: '#111827' }}>ASO Score Breakdown</h3>
+            <h3 className="text-sm font-bold" style={{ color: '#111827' }}>ASO Recommendations</h3>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-extrabold" style={{ color: '#10b981' }}>{Math.round(asoScore)}</span>
-              <span className="text-xs" style={{ color: '#9ca3af' }}>/ 100</span>
+              <span className="text-[10px] px-2 py-1 rounded-full font-bold" style={{ background: '#fef2f2', color: '#dc2626' }}>
+                {data.recommendations.filter(r => r.priority === 'high').length} High
+              </span>
+              <span className="text-[10px] px-2 py-1 rounded-full font-bold" style={{ background: '#fffbeb', color: '#d97706' }}>
+                {data.recommendations.filter(r => r.priority === 'medium').length} Medium
+              </span>
+              <span className="text-[10px] px-2 py-1 rounded-full font-bold" style={{ background: '#f0fdf4', color: '#10b981' }}>
+                {data.recommendations.filter(r => r.priority === 'low').length} Low
+              </span>
             </div>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {data.ascoreBreakdown.map(item => (
-              <div key={item.label} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-medium" style={{ color: '#374151' }}>{item.label}</span>
-                  <span className="text-xs font-bold px-1.5 py-0.5 rounded-md text-white"
-                    style={{ background: item.score >= 80 ? '#10b981' : item.score >= 60 ? '#f59e0b' : '#dc2626' }}>
-                    {item.score}
-                  </span>
-                </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#e5e7eb' }}>
-                  <div className="h-full rounded-full" style={{ width: `${item.score}%`, background: item.score >= 80 ? '#10b981' : item.score >= 60 ? '#f59e0b' : '#dc2626' }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Recommendations */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold" style={{ color: '#111827' }}>Recommendations</h3>
-            <span className="text-[10px] px-2 py-1 rounded-full font-bold" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
-              {data.recommendations.length} suggestions
-            </span>
-          </div>
-          {/* Priority summary */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            {[
-              { label: 'High', count: data.recommendations.filter(r => r.priority === 'high').length, color: '#dc2626', bg: '#fef2f2' },
-              { label: 'Medium', count: data.recommendations.filter(r => r.priority === 'medium').length, color: '#d97706', bg: '#fffbeb' },
-              { label: 'Low', count: data.recommendations.filter(r => r.priority === 'low').length, color: '#10b981', bg: '#f0fdf4' },
-            ].map(p => (
-              <div key={p.label} className="rounded-xl p-3 text-center" style={{ background: p.bg }}>
-                <p className="text-lg font-extrabold" style={{ color: p.color }}>{p.count}</p>
-                <p className="text-[10px] font-medium" style={{ color: p.color }}>{p.label}</p>
-              </div>
-            ))}
           </div>
           <div className="space-y-2">
             {data.recommendations.map((rec, i) => (
