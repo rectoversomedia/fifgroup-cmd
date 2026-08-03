@@ -74,10 +74,11 @@ export function getPageLockStatus(pageId: string): 'locked' | 'always' | 'open' 
 }
 
 export function setPageLock(pageId: string, locked: boolean) {
-  if (ALWAYS_VISIBLE.includes(pageId)) return; // cannot lock these
+  const id = normalizePageId(pageId);
+  if (ALWAYS_VISIBLE.includes(id)) return; // cannot lock these
   const locks = loadLocks();
-  if (locked) locks[pageId] = true;
-  else delete locks[pageId];
+  if (locked) locks[id] = true;
+  else delete locks[id];
   saveLocks(locks);
 }
 
