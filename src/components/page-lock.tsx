@@ -49,15 +49,28 @@ function saveLocks(locks: Record<string, boolean>) {
 // Pages that are ALWAYS visible — cannot be locked
 const ALWAYS_VISIBLE = ['fifgo'];
 
+// Normalize pageId to match keys stored in localStorage (ALL_PAGES ids)
+const normalizePageId = (id: string): string => {
+  const MAP: Record<string, string> = {
+    'push-notification': 'push-notif',
+    'portfolio-quality': 'portfolio-quality',
+    'journey-builder': 'journey-builder',
+    'error-tracking': 'error-tracking',
+  };
+  return MAP[id] ?? id;
+};
+
 export function isPageLocked(pageId: string): boolean {
-  if (ALWAYS_VISIBLE.includes(pageId)) return false;
-  return loadLocks()[pageId] === true;
+  const id = normalizePageId(pageId);
+  if (ALWAYS_VISIBLE.includes(id)) return false;
+  return loadLocks()[id] === true;
 }
 
 // Returns lock status including ALWAYS_VISIBLE (which are never locked)
 export function getPageLockStatus(pageId: string): 'locked' | 'always' | 'open' {
-  if (ALWAYS_VISIBLE.includes(pageId)) return 'always';
-  return isPageLocked(pageId) ? 'locked' : 'open';
+  const id = normalizePageId(pageId);
+  if (ALWAYS_VISIBLE.includes(id)) return 'always';
+  return isPageLocked(id) ? 'locked' : 'open';
 }
 
 export function setPageLock(pageId: string, locked: boolean) {

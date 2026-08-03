@@ -89,6 +89,13 @@ const NAV_GROUPS: NavGroup[] = [
 
 function getPageId(href: string): string {
   if (href === '/') return 'dashboard';
+  const PATH_TO_ID: Record<string, string> = {
+    '/push-notification': 'push-notif',
+    '/portfolio-quality': 'portfolio-quality',
+    '/journey-builder': 'journey-builder',
+    '/error-tracking': 'error-tracking',
+  };
+  if (PATH_TO_ID[href]) return PATH_TO_ID[href];
   return href.replace('/', '');
 }
 
