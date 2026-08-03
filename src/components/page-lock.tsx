@@ -118,10 +118,8 @@ export function PageLockAdmin() {
         </div>
         {lockedCount > 0 && (
           <button onClick={() => {
-            const reset: Record<string, boolean> = {};
-            ALL_PAGES.forEach(p => { if (!ALWAYS_VISIBLE.includes(p.id)) reset[p.id] = true; });
-            setLocks(reset);
-            saveLocks(reset);
+            setLocks({});
+            saveLocks({});
           }}
             className="text-[10px] px-3 py-1 rounded-lg font-semibold text-red-500 border border-red-200 hover:bg-red-50">
             Reset All

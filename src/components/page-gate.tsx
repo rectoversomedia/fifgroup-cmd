@@ -18,7 +18,8 @@ export default function PageGate({ children }: { children: React.ReactNode }) {
   React.useEffect(() => { setMounted(true); }, []);
 
   React.useEffect(() => {
-    if (!mounted || !user || isAdmin) return;
+    if (!mounted || !user) return;
+    if (isAdmin) return;
     const pageId = getPageId(pathname);
     if (pageId !== 'dashboard' && isPageLocked(pageId)) {
       window.location.href = '/';

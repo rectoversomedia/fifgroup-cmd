@@ -31,7 +31,7 @@ export type FifgoData = {
 
 export const DEFAULT_FIFGO: FifgoData = {
   playstore: {
-    rating: 4.2, downloads: '850K', downloadsChange: '+23%',
+    rating: 3.2, downloads: '850K', downloadsChange: '+23%',
     activeUsers: '234K', activeUsersChange: '+15%',
     ratingDistribution: [
       { stars: 5, pct: 68 }, { stars: 4, pct: 18 }, { stars: 3, pct: 8 }, { stars: 2, pct: 4 }, { stars: 1, pct: 2 },
@@ -46,7 +46,7 @@ export const DEFAULT_FIFGO: FifgoData = {
     ],
   },
   appstore: {
-    rating: 4.5, downloads: '92K', downloadsChange: '+41%',
+    rating: 3.1, downloads: '92K', downloadsChange: '+41%',
     activeUsers: '28K', activeUsersChange: '+38%',
     ratingDistribution: [
       { stars: 5, pct: 74 }, { stars: 4, pct: 16 }, { stars: 3, pct: 6 }, { stars: 2, pct: 3 }, { stars: 1, pct: 1 },
@@ -115,9 +115,18 @@ export function loadFifgoData(): FifgoData {
   if (typeof window === 'undefined') return DEFAULT_FIFGO;
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return { ...DEFAULT_FIFGO, ...JSON.parse(stored) };
-  } catch (_) {}
-  return DEFAULT_FIFGO;
+    if (!stored) return DEFAULT_FIFGO;
+    const parsed = JSON.parse(stored);
+    // Validate basic structure — reset if corrupt
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      localStorage.removeItem(STORAGE_KEY);
+      return DEFAULT_FIFGO;
+    }
+    return { ...DEFAULT_FIFGO, ...parsed };
+  } catch (_) {
+    localStorage.removeItem(STORAGE_KEY);
+    return DEFAULT_FIFGO;
+  }
 }
 
 export function saveFifgoData(data: FifgoData) {

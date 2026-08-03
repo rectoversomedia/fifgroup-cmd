@@ -85,13 +85,6 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/escalation', label: 'Escalation', icon: Bell, color: '#dc2626' },
     ],
   },
-  {
-    label: 'Admin',
-    items: [
-      { href: '/cdp-admin', label: 'CDP Admin', icon: Gear,        color: '#1e3a5f' },
-      { href: '/settings',  label: 'Settings',   icon: ShieldCheck, color: '#1e3a5f' },
-    ],
-  },
 ];
 
 function getPageId(href: string): string {
@@ -101,11 +94,13 @@ function getPageId(href: string): string {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, isAdmin } = useAuth();
-  const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
   const pathname = usePathname();
+  // Defer role-dependent rendering until client-side auth is loaded — prevents hydration mismatch
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
 
   React.useEffect(() => {
     setLastUpdated(new Date());
@@ -119,46 +114,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const filteredNavGroups = NAV_GROUPS.map(group => ({
     ...group,
-    items: group.items.filter(item =>
-      item.href === '/cdp-admin' || item.href === '/settings'
-        ? isAdmin
-        : true
-    ),
+    // Don't filter admin-only items here — let them render; conditional styling handles visibility
+    items: group.items,
   })).filter(group => group.items.length > 0);
 
   const sidebarContent = (
     <>
       {/* Logo */}
       <div className="h-[60px] flex items-center justify-center shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
-        {collapsed ? (
-          <img src={FIFGROUP_LOGO} alt="FIFGROUP" className="object-contain" style={{ height: 30, width: 30 }} />
-        ) : (
-          <img src={FIFGROUP_LOGO} alt="FIFGROUP" className="object-contain" style={{ height: 34, width: 'auto' }} />
-        )}
+        <img src={FIFGROUP_LOGO} alt="FIFGROUP" className="object-contain" style={{ height: 34, width: 'auto' }} />
       </div>
-
-      {/* Live Indicator */}
-      {!collapsed && (
-        <div className="px-3 py-2 flex items-center gap-2 shrink-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
-          <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot shrink-0" />
-          <span className="text-[10px]" style={{ color: '#9ca3af' }}>LIVE</span>
-          <span className="text-[10px] ml-auto" style={{ color: '#d1d5db' }}>{timeStr} WIB</span>
-        </div>
-      )}
 
       {/* Nav groups */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
         {filteredNavGroups.map(group => (
           <div key={group.label}>
-            {!collapsed && (
-              <p className="text-[9px] font-extrabold uppercase tracking-widest px-2 mb-1.5" style={{ color: '#d1d5db' }}>
-                {group.label}
-              </p>
-            )}
+            <p className="text-[9px] font-extrabold uppercase tracking-widest px-2 mb-1.5" style={{ color: '#d1d5db' }}>
+              {group.label}
+            </p>
             <div className="space-y-0">
               {group.items.map(item => {
+                const effectiveAdmin = mounted && isAdmin;
                 const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
-                const isLocked = !isAdmin && item.href !== '/cdp-admin' && item.href !== '/settings' && isPageLocked(getPageId(item.href));
+                const isAdminItem = item.href === '/cdp-admin' || item.href === '/settings';
+                // Hide admin-only items until mounted to prevent hydration mismatch
+                if (isAdminItem && !mounted) return null;
+                const isLocked = !effectiveAdmin && !isAdminItem && isPageLocked(getPageId(item.href));
                 const Icon = item.icon;
                 return (
                   <Link
@@ -177,10 +158,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       cursor: isLocked ? 'not-allowed' : 'pointer',
                       opacity: isLocked ? 0.7 : 1,
                     }}
-                    title={collapsed ? item.label : undefined}
                   >
                     <div className="relative shrink-0">
-                      {item.logo && !collapsed ? (
+                      {item.logo ? (
                         <img
                           src={item.logo}
                           alt={item.label}
@@ -200,7 +180,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </div>
                       )}
                     </div>
-                    {!collapsed && <span>{item.label}</span>}
+                    <span>{item.label}</span>
                   </Link>
                 );
               })}
@@ -209,12 +189,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         ))}
       </nav>
 
-      {/* Collapse button */}
-      <div className="p-2 shrink-0 hidden md:block" style={{ borderTop: '1px solid #f3f4f6' }}>
-        <button onClick={() => setCollapsed(!collapsed)} className="w-full flex items-center justify-center py-2 rounded-lg transition-all" style={{ background: '#f8fafc', color: '#94a3b8', fontSize: 12 }}>
-          {collapsed ? '→' : '← Collapse'}
-        </button>
-      </div>
     </>
   );
 
@@ -222,7 +196,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex h-screen overflow-hidden" style={{ background: '#f8fafc' }}>
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col bg-white transition-all duration-200 overflow-hidden shrink-0"
-        style={{ width: collapsed ? 80 : 210, borderRight: '1px solid #f1f5f9', zIndex: 10 }}>
+        style={{ width: 210, borderRight: '1px solid #f1f5f9', zIndex: 10 }}>
         {sidebarContent}
       </aside>
 
@@ -249,12 +223,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="hidden md:block" />
 
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" />
-              <span className="text-[11px] font-medium" style={{ color: '#059669' }}>LIVE</span>
-              <span className="text-[11px]" style={{ color: '#9ca3af' }}>{timeStr} WIB</span>
-            </div>
-
             {/* User Menu */}
             <div className="relative">
               <button
@@ -262,15 +230,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all"
                 style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}
               >
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: isAdmin ? '#1e3a5f' : '#059669' }}>
-                  <User size={14} weight="bold" style={{ color: 'white' }} />
-                </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-[11px] font-semibold leading-tight" style={{ color: '#111827' }}>{user?.name}</p>
-                  <p className="text-[9px] leading-tight" style={{ color: isAdmin ? '#1e3a5f' : '#059669' }}>
-                    {isAdmin ? 'Admin' : 'Viewer'}
-                  </p>
-                </div>
+                {mounted ? (
+                  <React.Fragment>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: isAdmin ? '#1e3a5f' : '#059669' }}>
+                      <User size={14} weight="bold" style={{ color: 'white' }} />
+                    </div>
+                    <div className="hidden sm:block text-left">
+                      <p className="text-[11px] font-semibold leading-tight" style={{ color: '#111827' }}>{user?.name ?? ''}</p>
+                      <p className="text-[9px] leading-tight" style={{ color: isAdmin ? '#1e3a5f' : '#059669' }}>
+                        {isAdmin ? 'Admin' : 'Viewer'}
+                      </p>
+                    </div>
+                  </React.Fragment>
+                ) : (
+                  <div className="w-7 h-7 rounded-lg shrink-0" style={{ background: '#e5e7eb' }} />
+                )}
               </button>
 
               {userMenuOpen && (
