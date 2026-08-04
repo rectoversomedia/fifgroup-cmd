@@ -1,16 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth-provider';
+import { useRouter } from 'next/navigation';
 
 const FIFGROUP_LOGO = '/images/fifgroup-logo.png';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      router.replace('/');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +27,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      window.location.href = '/';
+      router.replace('/');
     } catch (err) {
       setError(
         err instanceof Error
