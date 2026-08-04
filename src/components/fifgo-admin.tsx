@@ -36,7 +36,7 @@ export const DEFAULT_FIFGO: FifgoData = {
     ratingDistribution: [
       { stars: 5, pct: 68 }, { stars: 4, pct: 18 }, { stars: 3, pct: 8 }, { stars: 2, pct: 4 }, { stars: 1, pct: 2 },
     ],
-    totalReviews: '12,847',
+    totalReviews: '19,100',
     lobs: [
       { name: 'FIFASTRA', pct: 72, users: '168K', status: 'On Track', color: '#4f8ef7' },
       { name: 'SPEKTRA', pct: 28, users: '65K', status: 'Below Target', color: '#f97316' },
@@ -51,7 +51,7 @@ export const DEFAULT_FIFGO: FifgoData = {
     ratingDistribution: [
       { stars: 5, pct: 74 }, { stars: 4, pct: 16 }, { stars: 3, pct: 6 }, { stars: 2, pct: 3 }, { stars: 1, pct: 1 },
     ],
-    totalReviews: '1,203',
+    totalReviews: '251',
     lobs: [
       { name: 'FIFASTRA', pct: 72, users: '168K', status: 'On Track', color: '#4f8ef7' },
       { name: 'SPEKTRA', pct: 28, users: '65K', status: 'Below Target', color: '#f97316' },
@@ -66,7 +66,7 @@ export const DEFAULT_FIFGO: FifgoData = {
     { label: 'Screenshots', score: 90, weight: 20, detail: '5 screenshots, portrait + landscape' },
     { label: 'Icon', score: 95, weight: 10, detail: 'Professional, clear at all sizes' },
     { label: 'Videos', score: 65, weight: 10, detail: 'No promo video' },
-    { label: 'Ratings & Reviews', score: 78, weight: 15, detail: '4.2★ from 12,847 reviews' },
+    { label: 'Ratings & Reviews', score: 78, weight: 15, detail: '3.2★ from 19,100 reviews (Play) · 3.1★ from 251 reviews (iOS)' },
   ],
   keywords: [
     { keyword: 'pinjol mudah', position: 1, volume: '12K', change: 0 },
