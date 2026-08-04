@@ -13,6 +13,7 @@ export type FifgoStoreData = {
   ratingDistribution: { stars: number; pct: number }[];
   totalReviews: string;
   ascoreBreakdown: { label: string; score: number; weight: number; detail: string }[];
+  metricCards: { id: string; key: 'rating' | 'downloads' | 'totalReviews' | 'aso'; label: string; color: string }[];
   lobs: { name: string; pct: number; users: string; status: string; color: string }[];
 };
 
@@ -45,6 +46,12 @@ export const DEFAULT_FIFGO: FifgoData = {
       { label: 'Videos', score: 65, weight: 10, detail: 'No promo video' },
       { label: 'Ratings & Reviews', score: 78, weight: 15, detail: '3.2★ from 19,100 reviews' },
     ],
+    metricCards: [
+      { id: 'rating', key: 'rating', label: 'Rating', color: '#f59e0b' },
+      { id: 'downloads', key: 'downloads', label: 'Downloads', color: '#06b6d4' },
+      { id: 'totalReviews', key: 'totalReviews', label: 'Total Reviews', color: '#6366f1' },
+      { id: 'aso', key: 'aso', label: 'ASO Score', color: '#10b981' },
+    ],
     lobs: [
       { name: 'FIFASTRA', pct: 72, users: '168K', status: 'On Track', color: '#4f8ef7' },
       { name: 'SPEKTRA', pct: 28, users: '65K', status: 'Below Target', color: '#f97316' },
@@ -67,6 +74,12 @@ export const DEFAULT_FIFGO: FifgoData = {
       { label: 'Icon', score: 95, weight: 10, detail: 'Professional, clear at all sizes' },
       { label: 'Videos', score: 65, weight: 10, detail: 'No promo video' },
       { label: 'Ratings & Reviews', score: 78, weight: 15, detail: '3.1★ from 251 reviews' },
+    ],
+    metricCards: [
+      { id: 'rating', key: 'rating', label: 'Rating', color: '#f59e0b' },
+      { id: 'downloads', key: 'downloads', label: 'Downloads', color: '#06b6d4' },
+      { id: 'totalReviews', key: 'totalReviews', label: 'Total Reviews', color: '#6366f1' },
+      { id: 'aso', key: 'aso', label: 'ASO Score', color: '#10b981' },
     ],
     lobs: [
       { name: 'FIFASTRA', pct: 72, users: '168K', status: 'On Track', color: '#4f8ef7' },
@@ -139,6 +152,9 @@ export function loadFifgoData(): FifgoData {
       merged.playstore = { ...merged.playstore, ascoreBreakdown: parsed.ascoreBreakdown };
       merged.appstore = { ...merged.appstore, ascoreBreakdown: parsed.ascoreBreakdown };
     }
+    // Migration: ensure metricCards exist per store
+    if (!merged.playstore.metricCards) merged.playstore.metricCards = DEFAULT_FIFGO.playstore.metricCards;
+    if (!merged.appstore.metricCards) merged.appstore.metricCards = DEFAULT_FIFGO.appstore.metricCards;
     return merged;
   } catch (_) {
     return DEFAULT_FIFGO;

@@ -7,32 +7,14 @@ import {
   GooglePlayLogo, AppStoreLogo,
   PencilSimple, X, Trash, Plus,
 } from '@phosphor-icons/react';
-import { loadFifgoData, saveFifgoData, FifgoData, DEFAULT_FIFGO } from '@/components/fifgo-admin';
+import { saveFifgoData, FifgoData, DEFAULT_FIFGO } from '@/components/fifgo-admin';
 import { useAuth } from '@/components/auth-provider';
 
 const FIFGO_LOGO = '/images/fifgo-logo.png';
 
 type MetricKey = 'rating' | 'downloads' | 'totalReviews' | 'aso';
 
-type MetricCard = {
-  id: string;
-  key: MetricKey;
-  icon: React.ElementType;
-  color: string;
-  label: string;
-};
-
-// Icon map — used to serialize/deserialize icon reference from localStorage
 const ICON_MAP: Record<string, React.ElementType> = { Star, Download, ShieldCheck };
-
-const DEFAULT_CARDS: MetricCard[] = [
-  { id: 'rating', key: 'rating', icon: Star, color: '#f59e0b', label: 'Rating' },
-  { id: 'downloads', key: 'downloads', icon: Download, color: '#06b6d4', label: 'Downloads' },
-  { id: 'totalReviews', key: 'totalReviews', icon: Star, color: '#6366f1', label: 'Total Reviews' },
-  { id: 'aso', key: 'aso', icon: ShieldCheck, color: '#10b981', label: 'ASO Score' },
-];
-
-const CARDS_KEY = 'fifgo_metric_cards';
 
 type EditMode =
   | { type: 'kpi'; key: MetricKey }
@@ -42,20 +24,6 @@ type EditMode =
   | null;
 
 function num(v: string) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
-
-function safeCards(def: MetricCard[]): MetricCard[] {
-  if (typeof window === 'undefined') return def;
-  try {
-    const s = localStorage.getItem(CARDS_KEY);
-    if (!s) return def;
-    const parsed = JSON.parse(s);
-    if (!Array.isArray(parsed) || parsed.length === 0) return def;
-    return parsed.map(c => ({
-      ...c,
-      icon: ICON_MAP[c.iconName] ?? ShieldCheck,
-    }));
-  } catch (_) { return def; }
-}
 
 function safeData(def: FifgoData): FifgoData {
   if (typeof window === 'undefined') return def;
@@ -73,25 +41,23 @@ function safeData(def: FifgoData): FifgoData {
       playstore: { ...def.playstore, ...(parsed.playstore || {}) },
       appstore: { ...def.appstore, ...(parsed.appstore || {}) },
     };
-    // Migration: if old data had shared ascoreBreakdown, split to both stores
+    // Migration: split shared ascoreBreakdown to both stores
     if (parsed.ascoreBreakdown && !parsed.playstore?.ascoreBreakdown) {
       merged.playstore = { ...merged.playstore, ascoreBreakdown: parsed.ascoreBreakdown };
       merged.appstore = { ...merged.appstore, ascoreBreakdown: parsed.ascoreBreakdown };
     }
+    // Migration: migrate old shared metricCards to per-store
+    if (parsed.metricCards && !parsed.playstore?.metricCards) {
+      merged.playstore = { ...merged.playstore, metricCards: parsed.metricCards };
+      merged.appstore = { ...merged.appstore, metricCards: parsed.metricCards };
+    }
+    // Ensure metricCards exist
+    if (!merged.playstore.metricCards) merged.playstore.metricCards = DEFAULT_FIFGO.playstore.metricCards;
+    if (!merged.appstore.metricCards) merged.appstore.metricCards = DEFAULT_FIFGO.appstore.metricCards;
     return merged;
   } catch (_) {
     return def;
   }
-}
-
-function saveCards(cards: MetricCard[]) {
-  try {
-    const serializable = cards.map(c => ({
-      ...c,
-      iconName: c.key === 'rating' || c.key === 'totalReviews' ? 'Star' : c.key === 'downloads' ? 'Download' : 'ShieldCheck',
-    }));
-    localStorage.setItem(CARDS_KEY, JSON.stringify(serializable));
-  } catch (_) {}
 }
 
 class FifgoErrorBoundary extends React.Component<
@@ -135,9 +101,7 @@ export default function FIFGOPage() {
   const { isAdmin } = useAuth();
   const [store, setStore] = React.useState<'playstore' | 'appstore'>('playstore');
   const [timeStr, setTimeStr] = React.useState('--:--');
-  // Start with default data — safe from day one, no localStorage crash risk
   const [data, setData] = React.useState<FifgoData>(() => DEFAULT_FIFGO);
-  const [cards, setCards] = React.useState<MetricCard[]>(() => DEFAULT_CARDS);
   const [hydrated, setHydrated] = React.useState(false);
   const [editMode, setEditMode] = React.useState<EditMode>(null);
   const [kpiVal, setKpiVal] = React.useState('');
@@ -150,7 +114,6 @@ export default function FIFGOPage() {
     setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }));
     const t = setInterval(() => setTimeStr(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })), 30_000);
     setData(safeData(DEFAULT_FIFGO));
-    setCards(safeCards(DEFAULT_CARDS));
     setHydrated(true);
     return () => clearInterval(t);
   }, []);
@@ -163,6 +126,7 @@ export default function FIFGOPage() {
   const isHealthy = data.appHealthMetrics.every(m => m.good);
   const s = data[store];
   const asasoScore = s.ascoreBreakdown.reduce((acc, item) => acc + item.score * item.weight / 100, 0);
+  const cards = s.metricCards;
 
   const getCardValue = (key: MetricKey) => {
     if (key === 'rating') return `${s.rating}★`;
@@ -277,13 +241,14 @@ export default function FIFGOPage() {
   const isAddingRec = isEditingRec && editMode.idx === -1;
 
   const deleteCard = React.useCallback((id: string) => {
-    if (cards.length <= 1) { alert('Minimal harus ada 1 kartu.'); return; }
+    if (s.metricCards.length <= 1) { alert('Minimal harus ada 1 kartu.'); return; }
     try {
-      const next = cards.filter(c => c.id !== id);
-      setCards(next);
-      saveCards(next);
+      handleDataChange({
+        ...data,
+        [store]: { ...data[store], metricCards: data[store].metricCards.filter(c => c.id !== id) },
+      });
     } catch (_) {}
-  }, [cards]);
+  }, [s, data, store, handleDataChange]);
 
   const openAddCard = () => {
     setNewCardLabel('');
@@ -294,18 +259,24 @@ export default function FIFGOPage() {
   const applyAddCard = React.useCallback(() => {
     if (!newCardLabel.trim()) return;
     try {
-      const next = [...cards, {
-        id: `card_${Date.now()}`,
-        key: newCardKey,
-        icon: newCardKey === 'rating' ? Star : newCardKey === 'downloads' ? Download : newCardKey === 'totalReviews' ? Star : ShieldCheck,
-        color: newCardKey === 'rating' ? '#f59e0b' : newCardKey === 'downloads' ? '#06b6d4' : newCardKey === 'totalReviews' ? '#6366f1' : '#10b981',
-        label: newCardLabel.trim(),
-      }];
-      setCards(next);
-      saveCards(next);
+      handleDataChange({
+        ...data,
+        [store]: {
+          ...data[store],
+          metricCards: [
+            ...data[store].metricCards,
+            {
+              id: `card_${Date.now()}`,
+              key: newCardKey,
+              color: newCardKey === 'rating' ? '#f59e0b' : newCardKey === 'downloads' ? '#06b6d4' : newCardKey === 'totalReviews' ? '#6366f1' : '#10b981',
+              label: newCardLabel.trim(),
+            },
+          ],
+        },
+      });
     } catch (_) {}
     setEditMode(null);
-  }, [cards, newCardLabel, newCardKey]);
+  }, [data, store, newCardLabel, newCardKey, handleDataChange]);
 
   return (
     <FifgoErrorBoundary>
@@ -373,7 +344,9 @@ export default function FIFGOPage() {
             {cards.map(card => (
               <div key={card.id} className="bg-white rounded-2xl p-5 border border-gray-200 flex items-start gap-4 relative group/card">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: `${card.color}15` }}>
-                  <card.icon size={24} style={{ color: card.color }} weight="fill" />
+                  {(card.key === 'rating' || card.key === 'totalReviews') ? <Star size={24} style={{ color: card.color }} weight="fill" /> :
+                   card.key === 'downloads' ? <Download size={24} style={{ color: card.color }} weight="fill" /> :
+                   <ShieldCheck size={24} style={{ color: card.color }} weight="fill" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium mb-1" style={{ color: '#9ca3af' }}>{card.label}</p>
