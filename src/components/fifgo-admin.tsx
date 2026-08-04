@@ -12,13 +12,13 @@ export type FifgoStoreData = {
   activeUsersChange: string;
   ratingDistribution: { stars: number; pct: number }[];
   totalReviews: string;
+  ascoreBreakdown: { label: string; score: number; weight: number; detail: string }[];
   lobs: { name: string; pct: number; users: string; status: string; color: string }[];
 };
 
 export type FifgoData = {
   playstore: FifgoStoreData;
   appstore: FifgoStoreData;
-  ascoreBreakdown: { label: string; score: number; weight: number; detail: string }[];
   keywords: { keyword: string; position: number; volume: string; change: number }[];
   reviews: { author: string; rating: number; date: string; text: string }[];
   appHealthMetrics: { label: string; value: string; target: string; good: boolean }[];
@@ -37,6 +37,14 @@ export const DEFAULT_FIFGO: FifgoData = {
       { stars: 5, pct: 68 }, { stars: 4, pct: 18 }, { stars: 3, pct: 8 }, { stars: 2, pct: 4 }, { stars: 1, pct: 2 },
     ],
     totalReviews: '19,100',
+    ascoreBreakdown: [
+      { label: 'App Title', score: 85, weight: 20, detail: '50 chars, 3 keywords included' },
+      { label: 'Description', score: 72, weight: 25, detail: '3,200 chars, good structure' },
+      { label: 'Screenshots', score: 90, weight: 20, detail: '5 screenshots, portrait + landscape' },
+      { label: 'Icon', score: 95, weight: 10, detail: 'Professional, clear at all sizes' },
+      { label: 'Videos', score: 65, weight: 10, detail: 'No promo video' },
+      { label: 'Ratings & Reviews', score: 78, weight: 15, detail: '3.2★ from 19,100 reviews' },
+    ],
     lobs: [
       { name: 'FIFASTRA', pct: 72, users: '168K', status: 'On Track', color: '#4f8ef7' },
       { name: 'SPEKTRA', pct: 28, users: '65K', status: 'Below Target', color: '#f97316' },
@@ -52,6 +60,14 @@ export const DEFAULT_FIFGO: FifgoData = {
       { stars: 5, pct: 74 }, { stars: 4, pct: 16 }, { stars: 3, pct: 6 }, { stars: 2, pct: 3 }, { stars: 1, pct: 1 },
     ],
     totalReviews: '251',
+    ascoreBreakdown: [
+      { label: 'App Title', score: 85, weight: 20, detail: '50 chars, 3 keywords included' },
+      { label: 'Description', score: 72, weight: 25, detail: '3,200 chars, good structure' },
+      { label: 'Screenshots', score: 90, weight: 20, detail: '5 screenshots, portrait + landscape' },
+      { label: 'Icon', score: 95, weight: 10, detail: 'Professional, clear at all sizes' },
+      { label: 'Videos', score: 65, weight: 10, detail: 'No promo video' },
+      { label: 'Ratings & Reviews', score: 78, weight: 15, detail: '3.1★ from 251 reviews' },
+    ],
     lobs: [
       { name: 'FIFASTRA', pct: 72, users: '168K', status: 'On Track', color: '#4f8ef7' },
       { name: 'SPEKTRA', pct: 28, users: '65K', status: 'Below Target', color: '#f97316' },
@@ -60,14 +76,6 @@ export const DEFAULT_FIFGO: FifgoData = {
       { name: 'AMITRA', pct: 52, users: '121K', status: 'Growing', color: '#10b981' },
     ],
   },
-  ascoreBreakdown: [
-    { label: 'App Title', score: 85, weight: 20, detail: '50 chars, 3 keywords included' },
-    { label: 'Description', score: 72, weight: 25, detail: '3,200 chars, good structure' },
-    { label: 'Screenshots', score: 90, weight: 20, detail: '5 screenshots, portrait + landscape' },
-    { label: 'Icon', score: 95, weight: 10, detail: 'Professional, clear at all sizes' },
-    { label: 'Videos', score: 65, weight: 10, detail: 'No promo video' },
-    { label: 'Ratings & Reviews', score: 78, weight: 15, detail: '3.2★ from 19,100 reviews (Play) · 3.1★ from 251 reviews (iOS)' },
-  ],
   keywords: [
     { keyword: 'pinjol mudah', position: 1, volume: '12K', change: 0 },
     { keyword: 'kredit online', position: 3, volume: '45K', change: 2 },
@@ -117,14 +125,22 @@ export function loadFifgoData(): FifgoData {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return DEFAULT_FIFGO;
     const parsed = JSON.parse(stored);
-    // Validate basic structure — reset if corrupt
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      localStorage.removeItem(STORAGE_KEY);
       return DEFAULT_FIFGO;
     }
-    return { ...DEFAULT_FIFGO, ...parsed };
+    const merged: FifgoData = {
+      ...DEFAULT_FIFGO,
+      ...parsed,
+      playstore: { ...DEFAULT_FIFGO.playstore, ...(parsed.playstore || {}) },
+      appstore: { ...DEFAULT_FIFGO.appstore, ...(parsed.appstore || {}) },
+    };
+    // Migration: split shared ascoreBreakdown to both stores
+    if (parsed.ascoreBreakdown && !parsed.playstore?.ascoreBreakdown) {
+      merged.playstore = { ...merged.playstore, ascoreBreakdown: parsed.ascoreBreakdown };
+      merged.appstore = { ...merged.appstore, ascoreBreakdown: parsed.ascoreBreakdown };
+    }
+    return merged;
   } catch (_) {
-    localStorage.removeItem(STORAGE_KEY);
     return DEFAULT_FIFGO;
   }
 }
@@ -311,28 +327,28 @@ export function FifgoAdminPanel({ data, onChange, onClose }: Props) {
             set={setStoreData}
           />
 
-          {/* ASO */}
+          {/* ASO — per store */}
           <section>
             <SectionTitle icon="🔍" label="ASO Score Breakdown" />
             <div className="space-y-3">
-              {data.ascoreBreakdown.map((item, i) => (
+              {data[editStore].ascoreBreakdown.map((item: { label: string; score: number; weight: number; detail: string }, i: number) => (
                 <div key={i} className="rounded-2xl p-4" style={{ background: '#f9fafb', border: '1px solid #e5e7eb' }}>
                   <div className="flex items-center gap-2 mb-2">
                     <input value={item.label}
-                      onChange={e => onChange({ ...data, ascoreBreakdown: mut(data.ascoreBreakdown, i, 'label', e.target.value) })}
+                      onChange={e => onChange({ ...data, [editStore]: { ...data[editStore], ascoreBreakdown: mut(data[editStore].ascoreBreakdown, i, 'label', e.target.value) } })}
                       className="flex-1 px-3 py-1.5 rounded-lg border text-xs font-bold" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }} />
                     <span className="text-[10px] px-2 py-1 rounded-lg shrink-0 font-semibold" style={{ background: '#e5e7eb', color: '#6b7280' }}>{item.weight}%</span>
                   </div>
                   <div className="flex items-center gap-2 mb-2">
                     <input type="range" min="0" max="100" value={item.score}
-                      onChange={e => onChange({ ...data, ascoreBreakdown: mut(data.ascoreBreakdown, i, 'score', int(e.target.value)) })}
+                      onChange={e => onChange({ ...data, [editStore]: { ...data[editStore], ascoreBreakdown: mut(data[editStore].ascoreBreakdown, i, 'score', int(e.target.value)) } })}
                       className="flex-1 h-1.5 rounded-full" style={{ accentColor: item.score >= 80 ? '#10b981' : item.score >= 60 ? '#f59e0b' : '#dc2626' }} />
                     <input type="number" min="0" max="100" value={item.score}
-                      onChange={e => onChange({ ...data, ascoreBreakdown: mut(data.ascoreBreakdown, i, 'score', int(e.target.value)) })}
+                      onChange={e => onChange({ ...data, [editStore]: { ...data[editStore], ascoreBreakdown: mut(data[editStore].ascoreBreakdown, i, 'score', int(e.target.value)) } })}
                       className="w-14 px-2 py-1 rounded-lg border text-xs text-center font-bold" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }} />
                   </div>
                   <input value={item.detail}
-                    onChange={e => onChange({ ...data, ascoreBreakdown: mut(data.ascoreBreakdown, i, 'detail', e.target.value) })}
+                    onChange={e => onChange({ ...data, [editStore]: { ...data[editStore], ascoreBreakdown: mut(data[editStore].ascoreBreakdown, i, 'detail', e.target.value) } })}
                     className="w-full px-3 py-1.5 rounded-lg border text-xs" style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#6b7280' }} />
                 </div>
               ))}

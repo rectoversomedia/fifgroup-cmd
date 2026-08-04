@@ -64,12 +64,22 @@ function safeData(def: FifgoData): FifgoData {
     if (!stored) return def;
     const parsed = JSON.parse(stored);
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      localStorage.removeItem('fifgo_admin_data_v3');
       return def;
     }
-    return { ...def, ...parsed };
+    // Deep merge: ensure both stores always exist
+    const merged: FifgoData = {
+      ...def,
+      ...parsed,
+      playstore: { ...def.playstore, ...(parsed.playstore || {}) },
+      appstore: { ...def.appstore, ...(parsed.appstore || {}) },
+    };
+    // Migration: if old data had shared ascoreBreakdown, split to both stores
+    if (parsed.ascoreBreakdown && !parsed.playstore?.ascoreBreakdown) {
+      merged.playstore = { ...merged.playstore, ascoreBreakdown: parsed.ascoreBreakdown };
+      merged.appstore = { ...merged.appstore, ascoreBreakdown: parsed.ascoreBreakdown };
+    }
+    return merged;
   } catch (_) {
-    try { localStorage.removeItem('fifgo_admin_data_v3'); } catch (_) {}
     return def;
   }
 }
@@ -152,7 +162,7 @@ export default function FIFGOPage() {
 
   const isHealthy = data.appHealthMetrics.every(m => m.good);
   const s = data[store];
-  const asasoScore = data.ascoreBreakdown.reduce((acc, item) => acc + item.score * item.weight / 100, 0);
+  const asasoScore = s.ascoreBreakdown.reduce((acc, item) => acc + item.score * item.weight / 100, 0);
 
   const getCardValue = (key: MetricKey) => {
     if (key === 'rating') return `${s.rating}★`;
@@ -206,11 +216,17 @@ export default function FIFGOPage() {
     if (!editMode || editMode.type !== 'aso') return;
     try {
       const target = num(editMode.value);
-      const next = { ...data, ascoreBreakdown: data.ascoreBreakdown.map(item => ({ ...item, score: Math.max(0, Math.min(100, target)) })) };
+      const next = {
+        ...data,
+        [store]: {
+          ...data[store],
+          ascoreBreakdown: data[store].ascoreBreakdown.map(item => ({ ...item, score: Math.max(0, Math.min(100, target)) })),
+        },
+      };
       handleDataChange(next);
     } catch (_) {}
     setEditMode(null);
-  }, [editMode, data, handleDataChange]);
+  }, [editMode, data, store, handleDataChange]);
 
   const onAsoValChange = React.useCallback((val: string) => {
     setEditMode(prev => prev?.type === 'aso' ? { ...prev, value: val } : prev);
@@ -218,12 +234,18 @@ export default function FIFGOPage() {
     asoTimer.current = setTimeout(() => {
       try {
         const target = num(val);
-        const next = { ...data, ascoreBreakdown: data.ascoreBreakdown.map(item => ({ ...item, score: Math.max(0, Math.min(100, target)) })) };
+        const next = {
+          ...data,
+          [store]: {
+            ...data[store],
+            ascoreBreakdown: data[store].ascoreBreakdown.map(item => ({ ...item, score: Math.max(0, Math.min(100, target)) })),
+          },
+        };
         setData(next);
         saveFifgoData(next);
       } catch (_) {}
     }, 1500);
-  }, [data]);
+  }, [data, store]);
 
   const openRecEdit = (idx: number) => {
     const r = data.recommendations[idx];
