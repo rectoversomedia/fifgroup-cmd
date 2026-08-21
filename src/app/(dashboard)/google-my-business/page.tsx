@@ -3,103 +3,212 @@
 import * as React from 'react';
 import {
   Star, Globe, MapPin, Phone,
-  ChatCircle, MagnifyingGlass,
+  ChatCircle, MagnifyingGlass, ArrowClockwise,
+  ArrowRight, WarningCircle, CheckCircle, Clock, Cross,
 } from '@phosphor-icons/react';
 import { useAuth } from '@/components/auth-provider';
 
 const GMB_LOGO = 'https://www.google.com/favicon.ico';
+const STORAGE_KEY = 'gmb_places_api_key';
 
-type Review = {
-  id: string;
-  branch: string;
+type GMBReview = {
   author: string;
   rating: number;
-  date: string;
   text: string;
-  responded: boolean;
+  date: string;
+  relativeDate: string;
 };
 
-type Branch = {
-  id: string;
+type GMBBranch = {
+  placeId: string;
   name: string;
   address: string;
   phone: string;
   rating: number;
   reviewCount: number;
-  lastReview: string;
-  status: 'open' | 'closed';
+  reviews: GMBReview[];
+  openingHours: string[];
+  website: string;
+  status: 'open' | 'closed' | 'unknown';
 };
 
-const MOCK_BRANCHES: Branch[] = [
-  { id: '1', name: 'FIFGROUP Jakarta Pusat', address: 'Jl. Sudirman No. 28, Jakarta Pusat', phone: '(021) 5789-1234', rating: 4.5, reviewCount: 342, lastReview: '2 jam lalu', status: 'open' },
-  { id: '2', name: 'FIFGROUP Bandung', address: 'Jl. Asia Afrika No. 45, Bandung', phone: '(022) 8456-7890', rating: 4.3, reviewCount: 218, lastReview: '5 jam lalu', status: 'open' },
-  { id: '3', name: 'FIFGROUP Surabaya', address: 'Jl. Basuki Rahmat No. 12, Surabaya', phone: '(031) 5678-4321', rating: 4.6, reviewCount: 187, lastReview: '1 hari lalu', status: 'open' },
-  { id: '4', name: 'FIFGROUP Medan', address: 'Jl. Merdeka No. 33, Medan', phone: '(061) 7890-1234', rating: 4.1, reviewCount: 124, lastReview: '2 hari lalu', status: 'open' },
-  { id: '5', name: 'FIFGROUP Makassar', address: 'Jl. Pettarani No. 8, Makassar', phone: '(0411) 2345-6789', rating: 4.4, reviewCount: 156, lastReview: '3 hari lalu', status: 'closed' },
-  { id: '6', name: 'FIFGROUP Semarang', address: 'Jl. Pandanaran No. 22, Semarang', phone: '(024) 8765-4321', rating: 4.2, reviewCount: 98, lastReview: '4 hari lalu', status: 'open' },
-];
+type GMBData = {
+  branches: GMBBranch[];
+  errors?: string[];
+  fetchedAt: string;
+};
 
-const MOCK_REVIEWS: Review[] = [
-  { id: 'r1', branch: 'FIFGROUP Jakarta Pusat', author: 'Andi Wijaya', rating: 5, date: '15 Aug 2026', text: 'Pelayanan sangat memuaskan! Staff ramah dan proses pengajuan cepat. Recommended untuk kredit mikro.', responded: true },
-  { id: 'r2', branch: 'FIFGROUP Bandung', author: 'Sari Dewi', rating: 4, date: '14 Aug 2026', text: 'Aplikasi online-nya mudah digunakan. Tapi agak lama respon kalau via chat.', responded: false },
-  { id: 'r3', branch: 'FIFGROUP Surabaya', author: 'Budi Santoso', rating: 5, date: '13 Aug 2026', text: 'Sudah 3x financing di FIFGROUP, selalu lancar. Bunga kompetitif dibanding kompetitor.', responded: true },
-  { id: 'r4', branch: 'FIFGROUP Medan', author: 'Rina Amelia', rating: 3, date: '12 Aug 2026', text: 'Proses cukup lama dari pengajuan sampai pencairan. Semoga bisa lebih cepat ya.', responded: false },
-  { id: 'r5', branch: 'FIFGROUP Makassar', author: 'Hendra Kusuma', rating: 4, date: '11 Aug 2026', text: 'Cabang baru tapi pelayanan sudah prima. Ruangan tunggu nyaman dan AC dingin.', responded: true },
-];
-
-const STORAGE_KEY = 'gmb_settings_v1';
-
-function loadSettings() {
-  if (typeof window === 'undefined') return { apiKey: '', actorId: '' };
+function loadApiKey(): string {
+  if (typeof window === 'undefined') return '';
   try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    return s ? JSON.parse(s) : { apiKey: '', actorId: '' };
-  } catch (_) { return { apiKey: '', actorId: '' }; }
+    return localStorage.getItem(STORAGE_KEY) ?? '';
+  } catch (_) { return ''; }
 }
 
-function saveSettings(s: { apiKey: string; actorId: string }) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch (_) {}
+function saveApiKey(key: string) {
+  try { localStorage.setItem(STORAGE_KEY, key); } catch (_) {}
 }
 
 export default function GoogleMyBusinessPage() {
   const { isAdmin } = useAuth();
-  const [settings, setSettings] = React.useState({ apiKey: '', actorId: '' });
+  const [apiKey, setApiKey] = React.useState('');
+  const [showKey, setShowKey] = React.useState(false);
   const [showSettings, setShowSettings] = React.useState(false);
   const [selectedBranch, setSelectedBranch] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState('');
   const [mounted, setMounted] = React.useState(false);
+  const [data, setData] = React.useState<GMBData | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [lastFetch, setLastFetch] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    setSettings(loadSettings());
+    const savedKey = loadApiKey();
+    setApiKey(savedKey);
     setMounted(true);
   }, []);
 
-  const isConnected = settings.apiKey.trim() !== '' && settings.actorId.trim() !== '';
+  const fetchData = React.useCallback(async (key: string) => {
+    if (!key.trim()) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/gmb?apiKey=${encodeURIComponent(key)}`);
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? 'Request failed');
+      }
+      const json: GMBData = await res.json();
+      setData(json);
+      setLastFetch(new Date().toLocaleTimeString('id-ID', {
+        hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta',
+      }));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Gagal fetch data');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const avgRating = MOCK_BRANCHES.reduce((a, b) => a + b.rating, 0) / MOCK_BRANCHES.length;
-  const totalReviews = MOCK_BRANCHES.reduce((a, b) => a + b.reviewCount, 0);
-  const unresponded = MOCK_REVIEWS.filter(r => !r.responded).length;
+  React.useEffect(() => {
+    if (mounted && apiKey) fetchData(apiKey);
+  }, [mounted, apiKey, fetchData]);
 
-  const filteredBranches = MOCK_BRANCHES.filter(b =>
+  const branches = data?.branches ?? [];
+  const errors = data?.errors ?? [];
+  const avgRating = branches.filter(b => b.rating > 0).length > 0
+    ? branches.filter(b => b.rating > 0).reduce((a, b) => a + b.rating, 0) / branches.filter(b => b.rating > 0).length
+    : 0;
+  const totalReviews = branches.reduce((a, b) => a + b.reviewCount, 0);
+  const unresponded = branches.reduce((a, b) => a + b.reviews.filter(r => r.text.length > 50).length, 0);
+
+  const filteredBranches = branches.filter(b =>
     b.name.toLowerCase().includes(search.toLowerCase()) ||
     b.address.toLowerCase().includes(search.toLowerCase())
   );
 
-  const selectedBranchData = MOCK_BRANCHES.find(b => b.id === selectedBranch);
+  const selectedBranchData = branches.find(b => b.placeId === selectedBranch);
   const branchReviews = selectedBranch
-    ? MOCK_REVIEWS.filter(r => r.branch === selectedBranchData?.name)
-    : MOCK_REVIEWS;
+    ? selectedBranchData?.reviews ?? []
+    : branches.flatMap(b => b.reviews.slice(0, 3)).slice(0, 20);
 
-  const connectedPanel = (
+  const isConfigured = mounted && apiKey.trim() !== '';
+  const isLoading = mounted && loading;
+
+  const handleSaveKey = () => {
+    saveApiKey(apiKey);
+    setShowSettings(false);
+    fetchData(apiKey);
+  };
+
+  const handleReset = () => {
+    saveApiKey('');
+    setApiKey('');
+    setData(null);
+    setError(null);
+    setShowSettings(false);
+  };
+
+  const setupScreen = (
+    <div className="space-y-5">
+      <div className="bg-white rounded-2xl p-8 border border-gray-200 text-center">
+        <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#fef3c7' }}>
+          <Globe size={40} style={{ color: '#f59e0b' }} />
+        </div>
+        <h2 className="text-lg font-bold mb-2" style={{ color: '#111827' }}>Google Places API</h2>
+        <p className="text-sm max-w-md mx-auto mb-6" style={{ color: '#6b7280' }}>
+          Masukkan Google Places API Key untuk menarik data rating, review, dan info cabang FIFGROUP langsung dari Google Maps.
+        </p>
+
+        <div className="max-w-md mx-auto mb-4 space-y-3 text-left">
+          <div>
+            <label className="text-[10px] font-semibold block mb-1" style={{ color: '#9ca3af' }}>Google Places API Key</label>
+            <div className="relative">
+              <input
+                type={showKey ? 'text' : 'password'}
+                value={apiKey}
+                onChange={e => setApiKey(e.target.value)}
+                placeholder="AIzaSy..."
+                className="w-full px-3 py-2.5 rounded-xl border text-xs font-mono pr-16"
+                style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey(!showKey)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] px-2 py-1 rounded-lg"
+                style={{ color: '#6b7280', background: '#e5e7eb' }}
+              >
+                {showKey ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={handleSaveKey}
+          disabled={!apiKey.trim()}
+          className="px-8 py-3 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-40"
+          style={{ background: '#4285f4' }}
+        >
+          Hubungkan
+        </button>
+
+        <div className="max-w-md mx-auto mt-6">
+          <p className="text-[10px] font-semibold mb-2" style={{ color: '#374151' }}>Cara dapat API Key:</p>
+          <div className="text-left space-y-1.5">
+            {[
+              ['1', 'Buka', 'https://console.cloud.google.com/apis/library/places-backend.googleapis.com'],
+              ['2', 'Buat project GCP atau pilih existing', ''],
+              ['3', 'Enable "Places API (New)"', ''],
+              ['4', 'Buka Credentials → Create Credentials → API Key', ''],
+              ['5', 'Copy API Key dan paste di atas', ''],
+            ].map(([n, ...rest]) => (
+              <p key={n} className="text-[10px] flex items-start gap-1.5" style={{ color: '#6b7280' }}>
+                <span className="shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold" style={{ background: '#e5e7eb', color: '#374151' }}>{n}</span>
+                <span>{rest[0]}</span>
+                {rest[1] && <a href={rest[1]} target="_blank" rel="noopener noreferrer" className="underline" style={{ color: '#4285f4' }}>{rest[1]}</a>}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-[10px] mt-4" style={{ color: '#9ca3af' }}>
+          API Key tersimpan di browser ini saja. Tidak dikirim ke server manapun.
+        </p>
+      </div>
+    </div>
+  );
+
+  const dashboardPanel = (
     <div className="space-y-5">
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Cabang', value: MOCK_BRANCHES.length, icon: Globe, color: '#4285f4' },
-          { label: 'Avg Rating', value: avgRating.toFixed(1) + '★', icon: Star, color: '#f59e0b' },
-          { label: 'Total Reviews', value: totalReviews.toLocaleString(), icon: ChatCircle, color: '#10b981' },
-          { label: 'Belum Dibalas', value: unresponded, icon: ChatCircle, color: '#ef4444' },
+          { label: 'Total Cabang', value: branches.length, icon: Globe, color: '#4285f4' },
+          { label: 'Avg Rating', value: avgRating > 0 ? avgRating.toFixed(1) + '★' : '—', icon: Star, color: '#f59e0b' },
+          { label: 'Total Reviews', value: totalReviews > 0 ? totalReviews.toLocaleString() : '—', icon: ChatCircle, color: '#10b981' },
+          { label: 'Avg Reviews/Cabang', value: branches.length > 0 ? Math.round(totalReviews / branches.filter(b => b.reviewCount > 0).length || 0) : '—', icon: ChatCircle, color: '#8b5cf6' },
         ].map(stat => (
           <div key={stat.label} className="bg-white rounded-2xl p-4 border border-gray-200 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: `${stat.color}15` }}>
@@ -113,9 +222,9 @@ export default function GoogleMyBusinessPage() {
         ))}
       </div>
 
-      {/* Search + Settings */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1">
+      {/* Toolbar */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-48">
           <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9ca3af' }} />
           <input
             value={search}
@@ -125,62 +234,81 @@ export default function GoogleMyBusinessPage() {
             style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#111827' }}
           />
         </div>
+        {lastFetch && (
+          <div className="flex items-center gap-1.5 text-[10px]" style={{ color: '#9ca3af' }}>
+            <Clock size={12} />
+            Updated {lastFetch} WIB
+          </div>
+        )}
+        <button
+          onClick={() => fetchData(apiKey)}
+          disabled={loading}
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all disabled:opacity-50"
+          style={{ border: '1px solid #e5e7eb', color: '#6b7280', background: '#fff' }}
+        >
+          <ArrowClockwise size={14} className={loading ? 'animate-spin' : ''} />
+          Refresh
+        </button>
         {isAdmin && (
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all"
             style={{ border: '1px solid #e5e7eb', color: '#6b7280', background: '#fff' }}
           >
-            ⚙️ API Settings
+            ⚙️ Settings
           </button>
         )}
       </div>
 
-      {/* API Settings Panel */}
+      {/* API Key Settings Panel */}
       {showSettings && (
         <div className="bg-white rounded-2xl p-5 border border-gray-200 space-y-3">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-bold" style={{ color: '#111827' }}>API Configuration</h3>
-            <span className="text-[10px] px-2 py-1 rounded-full font-semibold" style={{ background: '#fef3c7', color: '#d97706' }}>Apify / Google API</span>
+            <h3 className="text-sm font-bold" style={{ color: '#111827' }}>Google Places API Key</h3>
+            <button onClick={() => setShowSettings(false)} className="p-1 rounded-lg" style={{ color: '#9ca3af' }}>
+              <Cross size={16} />
+            </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-semibold block mb-1" style={{ color: '#9ca3af' }}>Apify API Key / Google API Key</label>
-              <input
-                value={settings.apiKey}
-                onChange={e => setSettings(s => ({ ...s, apiKey: e.target.value }))}
-                placeholder="Aqw3kL9m... atau AIza..."
-                className="w-full px-3 py-2.5 rounded-xl border text-xs font-mono"
-                style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827' }}
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-semibold block mb-1" style={{ color: '#9ca3af' }}>Location IDs (koma separated)</label>
-              <input
-                value={settings.actorId}
-                onChange={e => setSettings(s => ({ ...s, actorId: e.target.value }))}
-                placeholder="ChIJN1t4GKcBry... (opsional)"
-                className="w-full px-3 py-2.5 rounded-xl border text-xs font-mono"
-                style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827' }}
-              />
-            </div>
+          <div className="flex items-center gap-2">
+            <input
+              type={showKey ? 'text' : 'password'}
+              value={apiKey}
+              onChange={e => setApiKey(e.target.value)}
+              placeholder="AIzaSy..."
+              className="flex-1 px-3 py-2.5 rounded-xl border text-xs font-mono"
+              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827' }}
+            />
+            <button onClick={() => setShowKey(!showKey)} className="px-3 py-2.5 rounded-xl text-xs" style={{ background: '#f3f4f6', color: '#6b7280' }}>
+              {showKey ? 'Hide' : 'Show'}
+            </button>
           </div>
-          <div className="flex items-center gap-2 pt-1">
-            <button
-              onClick={() => { saveSettings(settings); setShowSettings(false); }}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-white"
-              style={{ background: '#4285f4' }}
-            >
+          <div className="flex items-center gap-2">
+            <button onClick={handleSaveKey} className="px-4 py-2 rounded-xl text-xs font-semibold text-white" style={{ background: '#4285f4' }}>
               Simpan
             </button>
-            <button
-              onClick={() => { saveSettings({ apiKey: '', actorId: '' }); }}
-              className="px-4 py-2 rounded-xl text-xs font-semibold"
-              style={{ color: '#ef4444', background: '#fef2f2' }}
-            >
+            <button onClick={handleReset} className="px-4 py-2 rounded-xl text-xs font-semibold" style={{ color: '#ef4444', background: '#fef2f2' }}>
               Reset
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {error && (
+        <div className="flex items-center gap-3 p-4 rounded-2xl" style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
+          <WarningCircle size={20} style={{ color: '#ef4444' }} />
+          <p className="text-xs" style={{ color: '#dc2626' }}>{error}</p>
+          <button onClick={() => setError(null)} className="ml-auto"><Cross size={14} style={{ color: '#9ca3af' }} /></button>
+        </div>
+      )}
+
+      {/* Data Notice */}
+      {data && errors.length > 0 && (
+        <div className="flex items-center gap-3 p-4 rounded-2xl" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
+          <WarningCircle size={20} style={{ color: '#f59e0b' }} />
+          <p className="text-xs" style={{ color: '#92400e' }}>
+            {errors.length} cabang tidak ditemukan di Google Maps. Data cabang lain tetap ditampilkan.
+          </p>
         </div>
       )}
 
@@ -190,30 +318,59 @@ export default function GoogleMyBusinessPage() {
         {/* Branch List */}
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <div className="px-4 py-3" style={{ borderBottom: '1px solid #f3f4f6' }}>
-            <p className="text-xs font-bold" style={{ color: '#374151' }}>📍 Daftar Cabang ({filteredBranches.length})</p>
+            <p className="text-xs font-bold" style={{ color: '#374151' }}>
+              📍 Daftar Cabang ({filteredBranches.length})
+            </p>
           </div>
-          <div className="divide-y" style={{ borderColor: '#f3f4f6' }}>
-            {filteredBranches.map(branch => (
+          <div className="divide-y max-h-[420px] overflow-y-auto" style={{ borderColor: '#f3f4f6' }}>
+            {isLoading ? (
+              <div className="py-8 text-center">
+                <ArrowClockwise size={20} className="animate-spin mx-auto mb-2" style={{ color: '#e5e7eb' }} />
+                <p className="text-xs" style={{ color: '#9ca3af' }}>Memuat...</p>
+              </div>
+            ) : filteredBranches.length === 0 ? (
+              <div className="py-8 text-center">
+                <p className="text-xs" style={{ color: '#9ca3af' }}>Tidak ada cabang ditemukan</p>
+              </div>
+            ) : filteredBranches.map(branch => (
               <button
-                key={branch.id}
-                onClick={() => setSelectedBranch(branch.id === selectedBranch ? null : branch.id)}
+                key={branch.placeId}
+                onClick={() => setSelectedBranch(branch.placeId === selectedBranch ? null : branch.placeId)}
                 className="w-full text-left px-4 py-3 transition-all hover:bg-gray-50"
-                style={{ background: selectedBranch === branch.id ? '#eff6ff' : 'transparent' }}
+                style={{ background: selectedBranch === branch.placeId ? '#eff6ff' : 'transparent' }}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <p className="text-xs font-semibold truncate" style={{ color: selectedBranch === branch.id ? '#1e3a5f' : '#111827' }}>{branch.name}</p>
-                      <span className="shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: branch.status === 'open' ? '#10b981' : '#9ca3af' }} />
+                      <p className="text-xs font-semibold truncate" style={{ color: selectedBranch === branch.placeId ? '#1e3a5f' : '#111827' }}>{branch.name}</p>
+                      {branch.status === 'open' && <span className="shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#10b981' }} />}
+                      {branch.status === 'closed' && <span className="shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#9ca3af' }} />}
                     </div>
-                    <p className="text-[10px] truncate" style={{ color: '#9ca3af' }}><MapPin size={10} className="inline mr-0.5" />{branch.address}</p>
-                    <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}><Phone size={10} className="inline mr-0.5" />{branch.phone}</p>
+                    <p className="text-[10px] truncate" style={{ color: '#9ca3af' }}>
+                      <MapPin size={10} className="inline mr-0.5" />{branch.address}
+                    </p>
+                    {branch.phone && (
+                      <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>
+                        <Phone size={10} className="inline mr-0.5" />{branch.phone}
+                      </p>
+                    )}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-bold" style={{ color: '#f59e0b' }}>★ {branch.rating}</p>
-                    <p className="text-[10px]" style={{ color: '#9ca3af' }}>{branch.reviewCount} review</p>
+                    {branch.rating > 0 ? (
+                      <>
+                        <p className="text-sm font-bold" style={{ color: '#f59e0b' }}>★ {branch.rating.toFixed(1)}</p>
+                        <p className="text-[10px]" style={{ color: '#9ca3af' }}>{branch.reviewCount} review</p>
+                      </>
+                    ) : (
+                      <span className="text-[10px]" style={{ color: '#d1d5db' }}>—</span>
+                    )}
                   </div>
                 </div>
+                {branch.reviews.length > 0 && (
+                  <p className="text-[9px] mt-1.5" style={{ color: '#6b7280' }}>
+                    💬 {branch.reviews.length} review terlihat
+                  </p>
+                )}
               </button>
             ))}
           </div>
@@ -228,126 +385,63 @@ export default function GoogleMyBusinessPage() {
                 {selectedBranch ? selectedBranchData?.name : 'Semua cabang'} · {branchReviews.length} review
               </p>
             </div>
-            {unresponded > 0 && (
-              <span className="text-[10px] px-2 py-1 rounded-full font-semibold" style={{ background: '#fef3c7', color: '#d97706' }}>
-                ⚠️ {unresponded} belum dibalas
+            {!selectedBranch && branches.length > 0 && (
+              <span className="text-[10px] px-2 py-1 rounded-full" style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                ↑ Pilih cabang di kiri untuk lihat detail
               </span>
             )}
           </div>
           <div className="divide-y max-h-[480px] overflow-y-auto" style={{ borderColor: '#f3f4f6' }}>
-            {branchReviews.length === 0 ? (
+            {isLoading ? (
+              <div className="py-12 text-center">
+                <ArrowClockwise size={24} className="animate-spin mx-auto mb-2" style={{ color: '#e5e7eb' }} />
+                <p className="text-xs" style={{ color: '#9ca3af' }}>Memuat reviews...</p>
+              </div>
+            ) : branchReviews.length === 0 ? (
               <div className="py-12 text-center">
                 <ChatCircle size={32} className="mx-auto mb-2" style={{ color: '#e5e7eb' }} />
-                <p className="text-xs" style={{ color: '#9ca3af' }}>Belum ada review</p>
+                <p className="text-xs" style={{ color: '#9ca3af' }}>
+                  {selectedBranch ? 'Belum ada review untuk cabang ini' : 'Tidak ada review ditemukan'}
+                </p>
               </div>
-            ) : branchReviews.map(review => (
-              <div key={review.id} className="px-4 py-3">
-                <div className="flex items-start justify-between gap-2 mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: '#1e3a5f' }}>
-                      <span className="text-[10px] font-bold text-white">{review.author[0]}</span>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold" style={{ color: '#111827' }}>{review.author}</p>
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex">
-                          {[1,2,3,4,5].map(s => (
-                            <Star key={s} size={10} weight={s <= review.rating ? 'fill' : 'regular'} style={{ color: '#f59e0b' }} />
-                          ))}
+            ) : branchReviews.map((review, idx) => {
+              const branchRef = branches.find(b => b.reviews.includes(review));
+              return (
+                <div key={idx} className="px-4 py-3">
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: '#1e3a5f' }}>
+                        <span className="text-[10px] font-bold text-white">{review.author[0]}</span>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold" style={{ color: '#111827' }}>{review.author}</p>
+                        <div className="flex items-center gap-1.5">
+                          <div className="flex">
+                            {[1,2,3,4,5].map(s => (
+                              <Star key={s} size={10} weight={s <= review.rating ? 'fill' : 'regular'} style={{ color: '#f59e0b' }} />
+                            ))}
+                          </div>
+                          <span className="text-[9px]" style={{ color: '#9ca3af' }}>{review.date}</span>
                         </div>
-                        <span className="text-[9px]" style={{ color: '#9ca3af' }}>{review.date}</span>
                       </div>
                     </div>
                   </div>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold shrink-0" style={{ background: review.responded ? '#d1fae5' : '#fef3c7', color: review.responded ? '#065f46' : '#d97706' }}>
-                    {review.responded ? '✓ Dibalas' : '⚠️ Pending'}
-                  </span>
+                  {review.text && (
+                    <p className="text-[11px] ml-10" style={{ color: '#374151' }}>{review.text}</p>
+                  )}
+                  {branchRef && (
+                    <div className="flex items-center gap-1 mt-1.5 ml-10">
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                        📍 {branchRef.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <p className="text-[11px] ml-10" style={{ color: '#374151' }}>{review.text}</p>
-                <div className="flex items-center gap-1 mt-1.5 ml-10">
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: '#f3f4f6', color: '#6b7280' }}>
-                    📍 {review.branch}
-                  </span>
-                </div>
-                {isAdmin && !review.responded && (
-                  <button className="mt-2 ml-10 px-3 py-1.5 rounded-lg text-[10px] font-semibold text-white" style={{ background: '#4285f4' }}>
-                    Balas Review
-                  </button>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-      </div>
-
-    </div>
-  );
-
-  const notConnectedPanel = (
-    <div className="space-y-5">
-      <div className="bg-white rounded-2xl p-8 border border-gray-200 text-center">
-        <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: '#fef3c7' }}>
-          <Globe size={40} style={{ color: '#f59e0b' }} />
-        </div>
-        <h2 className="text-lg font-bold mb-2" style={{ color: '#111827' }}>Google My Business</h2>
-        <p className="text-sm max-w-md mx-auto mb-6" style={{ color: '#6b7280' }}>
-          Hubungkan Google Business Profile atau Apify untuk mengelola rating, review, dan info cabang FIFGROUP dari satu dashboard.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8">
-          <div className="text-left p-4 rounded-2xl" style={{ background: '#f9fafb', border: '1px solid #e5e7eb' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{ background: '#4285f4' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            </div>
-            <h3 className="text-sm font-bold mb-1" style={{ color: '#111827' }}>Google Business Profile API</h3>
-            <p className="text-[11px] mb-2" style={{ color: '#6b7280' }}>Resmi dari Google. Butuh Business Profile Manager account.</p>
-            <span className="text-[9px] px-2 py-1 rounded-full font-semibold" style={{ background: '#fee2e2', color: '#dc2626' }}>Butuh akun tambahan</span>
-          </div>
-          <div className="text-left p-4 rounded-2xl" style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{ background: '#10b981' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-            </div>
-            <h3 className="text-sm font-bold mb-1" style={{ color: '#111827' }}>Apify (Recommended)</h3>
-            <p className="text-[11px] mb-2" style={{ color: '#6b7280' }}>Gak perlu akun Business Profile. Langsung jalan.</p>
-            <span className="text-[9px] px-2 py-1 rounded-full font-semibold" style={{ background: '#d1fae5', color: '#065f46' }}>✅ Recommended</span>
-          </div>
-        </div>
-
-        <div className="max-w-md mx-auto mb-6 space-y-3">
-          <div className="text-left">
-            <label className="text-[10px] font-semibold block mb-1" style={{ color: '#9ca3af' }}>Apify API Key / Google API Key</label>
-            <input
-              value={settings.apiKey}
-              onChange={e => setSettings(s => ({ ...s, apiKey: e.target.value }))}
-              placeholder="Aqw3kL9m... atau AIza..."
-              className="w-full px-3 py-2.5 rounded-xl border text-xs font-mono"
-              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827' }}
-            />
-          </div>
-          <div className="text-left">
-            <label className="text-[10px] font-semibold block mb-1" style={{ color: '#9ca3af' }}>Location IDs (koma separated)</label>
-            <input
-              value={settings.actorId}
-              onChange={e => setSettings(s => ({ ...s, actorId: e.target.value }))}
-              placeholder="ChIJN1t4GKcBry... (opsional)"
-              className="w-full px-3 py-2.5 rounded-xl border text-xs font-mono"
-              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827' }}
-            />
-          </div>
-        </div>
-        <button
-          onClick={() => { saveSettings(settings); }}
-          className="px-8 py-3 rounded-xl text-sm font-bold text-white transition-all"
-          style={{ background: '#4285f4' }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#3367d6')}
-          onMouseLeave={e => (e.currentTarget.style.background = '#4285f4')}
-        >
-          Hubungkan
-        </button>
-        <p className="text-[10px] mt-3" style={{ color: '#9ca3af' }}>
-          Credential tersimpan di browser ini saja. Tidak dikirim ke server manapun.
-        </p>
       </div>
     </div>
   );
@@ -367,21 +461,21 @@ export default function GoogleMyBusinessPage() {
         </div>
         {mounted && (
           <div className="flex items-center gap-2">
-            {isConnected ? (
+            {isConfigured ? (
               <span className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full" style={{ background: '#d1fae5', color: '#065f46' }}>
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#10b981' }} />
-                ● Connected
+                ● Google Places API Connected
               </span>
             ) : (
               <span className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full" style={{ background: '#fef3c7', color: '#d97706' }}>
-                ⚠️ Belum terhubung
+                ⚠️ Perlu setup API Key
               </span>
             )}
           </div>
         )}
       </div>
 
-      {mounted && (isConnected ? connectedPanel : notConnectedPanel)}
+      {!mounted ? null : isConfigured ? dashboardPanel : setupScreen}
     </div>
   );
 }
