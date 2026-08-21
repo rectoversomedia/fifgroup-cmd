@@ -45,8 +45,9 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Digital Products',
     items: [
-      { href: '/fifgo',  label: 'FIFGO App',  icon: DeviceMobile, color: '#06b6d4', logo: FIFGO_LOGO_NAV },
-      { href: '/fifada', label: 'FIFADA App', icon: Star,        color: '#f59e0b', logo: FIFADA_LOGO_NAV },
+      { href: '/fifgo',              label: 'FIFGO App',            icon: DeviceMobile, color: '#06b6d4', logo: FIFGO_LOGO_NAV },
+      { href: '/fifada',            label: 'FIFADA App',           icon: Star,         color: '#f59e0b', logo: FIFADA_LOGO_NAV },
+      { href: '/google-my-business', label: 'Google My Business',  icon: Globe,        color: '#4285f4' },
     ],
   },
   {
